@@ -9,13 +9,12 @@ datasource db {
 
 model User {
   id               Int             @id @default(autoincrement())
-  email            String
+  email            String          @unique
   first_name       String
   last_name        String
-  role             String
   created_at       DateTime        @default(now())
   updated_at       DateTime        @default(now())
-  fk_user_role_id  Int             @unique
+  fk_user_role_id  Int             
   user_role        UserRole        @relation(fields: [fk_user_role_id], references: [id])
   user_auth_method UserAuthMethod?
   email_auth       EmailAuth?
@@ -52,7 +51,7 @@ model Doctor {
   phone_number         String
   licence_number       String
   fk_user_id           Int            @unique
-  fk_specialization_id Int            @unique
+  fk_specialization_id Int            
   user                 User           @relation(fields: [fk_user_id], references: [id])
   specialization       Specialization @relation(fields: [fk_specialization_id], references: [id])
   slots                Slot[]
@@ -77,7 +76,7 @@ model Appointment {
   reason                   String
   created_at               DateTime @default(now())
   updated_at               DateTime @default(now())
-  fk_patient_id            Int      @unique
+  fk_patient_id            Int      
   fk_slot_id               Int      @unique
   patient                  Patient  @relation(fields: [fk_patient_id], references: [id])
   slot                     Slot     @relation(fields: [fk_slot_id], references: [id])
@@ -89,7 +88,7 @@ model Slot {
   id           Int          @id @default(autoincrement())
   start_time   DateTime
   end_time     DateTime
-  fk_doctor_id Int          @unique
+  fk_doctor_id Int          
   doctor       Doctor       @relation(fields: [fk_doctor_id], references: [id])
   appointments Appointment?
 
@@ -109,7 +108,7 @@ model EmailAuth {
 model AuthProvider {
   id                 Int             @id @default(autoincrement())
   auth_provider_name String
-  user_auth_method   UserAuthMethod?
+  user_auth_method   UserAuthMethod[]
 
   @@map("auth_providers")
 }
@@ -118,7 +117,7 @@ model UserAuthMethod {
   id                  Int          @id @default(autoincrement())
   email               String       @unique
   fk_user_id          Int          @unique
-  fk_auth_provider_id Int          @unique
+  fk_auth_provider_id Int
   user                User         @relation(fields: [fk_user_id], references: [id])
   auth_provider       AuthProvider @relation(fields: [fk_auth_provider_id], references: [id])
 

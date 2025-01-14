@@ -6,6 +6,16 @@ import { UsersService } from './users.service';
 @Module({
   imports: [],
   controllers: [UsersController],
-  providers: [PrismaService, UsersService],
+  providers: [
+    PrismaService,
+    {
+      provide: 'USERS_SERVICE',
+      useFactory: (prisma: PrismaService) => {
+        return new UsersService(prisma);
+      },
+      inject: [PrismaService],
+    },
+  ],
+  exports: ['USERS_SERVICE'],
 })
 export class UsersModule {}
