@@ -1,0 +1,126 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id               Int             @id @default(autoincrement())
+  email            String
+  first_name       String
+  last_name        String
+  role             String
+  created_at       DateTime        @default(now())
+  updated_at       DateTime        @default(now())
+  fk_user_role_id  Int             @unique
+  user_role        UserRole        @relation(fields: [fk_user_role_id], references: [id])
+  user_auth_method UserAuthMethod?
+  email_auth       EmailAuth?
+  patient          Patient?
+  doctor           Doctor?
+
+  @@map("users")
+}
+
+model UserRole {
+  id        Int    @id @default(autoincrement())
+  role_name String
+  user      User[]
+
+  @@map("user_roles")
+}
+
+model Patient {
+  id            Int           @id @default(autoincrement())
+  date_of_birth DateTime
+  gender        String
+  address       String?
+  created_at    DateTime      @default(now())
+  updated_at    DateTime      @default(now())
+  fk_user_id    Int           @unique
+  user          User          @relation(fields: [fk_user_id], references: [id])
+  appointments  Appointment[]
+
+  @@map("patients")
+}
+
+model Doctor {
+  id                   Int            @id @default(autoincrement())
+  phone_number         String
+  licence_number       String
+  fk_user_id           Int            @unique
+  fk_specialization_id Int            @unique
+  user                 User           @relation(fields: [fk_user_id], references: [id])
+  specialization       Specialization @relation(fields: [fk_specialization_id], references: [id])
+  slots                Slot[]
+
+  @@map("doctors")
+}
+
+model Specialization {
+  id      Int      @id @default(autoincrement())
+  name    String
+  doctors Doctor[]
+
+  @@map("specializations")
+}
+
+model Appointment {
+  id                       Int      @id @default(autoincrement())
+  full_name                String
+  email                    String
+  phone_number             String
+  patient_insurance_number String
+  reason                   String
+  created_at               DateTime @default(now())
+  updated_at               DateTime @default(now())
+  fk_patient_id            Int      @unique
+  fk_slot_id               Int      @unique
+  patient                  Patient  @relation(fields: [fk_patient_id], references: [id])
+  slot                     Slot     @relation(fields: [fk_slot_id], references: [id])
+
+  @@map("appointments")
+}
+
+model Slot {
+  id           Int          @id @default(autoincrement())
+  start_time   DateTime
+  end_time     DateTime
+  fk_doctor_id Int          @unique
+  doctor       Doctor       @relation(fields: [fk_doctor_id], references: [id])
+  appointments Appointment?
+
+  @@map("slots")
+}
+
+model EmailAuth {
+  id           Int    @id @default(autoincrement())
+  email        String
+  passwordHash String
+  fk_user_id   Int    @unique
+  user         User   @relation(fields: [fk_user_id], references: [id])
+
+  @@map("email_auth")
+}
+
+model AuthProvider {
+  id                 Int             @id @default(autoincrement())
+  auth_provider_name String
+  user_auth_method   UserAuthMethod?
+
+  @@map("auth_providers")
+}
+
+model UserAuthMethod {
+  id                  Int          @id @default(autoincrement())
+  email               String       @unique
+  fk_user_id          Int          @unique
+  fk_auth_provider_id Int          @unique
+  user                User         @relation(fields: [fk_user_id], references: [id])
+  auth_provider       AuthProvider @relation(fields: [fk_auth_provider_id], references: [id])
+
+  @@map("user_auth_methods")
+}
