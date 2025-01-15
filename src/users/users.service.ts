@@ -6,7 +6,9 @@ import { IServiceResponse } from 'src/common/service-response.interface';
 export class UsersService {
   constructor(private prisma: PrismaService) {}
 
-  async create(user: UserEntity): Promise<IServiceResponse<User>> {
+  async create(
+    user: Omit<UserEntity, 'password'>,
+  ): Promise<IServiceResponse<User>> {
     const existingUser: User = await this.prisma.user.findFirst({
       where: {
         email: user.email,
@@ -35,12 +37,20 @@ export class UsersService {
     return { error: null, data: createdUser };
   }
 
-  async findOne(email: string): Promise<User> {
-    return await this.prisma.user.findUnique({
-      where: {
-        email: email,
-      },
-    });
+  async findOne(email: string): Promise<IServiceResponse<User>> {
+    try {
+      const user: User = await this.prisma.user.findUnique({
+        where: {
+          email: email,
+        },
+      });
+      if (!user) {
+        return { error: null, data: null };
+      }
+      return { error: null, data: user };
+    } catch (error) {
+      return { error: { message: error.message }, data: null };
+    }
   }
 
   async getUsers(): Promise<IServiceResponse<User[]>> {
