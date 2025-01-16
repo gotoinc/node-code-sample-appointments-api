@@ -7,63 +7,41 @@ import {
   Post,
   UnauthorizedException,
 } from '@nestjs/common';
-import { LoginDto } from './dto/login.dto';
-import { RegisterDto } from './dto/register.dto';
-import { UsersService } from 'src/users/users.service';
-import { EmailCredentialsService } from './email-credentials.service';
+import { LoginUserDto } from './dto/login-user.dto';
+import { RegisterUserDto } from './dto/register-user.dto';
 import { AuthService } from './auth.service';
-import { HashingService } from './hashing.service';
 
 @Controller('auth')
 export class AuthController {
   constructor(
-    @Inject('USERS_SERVICE') private readonly usersService: UsersService,
     @Inject('EMAIL_CREDENTIALS_SERVICE')
-    private readonly emailCredentialsService: EmailCredentialsService,
     private readonly authService: AuthService,
-    @Inject('HASHING_SERVICE') private readonly hashingService: HashingService,
   ) {}
 
   @HttpCode(200)
   @Post('login')
-  async login(@Body() body: LoginDto) {
+  async login(@Body() body: LoginUserDto) {
     const { email, password } = body;
 
-    const { error: errorValidateUser, data: userData } =
-      await this.authService.validateUser(email, password);
-    if (errorValidateUser) throw new UnauthorizedException();
+    const { error, data } = await this.authService.login(email, password);
 
-    const token = await this.authService.login(userData.id, userData.email);
+    if (error) {
+      throw new UnauthorizedException(error.message);
+    }
+
     return {
-      access_token: token,
+      access_token: data.accessToken,
     };
   }
 
   @Post('/register')
-  async register(@Body() body: RegisterDto) {
-    const { first_name, last_name, email, password, role } = body;
+  async register(@Body() body: RegisterUserDto) {
+    const { error, data } = await this.authService.register(body);
 
-    const { error, data: createdUser } = await this.usersService.create({
-      first_name,
-      last_name,
-      email,
-      role,
-    });
     if (error) {
       throw new BadRequestException(error.message);
     }
 
-    const hashedPassword = await this.hashingService.hash(password);
-    const { error: errorCreateEmailCredentials } =
-      await this.emailCredentialsService.create(
-        createdUser.id,
-        email,
-        hashedPassword,
-      );
-    if (errorCreateEmailCredentials) {
-      throw new BadRequestException(errorCreateEmailCredentials.message);
-    }
-
-    return createdUser;
+    return data;
   }
 }
