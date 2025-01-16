@@ -31,7 +31,6 @@ export class AuthController {
 
     const { error: errorValidateUser, data: userData } =
       await this.authService.validateUser(email, password);
-    console.log(errorValidateUser);
     if (errorValidateUser) throw new UnauthorizedException();
 
     const token = await this.authService.login(userData.id, userData.email);
