@@ -3,7 +3,6 @@ import {
   Body,
   Controller,
   HttpCode,
-  Inject,
   Post,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -13,10 +12,7 @@ import { AuthService } from './auth.service';
 
 @Controller('auth')
 export class AuthController {
-  constructor(
-    @Inject('EMAIL_CREDENTIALS_SERVICE')
-    private readonly authService: AuthService,
-  ) {}
+  constructor(private readonly authService: AuthService) {}
 
   @HttpCode(200)
   @Post('login')

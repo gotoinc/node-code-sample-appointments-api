@@ -49,35 +49,34 @@ export class AuthService {
 
   async register(
     registerUserDto: RegisterUserDto,
-  ): Promise<IServiceResponse<{ message: 'ok' }>> {
+  ): Promise<IServiceResponse<User>> {
     try {
       const { first_name, last_name, email, password, role } = registerUserDto;
 
-      const { error, data: createdUser } = await this.usersService.create({
-        first_name,
-        last_name,
-        email,
-        role,
-      });
+      const { error, data: exisingUser } =
+        await this.usersService.findOne(email);
 
       if (error) {
-        return { error: { message: error.message }, data: null };
+        return { error: { message: "Can't create user" }, data: null };
+      }
+      if (exisingUser) {
+        return {
+          error: { message: 'User with such email already exists' },
+          data: null,
+        };
       }
 
       const hashedPassword = await this.hashingService.hash(password);
 
-      const { error: credentialsError } =
-        await this.emailCredentialsService.create(
-          createdUser.id,
-          email,
-          hashedPassword,
-        );
+      const user = await this.emailCredentialsService.createNewUser(
+        email,
+        first_name,
+        last_name,
+        role,
+        hashedPassword,
+      );
 
-      if (credentialsError) {
-        return { error: { message: credentialsError.message }, data: null };
-      }
-
-      return { error: null, data: { message: 'ok' } };
+      return { error: null, data: user };
     } catch (err: unknown) {
       console.error(err);
       return { error: { message: 'Error while creating user' }, data: null };
@@ -91,7 +90,7 @@ export class AuthService {
     const { error, data: userCredentials } =
       await this.emailCredentialsService.findOne(email);
 
-    if (error) return null;
+    if (!userCredentials || error) return null;
 
     const isValidCredentials = this.hashingService.verify(
       pass,
@@ -123,14 +122,6 @@ export class AuthService {
         iat: Math.floor(Date.now() / 1000),
       } as AccessTokenPayload,
       this.configService.get('jwt'),
-      // {
-      //   secret: this.configService.get<string>('JWT_SECRET'),
-      //   expiresIn: +this.configService.get<string>(
-      //     'JWT_ACCESS_TOKEN_EXPIRES_IN',
-      //   ),
-      //   issuer: this.configService.get<string>('JWT_ISSUER'),
-      //   audience: this.configService.get<string>('JWT_AUDIENCE'),
-      // },
     );
 
     return token;

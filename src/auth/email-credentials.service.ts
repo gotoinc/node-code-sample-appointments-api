@@ -1,30 +1,44 @@
 import { PrismaService } from 'src/database/prisma.service';
-import { EmailCredentials } from '@prisma/client';
+import { EmailCredentials, User, UserRole } from '@prisma/client';
 import { IServiceResponse } from 'src/common/service-response.interface';
 
 export class EmailCredentialsService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async create(
-    userId: number,
+  async createNewUser(
     email: string,
+    firstName: string,
+    lastName: string,
+    roleName: string,
     hashedPassword: string,
-  ): Promise<IServiceResponse<Pick<EmailCredentials, 'id' | 'email'>>> {
-    const emailAuth = await this.prisma.emailCredentials.create({
-      data: {
-        email: email,
-        passwordHash: hashedPassword,
-        fk_user_id: userId,
-      },
+  ): Promise<User> {
+    const user = await this.prisma.$transaction(async (tx) => {
+      const role: UserRole = await tx.userRole.findFirst({
+        where: {
+          role_name: roleName,
+        },
+      });
+      const user: User = await tx.user.create({
+        data: {
+          email,
+          first_name: firstName,
+          last_name: lastName,
+          fk_user_role_id: role.id,
+        },
+      });
+
+      await tx.emailCredentials.create({
+        data: {
+          email: user.email,
+          passwordHash: hashedPassword,
+          fk_user_id: user.id,
+        },
+      });
+
+      return user;
     });
 
-    return {
-      error: null,
-      data: {
-        id: emailAuth.id,
-        email: emailAuth.email,
-      },
-    };
+    return user;
   }
 
   async findOne(email: string): Promise<IServiceResponse<EmailCredentials>> {
