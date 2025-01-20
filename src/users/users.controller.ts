@@ -2,7 +2,6 @@ import {
   Controller,
   Inject,
   ServiceUnavailableException,
-  Request,
   UseGuards,
 } from '@nestjs/common';
 import { Get } from '@nestjs/common';
@@ -17,8 +16,7 @@ export class UsersController {
 
   @UseGuards(JwtAuthGuard)
   @Get()
-  async getUsers(@Request() req) {
-    console.log(req.user);
+  async getUsers() {
     const { error, data: users } = await this.usersService.getUsers();
     if (error) {
       throw new ServiceUnavailableException(error.message);

@@ -96,11 +96,11 @@ model Slot {
 }
 
 model EmailCredentials {
-  id           Int    @id @default(autoincrement())
-  email        String @unique
-  passwordHash String
-  fk_user_id   Int    @unique
-  user         User   @relation(fields: [fk_user_id], references: [id])
+  id            Int    @id @default(autoincrement())
+  email         String @unique
+  password_hash String
+  fk_user_id    Int    @unique
+  user          User   @relation(fields: [fk_user_id], references: [id])
 
   @@map("email_credentials")
 }

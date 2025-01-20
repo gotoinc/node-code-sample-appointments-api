@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { EmailCredentialsService } from './email-credentials.service';
+import { EmailCredentialsService } from '../email-credentials/email-credentials.service';
 import { UsersService } from 'src/users/users.service';
 import { IServiceResponse } from 'src/common/service-response.interface';
 import { User } from '@prisma/client';
@@ -68,13 +68,18 @@ export class AuthService {
 
       const hashedPassword = await this.hashingService.hash(password);
 
-      const user = await this.emailCredentialsService.createNewUser(
-        email,
-        first_name,
-        last_name,
-        role,
-        hashedPassword,
-      );
+      const { error: createUserError, data: user } =
+        await this.emailCredentialsService.createNewUser(
+          email,
+          first_name,
+          last_name,
+          role,
+          hashedPassword,
+        );
+
+      if (createUserError) {
+        return { error: createUserError, data: null };
+      }
 
       return { error: null, data: user };
     } catch (err: unknown) {
@@ -94,7 +99,7 @@ export class AuthService {
 
     const isValidCredentials = this.hashingService.verify(
       pass,
-      userCredentials.passwordHash,
+      userCredentials.password_hash,
     );
 
     if (!isValidCredentials) return null;

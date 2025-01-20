@@ -52,40 +52,4 @@ export class UsersService {
     const users: User[] = await this.prisma.user.findMany();
     return { error: null, data: users };
   }
-
-  // async createNewEmailCredentialsUser(
-  //   email: string,
-  //   firstName: string,
-  //   lastName: string,
-  //   roleName: string,
-  //   hashedPassword: string,
-  // ): Promise<User> {
-  //   const user = await this.prisma.$transaction(async (tx) => {
-  //     const role: UserRole = await tx.userRole.findFirst({
-  //       where: {
-  //         role_name: roleName,
-  //       },
-  //     });
-  //     const user: User = await tx.user.create({
-  //       data: {
-  //         email,
-  //         first_name: firstName,
-  //         last_name: lastName,
-  //         fk_user_role_id: role.id,
-  //       },
-  //     });
-
-  //     await tx.emailCredentials.create({
-  //       data: {
-  //         email: user.email,
-  //         passwordHash: hashedPassword,
-  //         fk_user_id: user.id,
-  //       },
-  //     });
-
-  //     return user;
-  //   });
-
-  //   return user;
-  // }
 }
