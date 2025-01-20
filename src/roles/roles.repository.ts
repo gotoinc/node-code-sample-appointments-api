@@ -22,4 +22,20 @@ export class RolesRepository
       },
     });
   }
+
+  async create(roleName: string, tx?: unknown): Promise<UserRole> {
+    const prisma = this.getClient(tx);
+
+    return await prisma.userRole.create({
+      data: {
+        role_name: roleName,
+      },
+    });
+  }
+
+  async findAll(tx?: unknown): Promise<UserRole[]> {
+    const prisma = this.getClient(tx);
+
+    return await prisma.userRole.findMany();
+  }
 }

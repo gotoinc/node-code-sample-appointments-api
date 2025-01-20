@@ -3,21 +3,33 @@ import { PrismaService } from 'src/database/prisma.service';
 import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { UsersServiceSymbol } from './users.service.interface';
+import { UsersRepository } from './users.repository';
+import { RolesModule } from 'src/roles/roles.module';
+import { IUsersRepository } from './users.repository.interface';
+import {
+  IRolesService,
+  RolesServiceSymbol,
+} from 'src/roles/roles.service.interface';
 
 @Module({
-  imports: [],
+  imports: [RolesModule],
   controllers: [UsersController],
   providers: [
     PrismaService,
+    UsersRepository,
     {
-      provide: 'USERS_SERVICE',
-      useFactory: (prisma: PrismaService) => {
-        return new UsersService(prisma);
+      provide: UsersServiceSymbol,
+      useFactory: (
+        usersRepository: IUsersRepository,
+        rolesService: IRolesService,
+      ) => {
+        return new UsersService(usersRepository, rolesService);
       },
-      inject: [PrismaService],
+      inject: [UsersRepository, RolesServiceSymbol],
     },
     JwtAuthGuard,
   ],
-  exports: ['USERS_SERVICE'],
+  exports: [UsersServiceSymbol, UsersRepository],
 })
 export class UsersModule {}

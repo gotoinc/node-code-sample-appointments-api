@@ -4,8 +4,9 @@ import { IRolesRepository } from 'src/roles/roles.repository.interface';
 import { IUsersRepository } from 'src/users/users.repository.interface';
 import { IEmailCredentialsRepository } from 'src/email-credentials/email-credentials.repository.interface';
 import { ITransactionManager } from 'src/interfaces/transaction-manager.interface';
+import { IEmailCredentialsService } from './email-credentials.service.interface';
 
-export class EmailCredentialsService {
+export class EmailCredentialsService implements IEmailCredentialsService {
   constructor(
     private readonly transactionManager: ITransactionManager,
     private readonly userRepository: IUsersRepository,

@@ -1,6 +1,7 @@
 import * as crypto from 'node:crypto';
+import { IHashingService } from './hashing.service.interface';
 
-export class HashingService {
+export class HashingService implements IHashingService {
   hash(password: string) {
     const salt = crypto.randomBytes(16).toString('hex');
     const hash = crypto

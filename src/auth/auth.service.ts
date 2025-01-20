@@ -1,23 +1,33 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { EmailCredentialsService } from '../email-credentials/email-credentials.service';
-import { UsersService } from 'src/users/users.service';
 import { IServiceResponse } from 'src/common/service-response.interface';
 import { User } from '@prisma/client';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-import { HashingService } from './hashing.service';
 import { AccessTokenPayload } from './types/access-token-payload.interface';
 import { RegisterUserDto } from './dto/register-user.dto';
+import {
+  IUsersService,
+  UsersServiceSymbol,
+} from 'src/users/users.service.interface';
+import {
+  HashingServiceSymbol,
+  IHashingService,
+} from './hashing.service.interface';
+import {
+  EmailCredentialsServiceSymbol,
+  IEmailCredentialsService,
+} from 'src/email-credentials/email-credentials.service.interface';
 
 @Injectable()
 export class AuthService {
   constructor(
-    @Inject('EMAIL_CREDENTIALS_SERVICE')
-    private readonly emailCredentialsService: EmailCredentialsService,
-    @Inject('USERS_SERVICE') private readonly usersService: UsersService,
+    @Inject(EmailCredentialsServiceSymbol)
+    private readonly emailCredentialsService: IEmailCredentialsService,
+    @Inject(UsersServiceSymbol) private readonly usersService: IUsersService,
+    @Inject(HashingServiceSymbol)
+    private readonly hashingService: IHashingService,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
-    @Inject('HASHING_SERVICE') private readonly hashingService: HashingService,
   ) {}
 
   async login(

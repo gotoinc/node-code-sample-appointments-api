@@ -7,13 +7,13 @@ import {
   Post,
   ServiceUnavailableException,
 } from '@nestjs/common';
-import { RolesService } from './roles.service';
 import { CreateRoleDto } from './dto/create-role.dto';
+import { IRolesService, RolesServiceSymbol } from './roles.service.interface';
 
 @Controller('roles')
 export class RolesController {
   constructor(
-    @Inject('ROLES_SERVICE') private readonly rolesService: RolesService,
+    @Inject(RolesServiceSymbol) private readonly rolesService: IRolesService,
   ) {}
 
   @Post()

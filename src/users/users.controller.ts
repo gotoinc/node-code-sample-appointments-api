@@ -5,13 +5,13 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { Get } from '@nestjs/common';
-import { UsersService } from './users.service';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { IUsersService, UsersServiceSymbol } from './users.service.interface';
 
 @Controller('users')
 export class UsersController {
   constructor(
-    @Inject('USERS_SERVICE') private readonly usersService: UsersService,
+    @Inject(UsersServiceSymbol) private readonly usersService: IUsersService,
   ) {}
 
   @UseGuards(JwtAuthGuard)
