@@ -9,12 +9,14 @@ import { JwtAuthGuard } from './jwt-auth.guard';
 import jwtConfig from './config/jwt.config';
 import { HashingServiceSymbol } from './hashing.service.interface';
 import { EmailCredentialsModule } from 'src/email-credentials/email-credentials.module';
+import { GoogleOauthModule } from './social/google/google-oauth.module';
 
 @Module({
   imports: [
     UsersModule,
     JwtModule.registerAsync(jwtConfig.asProvider()),
     EmailCredentialsModule,
+    GoogleOauthModule,
   ],
   controllers: [AuthController],
   providers: [
