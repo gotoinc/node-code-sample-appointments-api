@@ -107,7 +107,7 @@ model EmailCredentials {
 
 model AuthProvider {
   id                 Int              @id @default(autoincrement())
-  auth_provider_name String
+  auth_provider_name String           @unique
   user_auth_method   UserAuthMethod[]
 
   @@map("auth_providers")

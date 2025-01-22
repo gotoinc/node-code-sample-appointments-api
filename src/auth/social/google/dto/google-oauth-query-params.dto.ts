@@ -1,13 +1,14 @@
-import { IsEnum, IsNotEmpty, IsString } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class GoogleOauthQueryParamsDto {
+  @IsOptional()
   @IsString()
   @IsNotEmpty()
   @IsEnum(['patient', 'doctor'])
-  role: string;
+  role: 'patient' | 'doctor';
 
   @IsString()
   @IsNotEmpty()
   @IsEnum(['login', 'register'])
-  action: string;
+  action: 'login' | 'register';
 }

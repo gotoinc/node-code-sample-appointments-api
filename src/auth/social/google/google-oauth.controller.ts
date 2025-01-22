@@ -10,13 +10,14 @@ export class GoogleOauthController {
 
   @Get()
   async auth(
-    @Query() { role, action }: GoogleOauthQueryParamsDto,
+    @Query() queryParams: GoogleOauthQueryParamsDto,
     @Req() req: Request,
     @Res() res: Response,
   ) {
+    const state = JSON.stringify(queryParams);
     passport.authenticate('google', {
       scope: ['profile', 'email'],
-      state: JSON.stringify({ role, action }),
+      state,
     })(req, res);
   }
 

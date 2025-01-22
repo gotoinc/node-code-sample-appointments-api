@@ -9,14 +9,14 @@ import { JwtAuthGuard } from './jwt-auth.guard';
 import jwtConfig from './config/jwt.config';
 import { HashingServiceSymbol } from './hashing.service.interface';
 import { EmailCredentialsModule } from 'src/email-credentials/email-credentials.module';
-import { GoogleOauthModule } from './social/google/google-oauth.module';
+import { AuthMethodsModule } from 'src/auth-methods/auth-methods.module';
 
 @Module({
   imports: [
     UsersModule,
     JwtModule.registerAsync(jwtConfig.asProvider()),
     EmailCredentialsModule,
-    GoogleOauthModule,
+    AuthMethodsModule,
   ],
   controllers: [AuthController],
   providers: [
@@ -30,6 +30,6 @@ import { GoogleOauthModule } from './social/google/google-oauth.module';
     JwtStrategy,
     JwtAuthGuard,
   ],
-  exports: [JwtAuthGuard],
+  exports: [JwtAuthGuard, AuthService],
 })
 export class AuthModule {}

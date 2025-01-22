@@ -17,6 +17,10 @@ import {
   EmailCredentialsServiceSymbol,
   IEmailCredentialsService,
 } from 'src/email-credentials/email-credentials.service.interface';
+import {
+  AuthMethodsServiceSymbol,
+  IAuthMethodsService,
+} from 'src/auth-methods/auth-methods.service.interface';
 
 @Injectable()
 export class AuthService {
@@ -28,6 +32,8 @@ export class AuthService {
     private readonly hashingService: IHashingService,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
+    @Inject(AuthMethodsServiceSymbol)
+    private readonly authMethodsService: IAuthMethodsService,
   ) {}
 
   async login(
@@ -69,6 +75,7 @@ export class AuthService {
       if (error) {
         return { error: { message: "Can't create user" }, data: null };
       }
+
       if (exisingUser) {
         return {
           error: { message: 'User with such email already exists' },
@@ -96,6 +103,60 @@ export class AuthService {
       console.error(err);
       return { error: { message: 'Error while creating user' }, data: null };
     }
+  }
+
+  async loginWithGoogle(email: string) {
+    const { error, data: userAuthMethod } =
+      await this.authMethodsService.findOne(email);
+
+    if (error || !userAuthMethod) {
+      return { error, data: null };
+    }
+
+    const token = await this.generateToken(userAuthMethod.fk_user_id, email);
+
+    return {
+      error: null,
+      data: { accessToken: token },
+    };
+  }
+
+  async registerWithGoogle(email, firstName, lastName, role) {
+    const { error: errorFindUser, data: exisingUser } =
+      await this.authMethodsService.findOne(email);
+
+    if (errorFindUser) {
+      return { error: { message: "Can't create user" }, data: null };
+    }
+
+    if (exisingUser) {
+      return {
+        error: { message: 'User with such email already exists' },
+        data: null,
+      };
+    }
+
+    const { error, data: userAuthMethod } =
+      await this.authMethodsService.createNewUser(
+        email,
+        firstName,
+        lastName,
+        role,
+        'google',
+      );
+
+    console.log({ userAuthMethod });
+
+    if (error || !userAuthMethod) {
+      return { error, data: null };
+    }
+
+    return {
+      error: null,
+      data: {
+        email: userAuthMethod.email,
+      },
+    };
   }
 
   private async validateUser(

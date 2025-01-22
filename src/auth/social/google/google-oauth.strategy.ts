@@ -3,11 +3,15 @@ import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy, StrategyOptions } from 'passport-google-oauth2';
 import { Request } from 'express';
-import { ROLES } from 'src/common/constants/roles';
+import { GoogleOauthQueryParamsDto } from './dto/google-oauth-query-params.dto';
+import { AuthService } from 'src/auth/auth.service';
 
 @Injectable()
 export class GoogleOauthStrategy extends PassportStrategy(Strategy, 'google') {
-  constructor(private readonly configService: ConfigService) {
+  constructor(
+    private readonly configService: ConfigService,
+    private readonly authService: AuthService,
+  ) {
     super({
       clientID: configService.get<string>('GOOGLE_OAUTH_CLIENT_ID'),
       clientSecret: configService.get<string>('GOOGLE_OAUTH_CLIENT_SECRET'),
@@ -32,32 +36,40 @@ export class GoogleOauthStrategy extends PassportStrategy(Strategy, 'google') {
       );
     }
 
-    const { role, action } = JSON.parse(state);
+    const { role, action }: GoogleOauthQueryParamsDto = JSON.parse(state);
 
-    this.validateQueryParams({ role, action });
+    const { given_name, family_name, email } = profile._json;
 
-    const { given_name, family_name, email, sub } = profile._json;
+    if (action === 'login') {
+      const { error, data: user } =
+        await this.authService.loginWithGoogle(email);
 
-    return { given_name, family_name, email, sub, role, action };
-  }
+      if (error) {
+        throw new HttpException('Login failed', HttpStatus.UNAUTHORIZED);
+      }
 
-  private validateQueryParams(query: any) {
-    const { role, action } = query;
-
-    if (!role) {
-      throw new HttpException('Missing role', HttpStatus.BAD_REQUEST);
+      return user;
     }
 
-    if (!ROLES.includes(role)) {
-      throw new HttpException('Invalid role', HttpStatus.BAD_REQUEST);
+    if (action === 'register') {
+      if (!role) {
+        throw new HttpException('Role is required', HttpStatus.UNAUTHORIZED);
+      }
+
+      const { error, data: user } = await this.authService.registerWithGoogle(
+        email,
+        given_name,
+        family_name,
+        role,
+      );
+
+      if (error) {
+        throw new HttpException(error.message, HttpStatus.UNAUTHORIZED);
+      }
+
+      return user;
     }
 
-    if (!action) {
-      throw new HttpException('Missing action', HttpStatus.BAD_REQUEST);
-    }
-
-    if (action !== 'login' && action !== 'register') {
-      throw new HttpException('Invalid action', HttpStatus.BAD_REQUEST);
-    }
+    throw new HttpException('Operation failed', HttpStatus.UNAUTHORIZED);
   }
 }
