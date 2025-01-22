@@ -3,7 +3,7 @@ import { IServiceResponse } from 'src/common/service-response.interface';
 import { User } from '@prisma/client';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-import { AccessTokenPayload } from './types/access-token-payload.interface';
+import { AccessTokenPayload } from './interfaces/access-token-payload.interface';
 import { RegisterUserDto } from './dto/register-user.dto';
 import {
   IUsersService,
@@ -47,7 +47,7 @@ export class AuthService {
         return { error: { message: 'Invalid email or password' }, data: null };
       }
 
-      const token = await this.generateToken(user.id, user.email);
+      const token = await this.generateToken(user.id, user.email, user.role);
 
       return {
         error: null,
@@ -106,14 +106,25 @@ export class AuthService {
   }
 
   async loginWithGoogle(email: string) {
-    const { error, data: userAuthMethod } =
+    const { error: errorAuthMethod, data: userAuthMethod } =
       await this.authMethodsService.findOne(email);
 
-    if (error || !userAuthMethod) {
-      return { error, data: null };
+    if (errorAuthMethod || !userAuthMethod) {
+      return { error: errorAuthMethod, data: null };
     }
 
-    const token = await this.generateToken(userAuthMethod.fk_user_id, email);
+    const { error: errorGetUser, data: user } =
+      await this.usersService.findOne(email);
+
+    if (errorGetUser || !user) {
+      return { error: errorGetUser, data: null };
+    }
+
+    const token = await this.generateToken(
+      userAuthMethod.fk_user_id,
+      email,
+      user.user_role.role_name,
+    );
 
     return {
       error: null,
@@ -145,8 +156,6 @@ export class AuthService {
         'google',
       );
 
-    console.log({ userAuthMethod });
-
     if (error || !userAuthMethod) {
       return { error, data: null };
     }
@@ -162,7 +171,9 @@ export class AuthService {
   private async validateUser(
     email: string,
     pass: string,
-  ): Promise<Pick<User, 'id' | 'email' | 'first_name' | 'last_name'>> {
+  ): Promise<
+    Pick<User, 'id' | 'email' | 'first_name' | 'last_name'> & { role: string }
+  > {
     const { error, data: userCredentials } =
       await this.emailCredentialsService.findOne(email);
 
@@ -185,17 +196,19 @@ export class AuthService {
       email: user.email,
       first_name: user.first_name,
       last_name: user.last_name,
+      role: user.user_role.role_name,
     };
 
     return result;
   }
 
-  private async generateToken(userId: number, email: string) {
+  private async generateToken(userId: number, email: string, role: string) {
     const token = await this.jwtService.signAsync(
       {
         sub: userId,
         email,
         iat: Math.floor(Date.now() / 1000),
+        role,
       } as AccessTokenPayload,
       this.configService.get('jwt'),
     );

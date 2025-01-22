@@ -1,4 +1,4 @@
-import { User } from '@prisma/client';
+import { User, UserRole } from '@prisma/client';
 import { UserEntity } from './entities/user.entity';
 import { IServiceResponse } from 'src/common/service-response.interface';
 import { IUsersService } from './users.service.interface';
@@ -36,9 +36,11 @@ export class UsersService implements IUsersService {
     }
   }
 
-  async findOne(email: string): Promise<IServiceResponse<User>> {
+  async findOne(
+    email: string,
+  ): Promise<IServiceResponse<User & { user_role: UserRole }>> {
     try {
-      const user: User = await this.usersRepository.findOne(email);
+      const user = await this.usersRepository.findOne(email);
 
       if (!user) {
         return { error: null, data: null };

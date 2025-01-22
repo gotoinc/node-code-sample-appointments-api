@@ -1,4 +1,4 @@
-import { User } from '@prisma/client';
+import { User, UserRole } from '@prisma/client';
 import { CreateUserDto } from './dto/create-user.dto';
 import { PrismaBaseRepository } from 'src/database/prisma-base.repository';
 import { PrismaService } from 'src/database/prisma.service';
@@ -27,12 +27,18 @@ export class UsersRepository
     });
   }
 
-  async findOne(email: string, tx?: unknown): Promise<User> {
+  async findOne(
+    email: string,
+    tx?: unknown,
+  ): Promise<User & { user_role: UserRole }> {
     const prisma = this.getClient(tx);
 
     return await prisma.user.findUnique({
       where: {
         email,
+      },
+      include: {
+        user_role: true,
       },
     });
   }

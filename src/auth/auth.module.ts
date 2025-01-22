@@ -12,6 +12,7 @@ import { EmailCredentialsModule } from 'src/email-credentials/email-credentials.
 import { AuthMethodsModule } from 'src/auth-methods/auth-methods.module';
 import { AuthGuard } from './auth.guard';
 import { APP_GUARD } from '@nestjs/core';
+import { RolesGuard } from './roles.guard';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { APP_GUARD } from '@nestjs/core';
     JwtStrategy,
     JwtAuthGuard,
     { provide: APP_GUARD, useClass: AuthGuard },
+    { provide: APP_GUARD, useClass: RolesGuard },
   ],
   exports: [JwtAuthGuard, AuthService],
 })

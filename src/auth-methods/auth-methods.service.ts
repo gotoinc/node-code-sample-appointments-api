@@ -26,15 +26,12 @@ export class AuthMethodsService implements IAuthMethodsService {
     const { error: errorRole, data: role } =
       await this.rolesService.findByName(roleName);
 
-    console.log({ errorRole, role });
     if (errorRole || !role) {
       return { error: errorRole, data: null };
     }
 
     const { error: errorAuthProvider, data: authProvider } =
       await this.authProvidersService.findOne(providerName);
-
-    console.log({ errorAuthProvider, authProvider });
 
     if (errorAuthProvider || !authProvider) {
       return { error: errorAuthProvider, data: null };

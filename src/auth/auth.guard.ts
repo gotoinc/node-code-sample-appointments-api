@@ -21,14 +21,7 @@ export class AuthGuard implements CanActivate {
   constructor(
     private readonly reflector: Reflector,
     private readonly jwtAuthGuard: JwtAuthGuard,
-  ) {
-    console.log({
-      reflector,
-      jwtAuthGuard,
-      canActivate: jwtAuthGuard.canActivate,
-      authTypeGuardMap: this.authTypeGuardMap,
-    });
-  }
+  ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const authTypes = this.reflector.getAllAndOverride<
@@ -36,14 +29,12 @@ export class AuthGuard implements CanActivate {
     >(AUTH_TYPE_KEY, [context.getHandler(), context.getClass()]) ?? [
       AuthGuard.defaultAuthType,
     ];
-    console.log({ authTypes });
-    const guards = authTypes.map((type) => this.authTypeGuardMap[type]);
-    // .flat();
+
+    const guards = authTypes.map((type) => this.authTypeGuardMap[type]).flat();
 
     let error = new UnauthorizedException();
-    console.log({ guards });
+
     for (const instance of guards) {
-      console.log({ instance });
       const canActivate = await Promise.resolve(
         instance.canActivate(context),
       ).catch((err) => {
