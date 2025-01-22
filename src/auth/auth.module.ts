@@ -10,6 +10,8 @@ import jwtConfig from './config/jwt.config';
 import { HashingServiceSymbol } from './hashing.service.interface';
 import { EmailCredentialsModule } from 'src/email-credentials/email-credentials.module';
 import { AuthMethodsModule } from 'src/auth-methods/auth-methods.module';
+import { AuthGuard } from './auth.guard';
+import { APP_GUARD } from '@nestjs/core';
 
 @Module({
   imports: [
@@ -29,6 +31,7 @@ import { AuthMethodsModule } from 'src/auth-methods/auth-methods.module';
     },
     JwtStrategy,
     JwtAuthGuard,
+    { provide: APP_GUARD, useClass: AuthGuard },
   ],
   exports: [JwtAuthGuard, AuthService],
 })

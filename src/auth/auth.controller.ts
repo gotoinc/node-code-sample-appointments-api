@@ -9,7 +9,9 @@ import {
 import { LoginUserDto } from './dto/login-user.dto';
 import { RegisterUserDto } from './dto/register-user.dto';
 import { AuthService } from './auth.service';
+import { Auth } from './auth.decorator';
 
+@Auth('None')
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}

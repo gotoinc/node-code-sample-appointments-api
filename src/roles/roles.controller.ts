@@ -9,7 +9,9 @@ import {
 } from '@nestjs/common';
 import { CreateRoleDto } from './dto/create-role.dto';
 import { IRolesService, RolesServiceSymbol } from './roles.service.interface';
+import { Auth } from 'src/auth/auth.decorator';
 
+@Auth('Jwt')
 @Controller('roles')
 export class RolesController {
   constructor(
