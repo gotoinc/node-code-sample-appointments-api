@@ -1,18 +1,25 @@
-import { Controller } from '@nestjs/common';
-import { Get, Post, Body } from '@nestjs/common';
-import { UsersService } from './users.service';
+import {
+  Controller,
+  Inject,
+  // ServiceUnavailableException,
+} from '@nestjs/common';
+// import { Get } from '@nestjs/common';
+import { IUsersService, UsersServiceSymbol } from './users.service.interface';
+import { Auth } from 'src/iam/authentication/decorators/auth.decorator';
 
+@Auth('Jwt')
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    @Inject(UsersServiceSymbol) private readonly usersService: IUsersService,
+  ) {}
 
-  @Post()
-  async createUser(@Body() user: any) {
-    return this.usersService.createUser(user);
-  }
-
-  @Get()
-  async getUsers() {
-    return this.usersService.getUsers();
-  }
+  // @Get()
+  // async getUsers() {
+  //   const { error, data: users } = await this.usersService.getUsers();
+  //   if (error) {
+  //     throw new ServiceUnavailableException(error.message);
+  //   }
+  //   return users;
+  // }
 }
