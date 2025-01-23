@@ -4,6 +4,7 @@ import { IServiceResponse } from 'src/common/service-response.interface';
 import { IUsersService } from './users.service.interface';
 import { IUsersRepository } from './users.repository.interface';
 import { IRolesService } from 'src/roles/roles.service.interface';
+import { CreateUserDto } from './dto/create-user.dto';
 
 export class UsersService implements IUsersService {
   constructor(
@@ -11,9 +12,7 @@ export class UsersService implements IUsersService {
     private readonly rolesService: IRolesService,
   ) {}
 
-  async create(
-    user: Omit<UserEntity, 'password'>,
-  ): Promise<IServiceResponse<User>> {
+  async create(user: CreateUserDto): Promise<IServiceResponse<User>> {
     try {
       const { error: errorRole, data: role } =
         await this.rolesService.findByName(user.role);
@@ -22,12 +21,14 @@ export class UsersService implements IUsersService {
         return { error: errorRole, data: null };
       }
 
-      const createdUser: User = await this.usersRepository.create({
+      const userEntity: UserEntity = {
         email: user.email,
         firstName: user.first_name,
         lastName: user.last_name,
         roleId: role.id,
-      });
+      };
+
+      const createdUser = await this.usersRepository.create(userEntity);
 
       return { error: null, data: createdUser };
     } catch (error) {

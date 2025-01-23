@@ -1,11 +1,11 @@
 import { User, UserRole } from '@prisma/client';
-import { UserEntity } from './entities/user.entity';
 import { IServiceResponse } from 'src/common/service-response.interface';
+import { CreateUserDto } from './dto/create-user.dto';
 
 export const UsersServiceSymbol = Symbol('USERS_SERVICE');
 
 export interface IUsersService {
-  create(user: Omit<UserEntity, 'password'>): Promise<IServiceResponse<User>>;
+  create(user: CreateUserDto): Promise<IServiceResponse<User>>;
 
   findOne(
     email: string,
