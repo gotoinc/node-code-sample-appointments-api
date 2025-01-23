@@ -25,8 +25,9 @@ export class GoogleOauthController {
 
   @Get('callback')
   @UseGuards(GoogleOauthGuard)
-  async callback(@Req() req) {
+  async callback(@Req() req, @Res() res: Response) {
     const user = req.user;
-    return user;
+    res.setHeader('Authorization', `Bearer ${user.access_token}`);
+    res.json(user);
   }
 }

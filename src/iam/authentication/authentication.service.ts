@@ -128,7 +128,7 @@ export class AuthenticationService {
 
     return {
       error: null,
-      data: { accessToken: token },
+      data: { access_token: token },
     };
   }
 
