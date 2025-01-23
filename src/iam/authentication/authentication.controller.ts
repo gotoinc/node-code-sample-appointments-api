@@ -25,9 +25,7 @@ export class AuthController {
 
     const { error, data } = await this.authService.login(email, password);
 
-    if (error) {
-      throw new UnauthorizedException(error.message);
-    }
+    if (error) throw new UnauthorizedException(error.message);
 
     res.setHeader('Authorization', `Bearer ${data.accessToken}`);
     res.json({
@@ -39,9 +37,7 @@ export class AuthController {
   async register(@Body() body: RegisterUserDto) {
     const { error, data } = await this.authService.register(body);
 
-    if (error) {
-      throw new BadRequestException(error.message);
-    }
+    if (error) throw new BadRequestException(error.message);
 
     return data;
   }

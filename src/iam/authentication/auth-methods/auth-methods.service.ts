@@ -26,16 +26,13 @@ export class AuthMethodsService implements IAuthMethodsService {
     const { error: errorRole, data: role } =
       await this.rolesService.findByName(roleName);
 
-    if (errorRole || !role) {
-      return { error: errorRole, data: null };
-    }
+    if (errorRole || !role) return { error: errorRole, data: null };
 
     const { error: errorAuthProvider, data: authProvider } =
       await this.authProvidersService.findOne(providerName);
 
-    if (errorAuthProvider || !authProvider) {
+    if (errorAuthProvider || !authProvider)
       return { error: errorAuthProvider, data: null };
-    }
 
     try {
       const user = await this.transactionManager.transaction(async (tx) => {
@@ -73,9 +70,7 @@ export class AuthMethodsService implements IAuthMethodsService {
       const userAuthMethod: UserAuthMethod =
         await this.authMethodsRepository.findOne(email);
 
-      if (!userAuthMethod) {
-        return { error: null, data: null };
-      }
+      if (!userAuthMethod) return { error: null, data: null };
 
       return { error: null, data: userAuthMethod };
     } catch (error) {

@@ -17,16 +17,13 @@ export class GoogleOauthService implements IGoogleOauthService {
     const { error: errorAuthMethod, data: userAuthMethod } =
       await this.authMethodsService.findOne(email);
 
-    if (errorAuthMethod || !userAuthMethod) {
+    if (errorAuthMethod || !userAuthMethod)
       return { error: errorAuthMethod, data: null };
-    }
 
     const { error: errorGetUser, data: user } =
       await this.usersService.findOne(email);
 
-    if (errorGetUser || !user) {
-      return { error: errorGetUser, data: null };
-    }
+    if (errorGetUser || !user) return { error: errorGetUser, data: null };
 
     const { error: errorTokenGeneration, data: token } =
       await this.tokenGenerationService.generateToken(
@@ -35,9 +32,8 @@ export class GoogleOauthService implements IGoogleOauthService {
         user.user_role.role_name,
       );
 
-    if (errorTokenGeneration) {
+    if (errorTokenGeneration)
       return { error: errorTokenGeneration, data: null };
-    }
 
     return {
       error: null,
@@ -54,16 +50,13 @@ export class GoogleOauthService implements IGoogleOauthService {
     const { error: errorFindUser, data: exisingUser } =
       await this.authMethodsService.findOne(email);
 
-    if (errorFindUser) {
-      return { error: errorFindUser, data: null };
-    }
+    if (errorFindUser) return { error: errorFindUser, data: null };
 
-    if (exisingUser) {
+    if (exisingUser)
       return {
         error: { message: 'User with such email already exists' },
         data: null,
       };
-    }
 
     const { error, data: userAuthMethod } =
       await this.authMethodsService.createNewUser(
@@ -74,9 +67,7 @@ export class GoogleOauthService implements IGoogleOauthService {
         'google',
       );
 
-    if (error || !userAuthMethod) {
-      return { error, data: null };
-    }
+    if (error || !userAuthMethod) return { error, data: null };
 
     return {
       error: null,

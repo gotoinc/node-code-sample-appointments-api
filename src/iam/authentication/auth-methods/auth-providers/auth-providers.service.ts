@@ -15,9 +15,8 @@ export class AuthProvidersService implements IAuthProvidersService {
       const authProvider: AuthProvider =
         await this.authProvidersRepository.findOne(authProviderName);
 
-      if (!authProvider) {
+      if (!authProvider)
         return { error: { message: 'Auth provider not found' }, data: null };
-      }
 
       return { error: null, data: authProvider };
     } catch (error) {

@@ -7,6 +7,7 @@ export class HashingService implements IHashingService {
     const hash = crypto
       .pbkdf2Sync(password, salt, 1000, 64, 'sha512')
       .toString('hex');
+
     return `${hash}:${salt}`;
   }
 
@@ -17,6 +18,7 @@ export class HashingService implements IHashingService {
         crypto
           .pbkdf2Sync(password, salt, 1000, 64, 'sha512')
           .toString('hex') === hash;
+
       return isPasswordValid;
     } catch {
       return false;

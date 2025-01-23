@@ -24,9 +24,8 @@ export class EmailCredentialsService implements IEmailCredentialsService {
     try {
       const { error: errorRole, data: role } =
         await this.rolesService.findByName(roleName);
-      if (errorRole || !role) {
-        return { error: errorRole, data: null };
-      }
+
+      if (errorRole || !role) return { error: errorRole, data: null };
 
       const user = await this.transactionManager.transaction(async (tx) => {
         const user = await this.usersRepository.create(
@@ -53,6 +52,7 @@ export class EmailCredentialsService implements IEmailCredentialsService {
 
       return { error: null, data: user };
     } catch (error) {
+      console.error(error);
       return { error: { message: error.message }, data: null };
     }
   }
@@ -62,9 +62,7 @@ export class EmailCredentialsService implements IEmailCredentialsService {
       const emailCredentials =
         await this.emailCredentialsRepository.findOne(email);
 
-      if (!emailCredentials) {
-        return { error: null, data: null };
-      }
+      if (!emailCredentials) return { error: null, data: null };
 
       return { error: null, data: emailCredentials };
     } catch (error) {

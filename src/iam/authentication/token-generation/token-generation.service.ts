@@ -29,6 +29,7 @@ export class TokenGenerationService implements ITokenGenerationService {
       return { error: null, data: token };
     } catch (error) {
       console.error(error);
+
       return { error: { message: error.message }, data: null };
     }
   }

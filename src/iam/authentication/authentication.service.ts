@@ -44,9 +44,8 @@ export class AuthenticationService {
     try {
       const user = await this.validateUser(email, password);
 
-      if (!user) {
+      if (!user)
         return { error: { message: 'Invalid email or password' }, data: null };
-      }
 
       const { error: errorTokenGeneration, data: token } =
         await this.tokenGenerationService.generateToken(
@@ -55,9 +54,8 @@ export class AuthenticationService {
           user.role,
         );
 
-      if (errorTokenGeneration) {
+      if (errorTokenGeneration)
         return { error: errorTokenGeneration, data: null };
-      }
 
       return {
         error: null,
@@ -82,16 +80,13 @@ export class AuthenticationService {
       const { error, data: exisingUser } =
         await this.usersService.findOne(email);
 
-      if (error) {
-        return { error, data: null };
-      }
+      if (error) return { error, data: null };
 
-      if (exisingUser) {
+      if (exisingUser)
         return {
           error: { message: 'User with such email already exists' },
           data: null,
         };
-      }
 
       const hashedPassword = await this.hashingService.hash(password);
 
@@ -104,9 +99,7 @@ export class AuthenticationService {
           hashedPassword,
         );
 
-      if (createUserError) {
-        return { error: createUserError, data: null };
-      }
+      if (createUserError) return { error: createUserError, data: null };
 
       return { error: null, data: user };
     } catch (err: unknown) {
