@@ -12,18 +12,18 @@ import {
 import {
   HashingServiceSymbol,
   IHashingService,
-} from './hashing.service.interface';
+} from './hashing/hashing.service.interface';
 import {
   EmailCredentialsServiceSymbol,
   IEmailCredentialsService,
-} from 'src/email-credentials/email-credentials.service.interface';
+} from 'src/iam/authentication/email-credentials/email-credentials.service.interface';
 import {
   AuthMethodsServiceSymbol,
   IAuthMethodsService,
-} from 'src/auth-methods/auth-methods.service.interface';
+} from 'src/iam/authentication/auth-methods/auth-methods.service.interface';
 
 @Injectable()
-export class AuthService {
+export class AuthenticationService {
   constructor(
     @Inject(EmailCredentialsServiceSymbol)
     private readonly emailCredentialsService: IEmailCredentialsService,
@@ -73,7 +73,7 @@ export class AuthService {
         await this.usersService.findOne(email);
 
       if (error) {
-        return { error: { message: "Can't create user" }, data: null };
+        return { error, data: null };
       }
 
       if (exisingUser) {
@@ -137,7 +137,7 @@ export class AuthService {
       await this.authMethodsService.findOne(email);
 
     if (errorFindUser) {
-      return { error: { message: "Can't create user" }, data: null };
+      return { error: errorFindUser, data: null };
     }
 
     if (exisingUser) {

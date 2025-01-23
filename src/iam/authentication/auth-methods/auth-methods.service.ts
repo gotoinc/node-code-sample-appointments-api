@@ -74,7 +74,7 @@ export class AuthMethodsService implements IAuthMethodsService {
         await this.authMethodsRepository.findOne(email);
 
       if (!userAuthMethod) {
-        return { error: { message: 'User not found' }, data: null };
+        return { error: null, data: null };
       }
 
       return { error: null, data: userAuthMethod };

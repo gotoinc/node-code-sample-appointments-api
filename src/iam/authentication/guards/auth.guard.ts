@@ -6,8 +6,8 @@ import {
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { JwtAuthGuard } from './jwt-auth.guard';
-import { AUTH_TYPES } from './auth-types';
-import { AUTH_TYPE_KEY } from './auth.decorator';
+import { AUTH_TYPES } from '../authentication.constants';
+import { AUTH_TYPE_KEY } from '../decorators/auth.decorator';
 
 @Injectable()
 export class AuthGuard implements CanActivate {

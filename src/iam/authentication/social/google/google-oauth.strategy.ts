@@ -4,13 +4,13 @@ import { PassportStrategy } from '@nestjs/passport';
 import { Strategy, StrategyOptions } from 'passport-google-oauth2';
 import { Request } from 'express';
 import { GoogleOauthQueryParamsDto } from './dto/google-oauth-query-params.dto';
-import { AuthService } from 'src/auth/auth.service';
+import { AuthenticationService } from 'src/iam/authentication/authentication.service';
 
 @Injectable()
 export class GoogleOauthStrategy extends PassportStrategy(Strategy, 'google') {
   constructor(
     private readonly configService: ConfigService,
-    private readonly authService: AuthService,
+    private readonly authService: AuthenticationService,
   ) {
     super({
       clientID: configService.get<string>('GOOGLE_OAUTH_CLIENT_ID'),
@@ -38,7 +38,7 @@ export class GoogleOauthStrategy extends PassportStrategy(Strategy, 'google') {
 
     const { role, action }: GoogleOauthQueryParamsDto = JSON.parse(state);
 
-    const { given_name, family_name, email } = profile._json;
+    const { given_name = '', family_name = '', email } = profile._json;
 
     if (action === 'login') {
       const { error, data: user } =

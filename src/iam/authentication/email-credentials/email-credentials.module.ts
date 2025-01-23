@@ -4,14 +4,16 @@ import { EmailCredentialsServiceSymbol } from './email-credentials.service.inter
 import { PrismaTransactionManager } from 'src/database/prisma-transaction.service';
 import { EmailCredentialsRepository } from './email-credentials.repository';
 import { UsersRepository } from 'src/users/users.repository';
-import { RolesRepository } from 'src/roles/roles.repository';
 import { IEmailCredentialsRepository } from './email-credentials.repository.interface';
 import { ITransactionManager } from 'src/interfaces/transaction-manager.interface';
 import { IUsersRepository } from 'src/users/users.repository.interface';
-import { IRolesRepository } from 'src/roles/roles.repository.interface';
 import { PrismaService } from 'src/database/prisma.service';
 import { UsersModule } from 'src/users/users.module';
 import { RolesModule } from 'src/roles/roles.module';
+import {
+  IRolesService,
+  RolesServiceSymbol,
+} from 'src/roles/roles.service.interface';
 
 @Module({
   imports: [UsersModule, RolesModule],
@@ -25,20 +27,20 @@ import { RolesModule } from 'src/roles/roles.module';
         transactionManager: ITransactionManager,
         emailCredentialsRepository: IEmailCredentialsRepository,
         usersRepository: IUsersRepository,
-        rolesRepository: IRolesRepository,
+        rolesService: IRolesService,
       ) => {
         return new EmailCredentialsService(
           transactionManager,
           usersRepository,
           emailCredentialsRepository,
-          rolesRepository,
+          rolesService,
         );
       },
       inject: [
         PrismaTransactionManager,
         EmailCredentialsRepository,
         UsersRepository,
-        RolesRepository,
+        RolesServiceSymbol,
       ],
     },
   ],

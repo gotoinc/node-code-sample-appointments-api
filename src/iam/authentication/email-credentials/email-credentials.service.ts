@@ -1,17 +1,17 @@
 import { EmailCredentials, User } from '@prisma/client';
 import { IServiceResponse } from 'src/common/service-response.interface';
-import { IRolesRepository } from 'src/roles/roles.repository.interface';
 import { IUsersRepository } from 'src/users/users.repository.interface';
-import { IEmailCredentialsRepository } from 'src/email-credentials/email-credentials.repository.interface';
+import { IEmailCredentialsRepository } from 'src/iam/authentication/email-credentials/email-credentials.repository.interface';
 import { ITransactionManager } from 'src/interfaces/transaction-manager.interface';
 import { IEmailCredentialsService } from './email-credentials.service.interface';
+import { IRolesService } from 'src/roles/roles.service.interface';
 
 export class EmailCredentialsService implements IEmailCredentialsService {
   constructor(
     private readonly transactionManager: ITransactionManager,
-    private readonly userRepository: IUsersRepository,
+    private readonly usersRepository: IUsersRepository,
     private readonly emailCredentialsRepository: IEmailCredentialsRepository,
-    private readonly roleRepository: IRolesRepository,
+    private readonly rolesService: IRolesService,
   ) {}
 
   async createNewUser(
@@ -22,13 +22,14 @@ export class EmailCredentialsService implements IEmailCredentialsService {
     hashedPassword: string,
   ): Promise<IServiceResponse<User>> {
     try {
-      const user = await this.transactionManager.transaction(async (tx) => {
-        const role = await this.roleRepository.findByName(roleName, tx);
-        if (!role) {
-          throw new Error(`Role ${roleName} not found`);
-        }
+      const { error: errorRole, data: role } =
+        await this.rolesService.findByName(roleName);
+      if (errorRole || !role) {
+        return { error: errorRole, data: null };
+      }
 
-        const user = await this.userRepository.create(
+      const user = await this.transactionManager.transaction(async (tx) => {
+        const user = await this.usersRepository.create(
           {
             email,
             firstName,

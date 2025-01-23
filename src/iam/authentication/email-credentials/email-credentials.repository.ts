@@ -2,7 +2,7 @@ import { PrismaBaseRepository } from 'src/database/prisma-base.repository';
 import { IEmailCredentialsRepository } from './email-credentials.repository.interface';
 import { PrismaService } from 'src/database/prisma.service';
 import { EmailCredentials } from '@prisma/client';
-import { CreateEmailCredentialsDto } from 'src/email-credentials/dto/create-email-credentials.dto';
+import { CreateEmailCredentialsDto } from 'src/iam/authentication/email-credentials/dto/create-email-credentials.dto';
 import { Injectable } from '@nestjs/common';
 
 @Injectable()

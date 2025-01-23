@@ -8,13 +8,13 @@ import {
 } from '@nestjs/common';
 import { LoginUserDto } from './dto/login-user.dto';
 import { RegisterUserDto } from './dto/register-user.dto';
-import { AuthService } from './auth.service';
-import { Auth } from './auth.decorator';
+import { AuthenticationService } from './authentication.service';
+import { Auth } from './decorators/auth.decorator';
 
 @Auth('None')
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(private readonly authService: AuthenticationService) {}
 
   @HttpCode(200)
   @Post('login')

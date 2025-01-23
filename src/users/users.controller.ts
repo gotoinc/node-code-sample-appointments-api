@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { Get } from '@nestjs/common';
 import { IUsersService, UsersServiceSymbol } from './users.service.interface';
-import { Auth } from 'src/auth/auth.decorator';
+import { Auth } from 'src/iam/authentication/decorators/auth.decorator';
 
 @Auth('Jwt')
 @Controller('users')
