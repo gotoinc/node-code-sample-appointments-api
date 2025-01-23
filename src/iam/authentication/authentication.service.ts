@@ -1,9 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { IServiceResponse } from 'src/common/service-response.interface';
 import { User } from '@prisma/client';
-import { JwtService } from '@nestjs/jwt';
-import { ConfigService } from '@nestjs/config';
-import { AccessTokenPayload } from './interfaces/access-token-payload.interface';
 import { RegisterUserDto } from './dto/register-user.dto';
 import {
   IUsersService,
@@ -21,6 +18,10 @@ import {
   AuthMethodsServiceSymbol,
   IAuthMethodsService,
 } from 'src/iam/authentication/auth-methods/auth-methods.service.interface';
+import {
+  ITokenGenerationService,
+  TokenGenerationServiceSymbol,
+} from './token-generation/token-generation.service.interface';
 
 @Injectable()
 export class AuthenticationService {
@@ -30,10 +31,10 @@ export class AuthenticationService {
     @Inject(UsersServiceSymbol) private readonly usersService: IUsersService,
     @Inject(HashingServiceSymbol)
     private readonly hashingService: IHashingService,
-    private readonly jwtService: JwtService,
-    private readonly configService: ConfigService,
     @Inject(AuthMethodsServiceSymbol)
     private readonly authMethodsService: IAuthMethodsService,
+    @Inject(TokenGenerationServiceSymbol)
+    private readonly tokenGenerationService: ITokenGenerationService,
   ) {}
 
   async login(
@@ -47,7 +48,16 @@ export class AuthenticationService {
         return { error: { message: 'Invalid email or password' }, data: null };
       }
 
-      const token = await this.generateToken(user.id, user.email, user.role);
+      const { error: errorTokenGeneration, data: token } =
+        await this.tokenGenerationService.generateToken(
+          user.id,
+          user.email,
+          user.role,
+        );
+
+      if (errorTokenGeneration) {
+        return { error: errorTokenGeneration, data: null };
+      }
 
       return {
         error: null,
@@ -105,69 +115,6 @@ export class AuthenticationService {
     }
   }
 
-  async loginWithGoogle(email: string) {
-    const { error: errorAuthMethod, data: userAuthMethod } =
-      await this.authMethodsService.findOne(email);
-
-    if (errorAuthMethod || !userAuthMethod) {
-      return { error: errorAuthMethod, data: null };
-    }
-
-    const { error: errorGetUser, data: user } =
-      await this.usersService.findOne(email);
-
-    if (errorGetUser || !user) {
-      return { error: errorGetUser, data: null };
-    }
-
-    const token = await this.generateToken(
-      userAuthMethod.fk_user_id,
-      email,
-      user.user_role.role_name,
-    );
-
-    return {
-      error: null,
-      data: { access_token: token },
-    };
-  }
-
-  async registerWithGoogle(email, firstName, lastName, role) {
-    const { error: errorFindUser, data: exisingUser } =
-      await this.authMethodsService.findOne(email);
-
-    if (errorFindUser) {
-      return { error: errorFindUser, data: null };
-    }
-
-    if (exisingUser) {
-      return {
-        error: { message: 'User with such email already exists' },
-        data: null,
-      };
-    }
-
-    const { error, data: userAuthMethod } =
-      await this.authMethodsService.createNewUser(
-        email,
-        firstName,
-        lastName,
-        role,
-        'google',
-      );
-
-    if (error || !userAuthMethod) {
-      return { error, data: null };
-    }
-
-    return {
-      error: null,
-      data: {
-        email: userAuthMethod.email,
-      },
-    };
-  }
-
   private async validateUser(
     email: string,
     pass: string,
@@ -200,19 +147,5 @@ export class AuthenticationService {
     };
 
     return result;
-  }
-
-  private async generateToken(userId: number, email: string, role: string) {
-    const token = await this.jwtService.signAsync(
-      {
-        sub: userId,
-        email,
-        iat: Math.floor(Date.now() / 1000),
-        role,
-      } as AccessTokenPayload,
-      this.configService.get('jwt'),
-    );
-
-    return token;
   }
 }

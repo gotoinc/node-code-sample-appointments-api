@@ -1,16 +1,20 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy, StrategyOptions } from 'passport-google-oauth2';
 import { Request } from 'express';
 import { GoogleOauthQueryParamsDto } from './dto/google-oauth-query-params.dto';
-import { AuthenticationService } from 'src/iam/authentication/authentication.service';
+import {
+  GoogleOauthServiceSymbol,
+  IGoogleOauthService,
+} from './google-oauth.service.interface';
 
 @Injectable()
 export class GoogleOauthStrategy extends PassportStrategy(Strategy, 'google') {
   constructor(
     private readonly configService: ConfigService,
-    private readonly authService: AuthenticationService,
+    @Inject(GoogleOauthServiceSymbol)
+    private readonly googleOauthService: IGoogleOauthService,
   ) {
     super({
       clientID: configService.get<string>('GOOGLE_OAUTH_CLIENT_ID'),
@@ -41,8 +45,7 @@ export class GoogleOauthStrategy extends PassportStrategy(Strategy, 'google') {
     const { given_name = '', family_name = '', email } = profile._json;
 
     if (action === 'login') {
-      const { error, data: user } =
-        await this.authService.loginWithGoogle(email);
+      const { error, data: user } = await this.googleOauthService.login(email);
 
       if (error) {
         throw new HttpException('Login failed', HttpStatus.UNAUTHORIZED);
@@ -56,7 +59,7 @@ export class GoogleOauthStrategy extends PassportStrategy(Strategy, 'google') {
         throw new HttpException('Role is required', HttpStatus.UNAUTHORIZED);
       }
 
-      const { error, data: user } = await this.authService.registerWithGoogle(
+      const { error, data: user } = await this.googleOauthService.register(
         email,
         given_name,
         family_name,
