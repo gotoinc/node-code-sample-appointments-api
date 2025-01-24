@@ -12,6 +12,7 @@ export interface IDoctorsService {
   ): Promise<IServiceResponse<Doctor>>;
   findAll(): Promise<IServiceResponse<Doctor[]>>;
   findOne(id: number): Promise<IServiceResponse<Doctor>>;
+  findByUserId(userId: number): Promise<IServiceResponse<Doctor>>;
   update(
     id: number,
     doctor: UpdateDoctorDto,

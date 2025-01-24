@@ -48,6 +48,16 @@ export class DoctorsController {
     return data;
   }
 
+  @Roles('doctor')
+  @Get('/me')
+  async findDoctorsProfileOfUser(@Req() req: Request) {
+    const user = req.user;
+    const { error, data } = await this.doctorsService.findByUserId(user.userId);
+    if (error) throw new ServiceUnavailableException(error.message);
+
+    return data;
+  }
+
   @Get(':id')
   async findOne(@Param() { id }: IdParamDto) {
     const { error, data } = await this.doctorsService.findOne(id);

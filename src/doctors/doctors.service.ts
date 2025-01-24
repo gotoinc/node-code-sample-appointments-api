@@ -76,6 +76,17 @@ export class DoctorsService implements IDoctorsService {
     }
   }
 
+  async findByUserId(userId: number): Promise<IServiceResponse<Doctor>> {
+    try {
+      const doctor = await this.doctorsRepository.findByUserId(userId);
+
+      return { error: null, data: doctor };
+    } catch (error) {
+      console.error(error);
+      return { error: { message: 'Error finding doctor' }, data: null };
+    }
+  }
+
   async update(
     id: number,
     doctor: UpdateDoctorDto,
