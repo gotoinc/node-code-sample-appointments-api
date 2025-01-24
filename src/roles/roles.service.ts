@@ -1,5 +1,5 @@
 import { UserRole } from '@prisma/client';
-import { IServiceResponse } from 'src/common/service-response.interface';
+import { IServiceResponse } from 'src/common/interfaces/service-response.interface';
 import { IRolesRepository } from './roles.repository.interface';
 import { IRolesService } from './roles.service.interface';
 

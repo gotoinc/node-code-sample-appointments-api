@@ -1,6 +1,6 @@
 import { User, UserRole } from '@prisma/client';
 import { UserEntity } from './entities/user.entity';
-import { IServiceResponse } from 'src/common/service-response.interface';
+import { IServiceResponse } from 'src/common/interfaces/service-response.interface';
 import { IUsersService } from './users.service.interface';
 import { IUsersRepository } from './users.repository.interface';
 import { IRolesService } from 'src/roles/roles.service.interface';

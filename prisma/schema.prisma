@@ -61,7 +61,7 @@ model Doctor {
 
 model Specialization {
   id      Int      @id @default(autoincrement())
-  name    String
+  name    String   @unique
   doctors Doctor[]
 
   @@map("specializations")
