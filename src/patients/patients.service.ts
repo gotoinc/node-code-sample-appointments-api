@@ -4,6 +4,7 @@ import { Patient } from '@prisma/client';
 import { CreatePatientDto } from './dto/create-patient.dto';
 import { IPatientsRepository } from './patients.repository.interface';
 import { PatientEntity } from './entities/patient.entity';
+import { UpdatePatientDto } from './dto/update-patient.dto';
 
 export class PatientsService implements IPatientsService {
   constructor(private readonly patientsRepository: IPatientsRepository) {}
@@ -69,6 +70,29 @@ export class PatientsService implements IPatientsService {
     } catch (error) {
       console.error(error);
       return { error: { message: 'Error finding patient' }, data: null };
+    }
+  }
+
+  async update(
+    id: number,
+    patient: UpdatePatientDto,
+  ): Promise<IServiceResponse<Patient>> {
+    try {
+      const patientEntity: PatientEntity = {
+        dateOfBirth: new Date(patient.date_of_birth),
+        gender: patient.gender,
+        address: patient.address,
+      };
+
+      const updatedPatient = await this.patientsRepository.update(
+        id,
+        patientEntity,
+      );
+
+      return { error: null, data: updatedPatient };
+    } catch (error) {
+      console.error(error);
+      return { error: { message: 'Error updating patient' }, data: null };
     }
   }
 }

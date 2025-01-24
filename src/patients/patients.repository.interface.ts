@@ -10,4 +10,5 @@ export interface IPatientsRepository {
   findAll(tx?: unknown): Promise<Patient[]>;
   findById(id: number, tx?: unknown): Promise<Patient>;
   findByUserId(userId: number, tx?: unknown): Promise<Patient>;
+  update(id: number, patient: PatientEntity, tx?: unknown): Promise<Patient>;
 }

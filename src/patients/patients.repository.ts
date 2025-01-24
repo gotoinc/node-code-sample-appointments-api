@@ -56,4 +56,23 @@ export class PatientsRepository
       },
     });
   }
+
+  async update(
+    id: number,
+    patient: PatientEntity,
+    tx?: unknown,
+  ): Promise<Patient> {
+    const prisma = this.getClient(tx);
+
+    return await prisma.patient.update({
+      where: {
+        id,
+      },
+      data: {
+        date_of_birth: patient.dateOfBirth,
+        gender: patient.gender,
+        address: patient.address,
+      },
+    });
+  }
 }
