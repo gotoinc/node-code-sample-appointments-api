@@ -4,6 +4,7 @@ import {
   Controller,
   Get,
   Inject,
+  NotFoundException,
   Param,
   Post,
   Put,
@@ -49,10 +50,11 @@ export class DoctorsController {
   }
 
   @Roles('doctor')
-  @Get('/me')
+  @Get('me')
   async findDoctorsProfileOfUser(@Req() req: Request) {
     const user = req.user;
     const { error, data } = await this.doctorsService.findByUserId(user.userId);
+    if (!data) throw new NotFoundException('Doctor not found');
     if (error) throw new ServiceUnavailableException(error.message);
 
     return data;
@@ -61,6 +63,7 @@ export class DoctorsController {
   @Get(':id')
   async findOne(@Param() { id }: IdParamDto) {
     const { error, data } = await this.doctorsService.findOne(id);
+    if (!data) throw new NotFoundException('Doctor not found');
     if (error) throw new ServiceUnavailableException(error.message);
 
     return data;
