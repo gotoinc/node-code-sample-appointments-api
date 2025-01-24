@@ -2,9 +2,9 @@ import { UserAuthMethod } from '@prisma/client';
 import { IAuthMethodsService } from './auth-methods.service.interface';
 import { IAuthMethodsRepository } from './auth-methods.repository.interface';
 import { IUsersRepository } from 'src/users/users.repository.interface';
-import { ITransactionManager } from 'src/interfaces/transaction-manager.interface';
+import { ITransactionManager } from 'src/common/interfaces/transaction-manager.interface';
 import { IAuthProvidersService } from './auth-providers/auth-providers.service.interface';
-import { IServiceResponse } from 'src/common/service-response.interface';
+import { IServiceResponse } from 'src/common/interfaces/service-response.interface';
 import { IRolesService } from 'src/roles/roles.service.interface';
 
 export class AuthMethodsService implements IAuthMethodsService {

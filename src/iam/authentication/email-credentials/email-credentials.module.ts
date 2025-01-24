@@ -5,7 +5,7 @@ import { PrismaTransactionManager } from 'src/database/prisma-transaction.servic
 import { EmailCredentialsRepository } from './email-credentials.repository';
 import { UsersRepository } from 'src/users/users.repository';
 import { IEmailCredentialsRepository } from './email-credentials.repository.interface';
-import { ITransactionManager } from 'src/interfaces/transaction-manager.interface';
+import { ITransactionManager } from 'src/common/interfaces/transaction-manager.interface';
 import { IUsersRepository } from 'src/users/users.repository.interface';
 import { PrismaService } from 'src/database/prisma.service';
 import { UsersModule } from 'src/users/users.module';

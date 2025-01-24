@@ -1,4 +1,4 @@
-import { IServiceResponse } from 'src/common/service-response.interface';
+import { IServiceResponse } from 'src/common/interfaces/service-response.interface';
 import { IGoogleOauthService } from './google-oauth.service.interface';
 import { IAuthMethodsService } from '../../auth-methods/auth-methods.service.interface';
 import { IUsersService } from 'src/users/users.service.interface';

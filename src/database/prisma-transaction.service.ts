@@ -1,4 +1,4 @@
-import { ITransactionManager } from 'src/interfaces/transaction-manager.interface';
+import { ITransactionManager } from 'src/common/interfaces/transaction-manager.interface';
 import { PrismaService } from './prisma.service';
 import { Injectable } from '@nestjs/common';
 

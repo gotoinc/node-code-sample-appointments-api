@@ -1,5 +1,5 @@
 import { EmailCredentials, User } from '@prisma/client';
-import { IServiceResponse } from 'src/common/service-response.interface';
+import { IServiceResponse } from 'src/common/interfaces/service-response.interface';
 
 export const EmailCredentialsServiceSymbol = Symbol(
   'EMAIL_CREDENTIALS_SERVICE',
