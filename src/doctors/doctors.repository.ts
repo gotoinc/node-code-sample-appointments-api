@@ -33,13 +33,13 @@ export class DoctorsRepository
     return await prisma.doctor.findMany();
   }
 
-  async findOne(id: number, tx?: unknown): Promise<Doctor> {
+  async findOne(id: number, tx?: unknown): Promise<Doctor | null> {
     const prisma = this.getClient(tx);
 
     return await prisma.doctor.findUnique({ where: { id } });
   }
 
-  async findByUserId(userId: number, tx?: unknown): Promise<Doctor> {
+  async findByUserId(userId: number, tx?: unknown): Promise<Doctor | null> {
     const prisma = this.getClient(tx);
 
     return await prisma.doctor.findUnique({

@@ -32,7 +32,7 @@ export class GoogleOauthService implements IGoogleOauthService {
         user.user_role.role_name,
       );
 
-    if (errorTokenGeneration)
+    if (errorTokenGeneration || !token)
       return { error: errorTokenGeneration, data: null };
 
     return {

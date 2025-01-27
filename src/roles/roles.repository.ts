@@ -13,7 +13,7 @@ export class RolesRepository
     super(prismaClient);
   }
 
-  async findByName(name: string, tx?: unknown): Promise<UserRole> {
+  async findByName(name: string, tx?: unknown): Promise<UserRole | null> {
     const prisma = this.getClient(tx);
 
     return await prisma.userRole.findFirst({

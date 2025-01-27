@@ -29,7 +29,7 @@ export class EmailCredentialsRepository
     });
   }
 
-  async findOne(email: string, tx?: unknown): Promise<EmailCredentials> {
+  async findOne(email: string, tx?: unknown): Promise<EmailCredentials | null> {
     const prisma = this.getClient(tx);
 
     return await prisma.emailCredentials.findUnique({

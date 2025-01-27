@@ -20,7 +20,7 @@ export class SpecializationsRepository
     return await prisma.specialization.findMany();
   }
 
-  async findOne(id: number, tx?: unknown): Promise<Specialization> {
+  async findOne(id: number, tx?: unknown): Promise<Specialization | null> {
     const prisma = this.getClient(tx);
 
     return await prisma.specialization.findUnique({
@@ -30,7 +30,7 @@ export class SpecializationsRepository
     });
   }
 
-  async findByName(name: string, tx?: unknown): Promise<Specialization> {
+  async findByName(name: string, tx?: unknown): Promise<Specialization | null> {
     const prisma = this.getClient(tx);
 
     return await prisma.specialization.findUnique({

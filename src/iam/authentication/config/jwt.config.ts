@@ -6,7 +6,7 @@ export default registerAs(
   () =>
     ({
       secret: process.env.JWT_SECRET,
-      expiresIn: parseInt(process.env.JWT_ACCESS_TOKEN_EXPIRES_IN),
+      expiresIn: parseInt(process.env.JWT_ACCESS_TOKEN_EXPIRES_IN || '3600'),
       issuer: process.env.JWT_ISSUER,
       audience: process.env.JWT_AUDIENCE,
     }) as JwtModuleOptions,

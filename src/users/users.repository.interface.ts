@@ -4,7 +4,10 @@ import { UserEntity } from './entities/user.entity';
 export interface IUsersRepository {
   create(user: UserEntity, tx?: unknown): Promise<User>;
 
-  findOne(email: string, tx?: unknown): Promise<User & { user_role: UserRole }>;
+  findOne(
+    email: string,
+    tx?: unknown,
+  ): Promise<(User & { user_role: UserRole }) | null>;
 
   findAll(tx?: unknown): Promise<User[]>;
 }

@@ -10,7 +10,6 @@ import {
   Put,
   Req,
   ServiceUnavailableException,
-  UnauthorizedException,
 } from '@nestjs/common';
 import { Auth } from 'src/iam/authentication/decorators/auth.decorator';
 import { CreateDoctorDto } from './dto/create-doctor.dto';
@@ -22,6 +21,7 @@ import {
 import { UpdateDoctorDto } from './dto/update-doctor.dto';
 import { IdParamDto } from 'src/common/dto/id-param.dto';
 import { Request } from 'express';
+import { handleServiceError } from 'src/common/handle-service-error';
 
 @Auth('Jwt')
 @Controller('doctors')
@@ -34,7 +34,7 @@ export class DoctorsController {
   @Roles('doctor')
   @Post()
   async create(@Body() body: CreateDoctorDto, @Req() req: Request) {
-    const user = req.user;
+    const user = req.user!;
     const { error, data } = await this.doctorsService.create(body, user.userId);
     if (error) throw new BadRequestException(error.message);
 
@@ -52,7 +52,7 @@ export class DoctorsController {
   @Roles('doctor')
   @Get('me')
   async findDoctorsProfileOfUser(@Req() req: Request) {
-    const user = req.user;
+    const user = req.user!;
     const { error, data } = await this.doctorsService.findByUserId(user.userId);
     if (!data) throw new NotFoundException('Doctor not found');
     if (error) throw new ServiceUnavailableException(error.message);
@@ -70,22 +70,14 @@ export class DoctorsController {
   }
 
   @Roles('doctor')
-  @Put(':id')
-  async update(
-    @Param() { id }: IdParamDto,
-    @Body() body: UpdateDoctorDto,
-    @Req() req: Request,
-  ) {
-    const user = req.user;
-    const { error: errorFindDoctor, data: doctor } =
-      await this.doctorsService.findOne(id);
-    if (errorFindDoctor)
-      throw new ServiceUnavailableException(errorFindDoctor.message);
-    if (user.userId !== doctor.fk_user_id)
-      throw new UnauthorizedException('Unauthorized');
+  @Put('me')
+  async update(@Body() body: UpdateDoctorDto, @Req() req: Request) {
+    const user = req.user!;
 
-    const { error, data } = await this.doctorsService.update(id, body);
-    if (error) throw new ServiceUnavailableException(error.message);
+    const { error, data } = await this.doctorsService.update(body, user.userId);
+
+    const exception = handleServiceError(error);
+    if (exception) throw exception;
 
     return data;
   }

@@ -67,8 +67,7 @@ export class AuthMethodsService implements IAuthMethodsService {
 
   async findOne(email: string): Promise<IServiceResponse<UserAuthMethod>> {
     try {
-      const userAuthMethod: UserAuthMethod =
-        await this.authMethodsRepository.findOne(email);
+      const userAuthMethod = await this.authMethodsRepository.findOne(email);
 
       if (!userAuthMethod) return { error: null, data: null };
 

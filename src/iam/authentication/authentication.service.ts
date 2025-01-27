@@ -54,7 +54,7 @@ export class AuthenticationService {
           user.role,
         );
 
-      if (errorTokenGeneration)
+      if (errorTokenGeneration || !token)
         return { error: errorTokenGeneration, data: null };
 
       return {
@@ -112,7 +112,10 @@ export class AuthenticationService {
     email: string,
     pass: string,
   ): Promise<
-    Pick<User, 'id' | 'email' | 'first_name' | 'last_name'> & { role: string }
+    | (Pick<User, 'id' | 'email' | 'first_name' | 'last_name'> & {
+        role: string;
+      })
+    | null
   > {
     const { error, data: userCredentials } =
       await this.emailCredentialsService.findOne(email);
@@ -129,7 +132,7 @@ export class AuthenticationService {
     const { error: errorFindUser, data: user } =
       await this.usersService.findOne(email);
 
-    if (errorFindUser) return null;
+    if (errorFindUser || !user) return null;
 
     const result = {
       id: user.id,

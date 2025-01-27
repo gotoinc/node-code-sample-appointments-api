@@ -12,7 +12,7 @@ export class AuthProvidersService implements IAuthProvidersService {
     authProviderName: string,
   ): Promise<IServiceResponse<AuthProvider>> {
     try {
-      const authProvider: AuthProvider =
+      const authProvider =
         await this.authProvidersRepository.findOne(authProviderName);
 
       if (!authProvider)

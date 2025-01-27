@@ -36,7 +36,8 @@ export class RolesService implements IRolesService {
 
   async findByName(roleName: string): Promise<IServiceResponse<UserRole>> {
     try {
-      const role: UserRole = await this.rolesRepository.findByName(roleName);
+      const role: UserRole | null =
+        await this.rolesRepository.findByName(roleName);
 
       if (!role) {
         return { error: { message: 'Role not found' }, data: null };

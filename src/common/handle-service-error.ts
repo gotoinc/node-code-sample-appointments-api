@@ -26,7 +26,7 @@ export const mapResponseStatusToException: Record<
 
 export const handleServiceError = (
   error: IServiceResponse<any>['error'] | null,
-): HttpException => {
+): HttpException | null => {
   if (!error) return null;
   if (error.status) {
     const exceptionFunction = mapResponseStatusToException[error.status];
