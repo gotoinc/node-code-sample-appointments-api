@@ -1,5 +1,5 @@
 import { Patient } from '@prisma/client';
-import { IServiceResponse } from 'src/common/interfaces/service-response.interface';
+import { IServiceResponse } from 'src/common/service-response';
 import { CreatePatientDto } from './dto/create-patient.dto';
 import { UpdatePatientDto } from './dto/update-patient.dto';
 
@@ -14,7 +14,7 @@ export interface IPatientsService {
   findById(id: number): Promise<IServiceResponse<Patient>>;
   findByUserId(userId: number): Promise<IServiceResponse<Patient>>;
   update(
-    id: number,
     patient: UpdatePatientDto,
+    userId: number,
   ): Promise<IServiceResponse<Patient>>;
 }

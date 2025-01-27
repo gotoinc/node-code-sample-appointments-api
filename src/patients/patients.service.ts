@@ -1,10 +1,11 @@
-import { IServiceResponse } from 'src/common/interfaces/service-response.interface';
+import { IServiceResponse } from 'src/common/service-response';
 import { IPatientsService } from './patients.service.interface';
 import { Patient } from '@prisma/client';
 import { CreatePatientDto } from './dto/create-patient.dto';
 import { IPatientsRepository } from './patients.repository.interface';
 import { PatientEntity } from './entities/patient.entity';
 import { UpdatePatientDto } from './dto/update-patient.dto';
+import { ServiceResponse } from 'src/common/service-response';
 
 export class PatientsService implements IPatientsService {
   constructor(private readonly patientsRepository: IPatientsRepository) {}
@@ -74,18 +75,27 @@ export class PatientsService implements IPatientsService {
   }
 
   async update(
-    id: number,
-    patient: UpdatePatientDto,
+    patientToUpdate: UpdatePatientDto,
+    userId: number,
   ): Promise<IServiceResponse<Patient>> {
     try {
+      const existingPatient =
+        await this.patientsRepository.findByUserId(userId);
+
+      if (!existingPatient)
+        return ServiceResponse.notFound('Patient not found');
+
+      if (userId !== existingPatient.fk_user_id)
+        return ServiceResponse.forbidden();
+
       const patientEntity: PatientEntity = {
-        dateOfBirth: new Date(patient.date_of_birth),
-        gender: patient.gender,
-        address: patient.address,
+        dateOfBirth: new Date(patientToUpdate.date_of_birth),
+        gender: patientToUpdate.gender,
+        address: patientToUpdate.address,
       };
 
       const updatedPatient = await this.patientsRepository.update(
-        id,
+        existingPatient.id,
         patientEntity,
       );
 

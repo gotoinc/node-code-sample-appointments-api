@@ -10,7 +10,6 @@ import {
   Put,
   Req,
   ServiceUnavailableException,
-  UnauthorizedException,
 } from '@nestjs/common';
 import { Roles } from 'src/iam/authorization/decorators/roles.decorator';
 import {
@@ -21,6 +20,7 @@ import { CreatePatientDto } from './dto/create-patient.dto';
 import { IdParamDto } from 'src/common/dto/id-param.dto';
 import { Request } from 'express';
 import { UpdatePatientDto } from './dto/update-patient.dto';
+import { handleServiceError } from 'src/common/handle-service-error';
 
 @Controller('patients')
 export class PatientsController {
@@ -71,22 +71,17 @@ export class PatientsController {
     return data;
   }
 
-  @Put(':id')
-  async update(
-    @Param() { id }: IdParamDto,
-    @Body() body: UpdatePatientDto,
-    @Req() req: Request,
-  ) {
+  @Put('me')
+  async update(@Body() body: UpdatePatientDto, @Req() req: Request) {
     const user = req.user;
-    const { error: errorFindPatient, data: patient } =
-      await this.patientsService.findById(id);
-    if (errorFindPatient)
-      throw new ServiceUnavailableException(errorFindPatient.message);
-    if (!patient) throw new NotFoundException('Patient not found');
-    if (user.userId !== patient.fk_user_id)
-      throw new UnauthorizedException('Unauthorized');
-    const { error, data } = await this.patientsService.update(id, body);
-    if (error) throw new ServiceUnavailableException(error.message);
+
+    const { error, data } = await this.patientsService.update(
+      body,
+      user.userId,
+    );
+
+    const exception = handleServiceError(error);
+    if (exception) throw exception;
 
     return data;
   }
