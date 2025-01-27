@@ -34,7 +34,7 @@ model UserRole {
 
 model Patient {
   id            Int           @id @default(autoincrement())
-  date_of_birth DateTime
+  date_of_birth DateTime      @db.Date
   gender        String
   address       String?
   created_at    DateTime      @default(now())
