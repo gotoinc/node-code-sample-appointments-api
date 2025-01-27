@@ -13,7 +13,10 @@ export class AuthProvidersRepository
     super(prismaClient);
   }
 
-  async findOne(authProviderName: string, tx?: unknown): Promise<AuthProvider> {
+  async findOne(
+    authProviderName: string,
+    tx?: unknown,
+  ): Promise<AuthProvider | null> {
     const prisma = this.getClient(tx);
 
     return await prisma.authProvider.findUnique({

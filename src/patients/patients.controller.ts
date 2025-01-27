@@ -32,7 +32,8 @@ export class PatientsController {
   @Roles('patient')
   @Post()
   async create(@Body() body: CreatePatientDto, @Req() req: Request) {
-    const user = req.user;
+    const user = req.user!;
+
     const { error, data } = await this.patientsService.create(
       body,
       user.userId,
@@ -45,6 +46,7 @@ export class PatientsController {
   @Get()
   async findAll() {
     const { error, data } = await this.patientsService.findAll();
+
     if (error) throw new ServiceUnavailableException(error.message);
 
     return data;
@@ -52,7 +54,8 @@ export class PatientsController {
 
   @Get('me')
   async findPatientsProfileOfUser(@Req() req: Request) {
-    const user = req.user;
+    const user = req.user!;
+
     const { error, data } = await this.patientsService.findByUserId(
       user.userId,
     );
@@ -71,9 +74,10 @@ export class PatientsController {
     return data;
   }
 
+  @Roles('patient')
   @Put('me')
   async update(@Body() body: UpdatePatientDto, @Req() req: Request) {
-    const user = req.user;
+    const user = req.user!;
 
     const { error, data } = await this.patientsService.update(
       body,

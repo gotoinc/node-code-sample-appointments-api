@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ConflictException,
   ForbiddenException,
   HttpException,
@@ -19,11 +20,14 @@ export const mapResponseStatusToException: Record<
   [ResponseStatus.Forbidden]: (...args: any[]) =>
     new ForbiddenException(...args),
   [ResponseStatus.Conflict]: (...args: any[]) => new ConflictException(...args),
+  [ResponseStatus.InvalidData]: (...args: any[]) =>
+    new BadRequestException(...args),
 };
 
 export const handleServiceError = (
-  error: IServiceResponse<any>['error'],
-): HttpException => {
+  error: IServiceResponse<any>['error'] | null,
+): HttpException | null => {
+  if (!error) return null;
   if (error.status) {
     const exceptionFunction = mapResponseStatusToException[error.status];
     return exceptionFunction(error.message);

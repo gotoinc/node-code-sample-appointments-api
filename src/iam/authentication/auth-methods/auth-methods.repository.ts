@@ -29,7 +29,7 @@ export class AuthMethodsRepository
     });
   }
 
-  async findOne(email: string, tx?: unknown): Promise<UserAuthMethod> {
+  async findOne(email: string, tx?: unknown): Promise<UserAuthMethod | null> {
     const prisma = this.getClient(tx);
 
     return await prisma.userAuthMethod.findUnique({

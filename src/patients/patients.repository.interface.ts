@@ -8,7 +8,7 @@ export interface IPatientsRepository {
     tx?: unknown,
   ): Promise<Patient>;
   findAll(tx?: unknown): Promise<Patient[]>;
-  findById(id: number, tx?: unknown): Promise<Patient>;
-  findByUserId(userId: number, tx?: unknown): Promise<Patient>;
+  findById(id: number, tx?: unknown): Promise<Patient | null>;
+  findByUserId(userId: number, tx?: unknown): Promise<Patient | null>;
   update(id: number, patient: PatientEntity, tx?: unknown): Promise<Patient>;
 }

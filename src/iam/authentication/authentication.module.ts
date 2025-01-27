@@ -5,7 +5,6 @@ import { UsersModule } from 'src/users/users.module';
 import { JwtStrategy } from './jwt.strategy';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { EmailCredentialsModule } from 'src/iam/authentication/email-credentials/email-credentials.module';
-import { AuthMethodsModule } from 'src/iam/authentication/auth-methods/auth-methods.module';
 import { AuthGuard } from './guards/auth.guard';
 import { APP_GUARD } from '@nestjs/core';
 import { RolesGuard } from '../authorization/guards/roles.guard';
@@ -16,7 +15,6 @@ import { TokenGenerationModule } from './token-generation/token-generation.modul
   imports: [
     UsersModule,
     EmailCredentialsModule,
-    AuthMethodsModule,
     HashingModule,
     TokenGenerationModule,
   ],

@@ -18,10 +18,9 @@ export class PatientsService implements IPatientsService {
       const exisingPatient = await this.patientsRepository.findByUserId(userId);
 
       if (exisingPatient)
-        return {
-          error: { message: 'Patient profile already exists for this user' },
-          data: null,
-        };
+        return ServiceResponse.conflict(
+          'Patient profile already exists for this user',
+        );
 
       const patientEntity: PatientEntity = {
         dateOfBirth: new Date(patient.date_of_birth),
@@ -34,7 +33,7 @@ export class PatientsService implements IPatientsService {
         userId,
       );
 
-      return { error: null, data: createdPatient };
+      return ServiceResponse.success<Patient>(createdPatient);
     } catch (error) {
       console.error(error);
       return { error: { message: 'Error creating patient' }, data: null };
@@ -45,29 +44,31 @@ export class PatientsService implements IPatientsService {
     try {
       const patients: Patient[] = await this.patientsRepository.findAll();
 
-      return { error: null, data: patients };
+      return ServiceResponse.success<Patient[]>(patients);
     } catch (error) {
       console.error(error);
       return { error: { message: 'Error finding all patients' }, data: null };
     }
   }
 
-  async findById(id: number): Promise<IServiceResponse<Patient>> {
+  async findById(id: number): Promise<IServiceResponse<Patient | null>> {
     try {
       const patient = await this.patientsRepository.findById(id);
 
-      return { error: null, data: patient };
+      return ServiceResponse.success<Patient | null>(patient);
     } catch (error) {
       console.error(error);
       return { error: { message: 'Error finding patient' }, data: null };
     }
   }
 
-  async findByUserId(userId: number): Promise<IServiceResponse<Patient>> {
+  async findByUserId(
+    userId: number,
+  ): Promise<IServiceResponse<Patient | null>> {
     try {
       const patient = await this.patientsRepository.findByUserId(userId);
 
-      return { error: null, data: patient };
+      return ServiceResponse.success<Patient | null>(patient);
     } catch (error) {
       console.error(error);
       return { error: { message: 'Error finding patient' }, data: null };
@@ -99,7 +100,7 @@ export class PatientsService implements IPatientsService {
         patientEntity,
       );
 
-      return { error: null, data: updatedPatient };
+      return ServiceResponse.success<Patient>(updatedPatient);
     } catch (error) {
       console.error(error);
       return { error: { message: 'Error updating patient' }, data: null };

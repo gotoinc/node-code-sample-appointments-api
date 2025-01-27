@@ -1,4 +1,4 @@
-import { IServiceResponse } from 'src/common/interfaces/service-response.interface';
+import { IServiceResponse } from 'src/common/service-response';
 
 export const GoogleOauthServiceSymbol = 'GOOGLE_OAUTH_SERVICE_SYMBOL';
 

@@ -7,5 +7,5 @@ export interface IAuthMethodsRepository {
     tx?: unknown,
   ): Promise<UserAuthMethod>;
 
-  findOne(email: string, tx?: unknown): Promise<UserAuthMethod>;
+  findOne(email: string, tx?: unknown): Promise<UserAuthMethod | null>;
 }

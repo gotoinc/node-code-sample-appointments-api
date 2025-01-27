@@ -7,5 +7,5 @@ export interface IEmailCredentialsRepository {
     tx?: unknown,
   ): Promise<EmailCredentials>;
 
-  findOne(email: string): Promise<EmailCredentials>;
+  findOne(email: string): Promise<EmailCredentials | null>;
 }

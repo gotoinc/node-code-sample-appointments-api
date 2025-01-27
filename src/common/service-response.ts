@@ -2,6 +2,7 @@ export const ResponseStatus = {
   NotFound: 'NOT_FOUND',
   Forbidden: 'FORBIDDEN',
   Conflict: 'CONFLICT',
+  InvalidData: 'INVALID_DATA',
 } as const;
 
 export type ErrorResponseStatus =
@@ -48,6 +49,13 @@ export class ServiceResponse<T> implements IServiceResponse<T> {
   static conflict(message: string = 'Conflict'): ServiceResponse<null> {
     return new ServiceResponse(
       { message, status: ResponseStatus.Conflict },
+      null,
+    );
+  }
+
+  static invalidData(message: string = 'Invalid data'): ServiceResponse<null> {
+    return new ServiceResponse(
+      { message, status: ResponseStatus.InvalidData },
       null,
     );
   }

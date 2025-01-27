@@ -1,5 +1,5 @@
 import { EmailCredentials, User } from '@prisma/client';
-import { IServiceResponse } from 'src/common/interfaces/service-response.interface';
+import { IServiceResponse, ServiceResponse } from 'src/common/service-response';
 import { IUsersRepository } from 'src/users/users.repository.interface';
 import { IEmailCredentialsRepository } from 'src/iam/authentication/email-credentials/email-credentials.repository.interface';
 import { ITransactionManager } from 'src/common/interfaces/transaction-manager.interface';
@@ -50,7 +50,7 @@ export class EmailCredentialsService implements IEmailCredentialsService {
         return user;
       });
 
-      return { error: null, data: user };
+      return ServiceResponse.success<User>(user);
     } catch (error) {
       console.error(error);
       return { error: { message: error.message }, data: null };
@@ -62,12 +62,15 @@ export class EmailCredentialsService implements IEmailCredentialsService {
       const emailCredentials =
         await this.emailCredentialsRepository.findOne(email);
 
-      if (!emailCredentials) return { error: null, data: null };
+      if (!emailCredentials) return ServiceResponse.notFound('Email not found');
 
-      return { error: null, data: emailCredentials };
+      return ServiceResponse.success<EmailCredentials>(emailCredentials);
     } catch (error) {
       console.error(error);
-      return { error: { message: error.message }, data: null };
+      return {
+        error: { message: 'Error finding email credentials' },
+        data: null,
+      };
     }
   }
 }

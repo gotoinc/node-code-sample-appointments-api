@@ -37,7 +37,7 @@ export class PatientsRepository
     return await prisma.patient.findMany();
   }
 
-  async findById(id: number, tx?: unknown): Promise<Patient> {
+  async findById(id: number, tx?: unknown): Promise<Patient | null> {
     const prisma = this.getClient(tx);
 
     return await prisma.patient.findUnique({
@@ -47,7 +47,7 @@ export class PatientsRepository
     });
   }
 
-  async findByUserId(userId: number, tx?: unknown): Promise<Patient> {
+  async findByUserId(userId: number, tx?: unknown): Promise<Patient | null> {
     const prisma = this.getClient(tx);
 
     return await prisma.patient.findUnique({

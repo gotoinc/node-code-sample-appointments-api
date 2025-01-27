@@ -30,7 +30,7 @@ export class UsersRepository
   async findOne(
     email: string,
     tx?: unknown,
-  ): Promise<User & { user_role: UserRole }> {
+  ): Promise<(User & { user_role: UserRole }) | null> {
     const prisma = this.getClient(tx);
 
     return await prisma.user.findUnique({

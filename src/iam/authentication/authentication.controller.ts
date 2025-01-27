@@ -26,6 +26,7 @@ export class AuthController {
     const { error, data } = await this.authService.login(email, password);
 
     if (error) throw new UnauthorizedException(error.message);
+    if (!data) throw new UnauthorizedException('Invalid email or password');
 
     res.setHeader('Authorization', `Bearer ${data.accessToken}`);
     res.json({

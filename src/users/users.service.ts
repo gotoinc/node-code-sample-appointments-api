@@ -1,6 +1,6 @@
 import { User, UserRole } from '@prisma/client';
 import { UserEntity } from './entities/user.entity';
-import { IServiceResponse } from 'src/common/interfaces/service-response.interface';
+import { IServiceResponse, ServiceResponse } from 'src/common/service-response';
 import { IUsersService } from './users.service.interface';
 import { IUsersRepository } from './users.repository.interface';
 import { IRolesService } from 'src/roles/roles.service.interface';
@@ -30,7 +30,7 @@ export class UsersService implements IUsersService {
 
       const createdUser = await this.usersRepository.create(userEntity);
 
-      return { error: null, data: createdUser };
+      return ServiceResponse.success<User>(createdUser);
     } catch (error) {
       console.error(error);
       return { error: { message: 'Error creating user' }, data: null };
@@ -43,11 +43,9 @@ export class UsersService implements IUsersService {
     try {
       const user = await this.usersRepository.findOne(email);
 
-      if (!user) {
-        return { error: null, data: null };
-      }
+      if (!user) return ServiceResponse.notFound('User not found');
 
-      return { error: null, data: user };
+      return ServiceResponse.success<User & { user_role: UserRole }>(user);
     } catch (error) {
       console.error(error);
       return { error: { message: error.message }, data: null };
@@ -58,7 +56,7 @@ export class UsersService implements IUsersService {
     try {
       const users: User[] = await this.usersRepository.findAll();
 
-      return { error: null, data: users };
+      return ServiceResponse.success<User[]>(users);
     } catch (error) {
       console.error(error);
       return { error: { message: error.message }, data: null };

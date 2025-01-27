@@ -1,5 +1,5 @@
 import { AuthProvider } from '@prisma/client';
-import { IServiceResponse } from 'src/common/interfaces/service-response.interface';
+import { IServiceResponse } from 'src/common/service-response';
 import { IAuthProvidersRepository } from './auth-providers.repository.interface';
 import { IAuthProvidersService } from './auth-providers.service.interface';
 
@@ -12,7 +12,7 @@ export class AuthProvidersService implements IAuthProvidersService {
     authProviderName: string,
   ): Promise<IServiceResponse<AuthProvider>> {
     try {
-      const authProvider: AuthProvider =
+      const authProvider =
         await this.authProvidersRepository.findOne(authProviderName);
 
       if (!authProvider)

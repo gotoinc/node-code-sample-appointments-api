@@ -11,8 +11,8 @@ export interface IPatientsService {
     userId: number,
   ): Promise<IServiceResponse<Patient>>;
   findAll(): Promise<IServiceResponse<Patient[]>>;
-  findById(id: number): Promise<IServiceResponse<Patient>>;
-  findByUserId(userId: number): Promise<IServiceResponse<Patient>>;
+  findById(id: number): Promise<IServiceResponse<Patient | null>>;
+  findByUserId(userId: number): Promise<IServiceResponse<Patient | null>>;
   update(
     patient: UpdatePatientDto,
     userId: number,

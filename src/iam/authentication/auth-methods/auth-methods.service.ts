@@ -4,7 +4,7 @@ import { IAuthMethodsRepository } from './auth-methods.repository.interface';
 import { IUsersRepository } from 'src/users/users.repository.interface';
 import { ITransactionManager } from 'src/common/interfaces/transaction-manager.interface';
 import { IAuthProvidersService } from './auth-providers/auth-providers.service.interface';
-import { IServiceResponse } from 'src/common/interfaces/service-response.interface';
+import { IServiceResponse, ServiceResponse } from 'src/common/service-response';
 import { IRolesService } from 'src/roles/roles.service.interface';
 
 export class AuthMethodsService implements IAuthMethodsService {
@@ -58,7 +58,7 @@ export class AuthMethodsService implements IAuthMethodsService {
         return userAuthMethod;
       });
 
-      return { error: null, data: user };
+      return ServiceResponse.success<UserAuthMethod>(user);
     } catch (err) {
       console.error(err);
       return { error: { message: 'Error creating user' }, data: null };
@@ -67,12 +67,11 @@ export class AuthMethodsService implements IAuthMethodsService {
 
   async findOne(email: string): Promise<IServiceResponse<UserAuthMethod>> {
     try {
-      const userAuthMethod: UserAuthMethod =
-        await this.authMethodsRepository.findOne(email);
+      const userAuthMethod = await this.authMethodsRepository.findOne(email);
 
-      if (!userAuthMethod) return { error: null, data: null };
+      if (!userAuthMethod) return ServiceResponse.notFound('User not found');
 
-      return { error: null, data: userAuthMethod };
+      return ServiceResponse.success<UserAuthMethod>(userAuthMethod);
     } catch (error) {
       console.error(error);
       return { error: { message: 'Error finding user' }, data: null };

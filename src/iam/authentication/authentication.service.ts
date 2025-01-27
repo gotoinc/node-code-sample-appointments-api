@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { IServiceResponse } from 'src/common/interfaces/service-response.interface';
+import { IServiceResponse } from 'src/common/service-response';
 import { User } from '@prisma/client';
 import { RegisterUserDto } from './dto/register-user.dto';
 import {
@@ -15,10 +15,6 @@ import {
   IEmailCredentialsService,
 } from 'src/iam/authentication/email-credentials/email-credentials.service.interface';
 import {
-  AuthMethodsServiceSymbol,
-  IAuthMethodsService,
-} from 'src/iam/authentication/auth-methods/auth-methods.service.interface';
-import {
   ITokenGenerationService,
   TokenGenerationServiceSymbol,
 } from './token-generation/token-generation.service.interface';
@@ -31,8 +27,6 @@ export class AuthenticationService {
     @Inject(UsersServiceSymbol) private readonly usersService: IUsersService,
     @Inject(HashingServiceSymbol)
     private readonly hashingService: IHashingService,
-    @Inject(AuthMethodsServiceSymbol)
-    private readonly authMethodsService: IAuthMethodsService,
     @Inject(TokenGenerationServiceSymbol)
     private readonly tokenGenerationService: ITokenGenerationService,
   ) {}
@@ -54,7 +48,7 @@ export class AuthenticationService {
           user.role,
         );
 
-      if (errorTokenGeneration)
+      if (errorTokenGeneration || !token)
         return { error: errorTokenGeneration, data: null };
 
       return {
@@ -112,7 +106,10 @@ export class AuthenticationService {
     email: string,
     pass: string,
   ): Promise<
-    Pick<User, 'id' | 'email' | 'first_name' | 'last_name'> & { role: string }
+    | (Pick<User, 'id' | 'email' | 'first_name' | 'last_name'> & {
+        role: string;
+      })
+    | null
   > {
     const { error, data: userCredentials } =
       await this.emailCredentialsService.findOne(email);
@@ -129,7 +126,7 @@ export class AuthenticationService {
     const { error: errorFindUser, data: user } =
       await this.usersService.findOne(email);
 
-    if (errorFindUser) return null;
+    if (errorFindUser || !user) return null;
 
     const result = {
       id: user.id,
