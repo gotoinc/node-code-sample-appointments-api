@@ -1,4 +1,4 @@
-import { IServiceResponse } from 'src/common/service-response';
+import { IServiceResponse, ServiceResponse } from 'src/common/service-response';
 import { ITokenGenerationService } from './token-generation.service.interface';
 import { AccessTokenPayload } from '../interfaces/access-token-payload.interface';
 import { JwtService } from '@nestjs/jwt';
@@ -26,11 +26,10 @@ export class TokenGenerationService implements ITokenGenerationService {
         this.configService.get('jwt'),
       );
 
-      return { error: null, data: token };
+      return ServiceResponse.success<string>(token);
     } catch (error) {
       console.error(error);
-
-      return { error: { message: error.message }, data: null };
+      return { error: { message: 'Error generating token' }, data: null };
     }
   }
 }

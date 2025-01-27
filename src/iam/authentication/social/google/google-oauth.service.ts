@@ -1,4 +1,4 @@
-import { IServiceResponse } from 'src/common/service-response';
+import { IServiceResponse, ServiceResponse } from 'src/common/service-response';
 import { IGoogleOauthService } from './google-oauth.service.interface';
 import { IAuthMethodsService } from '../../auth-methods/auth-methods.service.interface';
 import { IUsersService } from 'src/users/users.service.interface';
@@ -35,10 +35,7 @@ export class GoogleOauthService implements IGoogleOauthService {
     if (errorTokenGeneration || !token)
       return { error: errorTokenGeneration, data: null };
 
-    return {
-      error: null,
-      data: { access_token: token },
-    };
+    return ServiceResponse.success({ access_token: token });
   }
 
   async register(
@@ -53,10 +50,7 @@ export class GoogleOauthService implements IGoogleOauthService {
     if (errorFindUser) return { error: errorFindUser, data: null };
 
     if (exisingUser)
-      return {
-        error: { message: 'User with such email already exists' },
-        data: null,
-      };
+      return ServiceResponse.conflict('User with such email already exists');
 
     const { error, data: userAuthMethod } =
       await this.authMethodsService.createNewUser(
@@ -69,11 +63,8 @@ export class GoogleOauthService implements IGoogleOauthService {
 
     if (error || !userAuthMethod) return { error, data: null };
 
-    return {
-      error: null,
-      data: {
-        email: userAuthMethod.email,
-      },
-    };
+    return ServiceResponse.success({
+      email: userAuthMethod.email,
+    });
   }
 }

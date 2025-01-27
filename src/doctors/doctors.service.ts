@@ -30,7 +30,7 @@ export class DoctorsService implements IDoctorsService {
       const exisingDoctor = await this.doctorsRepository.findByUserId(userId);
 
       if (exisingDoctor)
-        return ServiceResponse.invalidData(
+        return ServiceResponse.conflict(
           'Doctor profile already exists for this user',
         );
 
@@ -48,7 +48,6 @@ export class DoctorsService implements IDoctorsService {
       return ServiceResponse.success(createdDoctor);
     } catch (error) {
       console.error(error);
-
       return { error: { message: 'Error creating doctor' }, data: null };
     }
   }
@@ -57,29 +56,29 @@ export class DoctorsService implements IDoctorsService {
     try {
       const doctors = await this.doctorsRepository.findAll();
 
-      return { error: null, data: doctors };
+      return ServiceResponse.success<Doctor[]>(doctors);
     } catch (error) {
       console.error(error);
       return { error: { message: 'Error finding all doctors' }, data: null };
     }
   }
 
-  async findOne(id: number): Promise<IServiceResponse<Doctor>> {
+  async findOne(id: number): Promise<IServiceResponse<Doctor | null>> {
     try {
       const doctor = await this.doctorsRepository.findOne(id);
 
-      return { error: null, data: doctor };
+      return ServiceResponse.success<Doctor | null>(doctor);
     } catch (error) {
       console.error(error);
       return { error: { message: 'Error finding doctor' }, data: null };
     }
   }
 
-  async findByUserId(userId: number): Promise<IServiceResponse<Doctor>> {
+  async findByUserId(userId: number): Promise<IServiceResponse<Doctor | null>> {
     try {
       const doctor = await this.doctorsRepository.findByUserId(userId);
 
-      return { error: null, data: doctor };
+      return ServiceResponse.success<Doctor | null>(doctor);
     } catch (error) {
       console.error(error);
       return { error: { message: 'Error finding doctor' }, data: null };
@@ -118,7 +117,7 @@ export class DoctorsService implements IDoctorsService {
         doctorEntity,
       );
 
-      return { error: null, data: updatedDoctor };
+      return ServiceResponse.success<Doctor>(updatedDoctor);
     } catch (error) {
       console.error(error);
       return { error: { message: 'Error updating doctor' }, data: null };

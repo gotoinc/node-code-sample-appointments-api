@@ -15,10 +15,6 @@ import {
   IEmailCredentialsService,
 } from 'src/iam/authentication/email-credentials/email-credentials.service.interface';
 import {
-  AuthMethodsServiceSymbol,
-  IAuthMethodsService,
-} from 'src/iam/authentication/auth-methods/auth-methods.service.interface';
-import {
   ITokenGenerationService,
   TokenGenerationServiceSymbol,
 } from './token-generation/token-generation.service.interface';
@@ -31,8 +27,6 @@ export class AuthenticationService {
     @Inject(UsersServiceSymbol) private readonly usersService: IUsersService,
     @Inject(HashingServiceSymbol)
     private readonly hashingService: IHashingService,
-    @Inject(AuthMethodsServiceSymbol)
-    private readonly authMethodsService: IAuthMethodsService,
     @Inject(TokenGenerationServiceSymbol)
     private readonly tokenGenerationService: ITokenGenerationService,
   ) {}

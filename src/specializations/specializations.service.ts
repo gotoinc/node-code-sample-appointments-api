@@ -1,4 +1,4 @@
-import { IServiceResponse } from 'src/common/service-response';
+import { IServiceResponse, ServiceResponse } from 'src/common/service-response';
 import { ISpecializationsService } from './specializations.service.interface';
 import { Specialization } from '@prisma/client';
 import { CreateSpecializationDto } from './dto/create-specialization.dto';
@@ -14,28 +14,33 @@ export class SpecializationsService implements ISpecializationsService {
     try {
       const specializations: Specialization[] =
         await this.specializationsRepository.findAll();
-      return { error: null, data: specializations };
+
+      return ServiceResponse.success<Specialization[]>(specializations);
     } catch (error) {
       console.error(error);
       return { error: { message: error.message }, data: null };
     }
   }
 
-  async findOne(id: number): Promise<IServiceResponse<Specialization>> {
+  async findOne(id: number): Promise<IServiceResponse<Specialization | null>> {
     try {
       const specialization = await this.specializationsRepository.findOne(id);
-      return { error: null, data: specialization };
+
+      return ServiceResponse.success<Specialization | null>(specialization);
     } catch (error) {
       console.error(error);
       return { error: { message: error.message }, data: null };
     }
   }
 
-  async findByName(name: string): Promise<IServiceResponse<Specialization>> {
+  async findByName(
+    name: string,
+  ): Promise<IServiceResponse<Specialization | null>> {
     try {
       const specialization =
         await this.specializationsRepository.findByName(name);
-      return { error: null, data: specialization };
+
+      return ServiceResponse.success<Specialization | null>(specialization);
     } catch (error) {
       console.error(error);
       return { error: { message: error.message }, data: null };
@@ -53,7 +58,7 @@ export class SpecializationsService implements ISpecializationsService {
       const createdSpecialization =
         await this.specializationsRepository.create(specializationEntity);
 
-      return { error: null, data: createdSpecialization };
+      return ServiceResponse.success<Specialization>(createdSpecialization);
     } catch (error) {
       console.error(error);
       return {

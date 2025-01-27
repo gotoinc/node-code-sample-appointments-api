@@ -6,8 +6,8 @@ export const SpecializationsServiceSymbol = Symbol('SPECIALIZATIONS_SERVICE');
 
 export interface ISpecializationsService {
   findAll(): Promise<IServiceResponse<Specialization[]>>;
-  findOne(id: number): Promise<IServiceResponse<Specialization>>;
-  findByName(name: string): Promise<IServiceResponse<Specialization>>;
+  findOne(id: number): Promise<IServiceResponse<Specialization | null>>;
+  findByName(name: string): Promise<IServiceResponse<Specialization | null>>;
   create(
     specialization: CreateSpecializationDto,
   ): Promise<IServiceResponse<Specialization>>;
