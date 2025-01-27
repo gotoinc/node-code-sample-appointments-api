@@ -4,14 +4,14 @@ export const ResponseStatus = {
   Conflict: 'CONFLICT',
 } as const;
 
-export type ResponseStatus =
+export type ErrorResponseStatus =
   (typeof ResponseStatus)[keyof typeof ResponseStatus];
 
 export interface IServiceResponse<T> {
   data: T | null;
   error: {
     message: string;
-    status: ResponseStatus;
+    status: ErrorResponseStatus;
   } | null;
 }
 
