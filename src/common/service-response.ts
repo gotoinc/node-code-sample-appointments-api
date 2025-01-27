@@ -11,7 +11,7 @@ export interface IServiceResponse<T> {
   data: T | null;
   error: {
     message: string;
-    status: ErrorResponseStatus;
+    status?: ErrorResponseStatus;
   } | null;
 }
 
