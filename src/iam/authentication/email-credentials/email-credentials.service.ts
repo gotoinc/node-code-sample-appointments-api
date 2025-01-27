@@ -1,5 +1,5 @@
 import { EmailCredentials, User } from '@prisma/client';
-import { IServiceResponse } from 'src/common/interfaces/service-response.interface';
+import { IServiceResponse } from 'src/common/service-response';
 import { IUsersRepository } from 'src/users/users.repository.interface';
 import { IEmailCredentialsRepository } from 'src/iam/authentication/email-credentials/email-credentials.repository.interface';
 import { ITransactionManager } from 'src/common/interfaces/transaction-manager.interface';

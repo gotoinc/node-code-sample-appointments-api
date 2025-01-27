@@ -1,5 +1,5 @@
 import { UserRole } from '@prisma/client';
-import { IServiceResponse } from 'src/common/interfaces/service-response.interface';
+import { IServiceResponse } from 'src/common/service-response';
 
 export const RolesServiceSymbol = Symbol('ROLES_SERVICE');
 

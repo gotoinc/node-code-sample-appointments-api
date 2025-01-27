@@ -1,4 +1,4 @@
-import { IServiceResponse } from 'src/common/interfaces/service-response.interface';
+import { IServiceResponse } from 'src/common/service-response';
 import { ISpecializationsService } from './specializations.service.interface';
 import { Specialization } from '@prisma/client';
 import { CreateSpecializationDto } from './dto/create-specialization.dto';

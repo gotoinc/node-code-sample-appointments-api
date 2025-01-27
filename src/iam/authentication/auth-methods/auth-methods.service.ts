@@ -4,7 +4,7 @@ import { IAuthMethodsRepository } from './auth-methods.repository.interface';
 import { IUsersRepository } from 'src/users/users.repository.interface';
 import { ITransactionManager } from 'src/common/interfaces/transaction-manager.interface';
 import { IAuthProvidersService } from './auth-providers/auth-providers.service.interface';
-import { IServiceResponse } from 'src/common/interfaces/service-response.interface';
+import { IServiceResponse } from 'src/common/service-response';
 import { IRolesService } from 'src/roles/roles.service.interface';
 
 export class AuthMethodsService implements IAuthMethodsService {

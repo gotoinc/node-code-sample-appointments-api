@@ -1,4 +1,4 @@
-import { IServiceResponse } from 'src/common/interfaces/service-response.interface';
+import { IServiceResponse } from 'src/common/service-response';
 import { ITokenGenerationService } from './token-generation.service.interface';
 import { AccessTokenPayload } from '../interfaces/access-token-payload.interface';
 import { JwtService } from '@nestjs/jwt';

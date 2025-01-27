@@ -1,5 +1,5 @@
 import { AuthProvider } from '@prisma/client';
-import { IServiceResponse } from 'src/common/interfaces/service-response.interface';
+import { IServiceResponse } from 'src/common/service-response';
 
 export const AuthProvidersServiceSymbol = Symbol('AUTH_PROVIDERS_SERVICE');
 

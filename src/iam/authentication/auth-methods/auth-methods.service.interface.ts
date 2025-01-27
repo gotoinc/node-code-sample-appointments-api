@@ -1,5 +1,5 @@
 import { UserAuthMethod } from '@prisma/client';
-import { IServiceResponse } from 'src/common/interfaces/service-response.interface';
+import { IServiceResponse } from 'src/common/service-response';
 
 export const AuthMethodsServiceSymbol = Symbol('AUTH_METHODS_SERVICE');
 

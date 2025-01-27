@@ -1,4 +1,4 @@
-import { IServiceResponse } from 'src/common/interfaces/service-response.interface';
+import { IServiceResponse } from 'src/common/service-response';
 import { CreateDoctorDto } from './dto/create-doctor.dto';
 import { Doctor } from '@prisma/client';
 import { UpdateDoctorDto } from './dto/update-doctor.dto';

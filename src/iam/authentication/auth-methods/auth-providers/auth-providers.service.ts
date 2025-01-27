@@ -1,5 +1,5 @@
 import { AuthProvider } from '@prisma/client';
-import { IServiceResponse } from 'src/common/interfaces/service-response.interface';
+import { IServiceResponse } from 'src/common/service-response';
 import { IAuthProvidersRepository } from './auth-providers.repository.interface';
 import { IAuthProvidersService } from './auth-providers.service.interface';
 

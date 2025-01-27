@@ -1,4 +1,4 @@
-import { IServiceResponse } from 'src/common/interfaces/service-response.interface';
+import { IServiceResponse } from 'src/common/service-response';
 
 export const TokenGenerationServiceSymbol = Symbol('TOKEN_GENERATION_SERVICE');
 

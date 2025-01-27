@@ -1,5 +1,5 @@
 import { Specialization } from '@prisma/client';
-import { IServiceResponse } from 'src/common/interfaces/service-response.interface';
+import { IServiceResponse } from 'src/common/service-response';
 import { CreateSpecializationDto } from './dto/create-specialization.dto';
 
 export const SpecializationsServiceSymbol = Symbol('SPECIALIZATIONS_SERVICE');

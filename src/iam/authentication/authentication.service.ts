@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { IServiceResponse } from 'src/common/interfaces/service-response.interface';
+import { IServiceResponse } from 'src/common/service-response';
 import { User } from '@prisma/client';
 import { RegisterUserDto } from './dto/register-user.dto';
 import {
