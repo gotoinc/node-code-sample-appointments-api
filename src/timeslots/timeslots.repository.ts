@@ -4,6 +4,7 @@ import { ITimeslotsRepository } from './timeslots.repository.interface';
 import { PrismaService } from 'src/database/prisma.service';
 import { Timeslot } from '@prisma/client';
 import { TimeslotEntity } from './entities/timeslot.entity';
+import { FromToEntity } from './entities/from-to.entity';
 
 @Injectable()
 export class TimeslotsRepository
@@ -28,6 +29,7 @@ export class TimeslotsRepository
 
   async findManyByDoctorId(
     doctorId: number,
+    { from, to }: FromToEntity,
     tx?: unknown,
   ): Promise<Timeslot[]> {
     const prisma = this.getClient(tx);
@@ -35,6 +37,8 @@ export class TimeslotsRepository
     return await prisma.timeslot.findMany({
       where: {
         fk_doctor_id: doctorId,
+        start_time: { gte: from },
+        end_time: { lte: to },
       },
     });
   }

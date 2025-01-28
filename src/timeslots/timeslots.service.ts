@@ -5,6 +5,7 @@ import { ITimeslotsRepository } from './timeslots.repository.interface';
 import { CreateTimeslotDto } from './dto/create-timeslot.dto';
 import { TimeslotEntity } from './entities/timeslot.entity';
 import { IDoctorsService } from 'src/doctors/doctors.service.interface';
+import { FromToQueryDto } from './dto/from-to-query.dto';
 
 export class TimeslotsService implements ITimeslotsService {
   constructor(
@@ -53,10 +54,18 @@ export class TimeslotsService implements ITimeslotsService {
 
   async findByDoctorId(
     doctorId: number,
+    { from, to }: FromToQueryDto,
   ): Promise<IServiceResponse<Timeslot[]>> {
     try {
-      const timeslots =
-        await this.timeslotsRepository.findManyByDoctorId(doctorId);
+      const fromToEntity = {
+        from: new Date(from),
+        to: new Date(to),
+      };
+
+      const timeslots = await this.timeslotsRepository.findManyByDoctorId(
+        doctorId,
+        fromToEntity,
+      );
 
       return ServiceResponse.success<Timeslot[]>(timeslots);
     } catch (error) {
