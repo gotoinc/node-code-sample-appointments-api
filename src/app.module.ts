@@ -6,6 +6,7 @@ import { IamModule } from './iam/iam.module';
 import { DoctorsModule } from './doctors/doctors.module';
 import { SpecializationsModule } from './specializations/specializations.module';
 import { PatientsModule } from './patients/patients.module';
+import { TimeslotsModule } from './timeslots/timeslots.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { PatientsModule } from './patients/patients.module';
     DoctorsModule,
     SpecializationsModule,
     PatientsModule,
+    TimeslotsModule,
   ],
   controllers: [],
   providers: [],

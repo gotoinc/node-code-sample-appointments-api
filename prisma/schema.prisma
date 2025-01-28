@@ -54,7 +54,7 @@ model Doctor {
   fk_specialization_id Int
   user                 User           @relation(fields: [fk_user_id], references: [id], onDelete: Cascade)
   specialization       Specialization @relation(fields: [fk_specialization_id], references: [id])
-  slots                Slot[]
+  slots                Timeslot[]
 
   @@map("doctors")
 }
@@ -79,12 +79,12 @@ model Appointment {
   fk_patient_id            Int
   fk_slot_id               Int      @unique
   patient                  Patient  @relation(fields: [fk_patient_id], references: [id])
-  slot                     Slot     @relation(fields: [fk_slot_id], references: [id])
+  slot                     Timeslot     @relation(fields: [fk_slot_id], references: [id])
 
   @@map("appointments")
 }
 
-model Slot {
+model Timeslot {
   id           Int          @id @default(autoincrement())
   start_time   DateTime
   end_time     DateTime
@@ -92,7 +92,7 @@ model Slot {
   doctor       Doctor       @relation(fields: [fk_doctor_id], references: [id])
   appointments Appointment?
 
-  @@map("slots")
+  @@map("timeslots")
 }
 
 model EmailCredentials {

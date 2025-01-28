@@ -28,5 +28,6 @@ import { PrismaService } from 'src/database/prisma.service';
       inject: [DoctorsRepository, SpecializationsServiceSymbol],
     },
   ],
+  exports: [DoctorsServiceSymbol],
 })
 export class DoctorsModule {}
