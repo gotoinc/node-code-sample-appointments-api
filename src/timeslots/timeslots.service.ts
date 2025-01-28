@@ -11,6 +11,7 @@ export class TimeslotsService implements ITimeslotsService {
     private readonly timeslotsRepository: ITimeslotsRepository,
     private readonly doctorsService: IDoctorsService,
   ) {}
+
   async create(
     timeslotDto: CreateTimeslotDto,
     userId: number,
@@ -27,6 +28,14 @@ export class TimeslotsService implements ITimeslotsService {
         endTime: new Date(timeslotDto.endTime),
         doctorId,
       };
+
+      const collisions = await this.timeslotsRepository.findCollisions(
+        timeslotEntity.startTime,
+        timeslotEntity.endTime,
+      );
+
+      if (collisions.length > 0)
+        return ServiceResponse.conflict('Timeslots collision');
 
       const timeslot = await this.timeslotsRepository.create(timeslotEntity);
 

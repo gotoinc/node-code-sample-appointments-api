@@ -38,4 +38,51 @@ export class TimeslotsRepository
       },
     });
   }
+
+  async findCollisions(
+    startTime: Date,
+    endTime: Date,
+    tx?: unknown,
+  ): Promise<Timeslot[]> {
+    const prisma = this.getClient(tx);
+
+    return await prisma.timeslot.findMany({
+      where: {
+        OR: [
+          {
+            start_time: {
+              lt: startTime,
+            },
+            end_time: {
+              gt: startTime,
+            },
+          },
+          {
+            start_time: {
+              lt: endTime,
+            },
+            end_time: {
+              gt: endTime,
+            },
+          },
+          {
+            start_time: {
+              gt: startTime,
+            },
+            end_time: {
+              lt: endTime,
+            },
+          },
+          {
+            start_time: {
+              lt: startTime,
+            },
+            end_time: {
+              gt: endTime,
+            },
+          },
+        ],
+      },
+    });
+  }
 }
