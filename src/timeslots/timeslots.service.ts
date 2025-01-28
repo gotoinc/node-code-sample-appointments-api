@@ -19,7 +19,9 @@ export class TimeslotsService implements ITimeslotsService {
     try {
       const { error: errorDoctor, data: doctor } =
         await this.doctorsService.findByUserId(userId);
-      if (errorDoctor || !doctor) return { error: errorDoctor, data: null };
+
+      if (errorDoctor) return { error: errorDoctor, data: null };
+      if (!doctor) return ServiceResponse.notFound('Doctor not found');
 
       const doctorId = doctor.id;
 

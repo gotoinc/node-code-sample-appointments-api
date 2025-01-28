@@ -48,37 +48,15 @@ export class TimeslotsRepository
 
     return await prisma.timeslot.findMany({
       where: {
-        OR: [
-          {
-            start_time: {
-              lt: startTime,
-            },
-            end_time: {
-              gt: startTime,
-            },
-          },
+        AND: [
           {
             start_time: {
               lt: endTime,
             },
-            end_time: {
-              gt: endTime,
-            },
           },
           {
-            start_time: {
+            end_time: {
               gt: startTime,
-            },
-            end_time: {
-              lt: endTime,
-            },
-          },
-          {
-            start_time: {
-              lt: startTime,
-            },
-            end_time: {
-              gt: endTime,
             },
           },
         ],

@@ -24,7 +24,7 @@ export class TimeslotsController {
     private readonly timeslotsService: ITimeslotsService,
   ) {}
 
-  @Get('doctors:doctorId')
+  @Get('doctors/:doctorId')
   async getDoctorTimeslots(@Param() { doctorId }: DoctorIdParamDto) {
     const { error, data } =
       await this.timeslotsService.findByDoctorId(doctorId);
