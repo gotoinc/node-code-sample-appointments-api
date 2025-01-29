@@ -14,4 +14,5 @@ export interface ITimeslotsRepository {
     endTime: Date,
     tx?: unknown,
   ): Promise<Timeslot[]>;
+  findById(id: number, tx?: unknown): Promise<Timeslot | null>;
 }

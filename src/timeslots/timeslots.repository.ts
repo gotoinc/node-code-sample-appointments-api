@@ -67,4 +67,14 @@ export class TimeslotsRepository
       },
     });
   }
+
+  async findById(id: number, tx?: unknown): Promise<Timeslot | null> {
+    const prisma = this.getClient(tx);
+
+    return await prisma.timeslot.findUnique({
+      where: {
+        id,
+      },
+    });
+  }
 }
