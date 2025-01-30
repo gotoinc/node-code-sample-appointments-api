@@ -91,6 +91,7 @@ model Timeslot {
   id           Int          @id @default(autoincrement())
   start_time   DateTime
   end_time     DateTime
+  is_available Boolean      @default(true)
   fk_doctor_id Int
   doctor       Doctor       @relation(fields: [fk_doctor_id], references: [id])
   appointments Appointment?

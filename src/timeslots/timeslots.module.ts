@@ -28,6 +28,6 @@ import { DoctorsModule } from 'src/doctors/doctors.module';
     },
   ],
   controllers: [TimeslotsController],
-  exports: [TimeslotsServiceSymbol],
+  exports: [TimeslotsServiceSymbol, TimeslotsRepository],
 })
 export class TimeslotsModule {}

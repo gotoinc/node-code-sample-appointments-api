@@ -4,16 +4,18 @@ import { IAppointmentsService } from './appointments.service.interface';
 import { CreateAppointmentDto } from './dto/create-appointment.dto';
 import { IAppointmentsRepository } from './appointments.repository.interface';
 import { IPatientsService } from 'src/patients/patients.service.interface';
-import { ITimeslotsService } from 'src/timeslots/timeslots.service.interface';
 import { IDoctorsService } from 'src/doctors/doctors.service.interface';
 import { AppointmentEntity } from './entities/appointment.entity';
+import { ITransactionManager } from 'src/common/interfaces/transaction-manager.interface';
+import { ITimeslotsRepository } from 'src/timeslots/timeslots.repository.interface';
 
 export class AppointmentsService implements IAppointmentsService {
   constructor(
     private readonly appointmentsRepository: IAppointmentsRepository,
     private readonly patientsService: IPatientsService,
-    private readonly timeslotsService: ITimeslotsService,
+    private readonly timeslotsRepository: ITimeslotsRepository,
     private readonly doctorsService: IDoctorsService,
+    private readonly transactionManager: ITransactionManager,
   ) {}
 
   async getById(id: number): Promise<IServiceResponse<Appointment>> {
@@ -75,11 +77,14 @@ export class AppointmentsService implements IAppointmentsService {
       if (errorDoctor) return { error: errorDoctor, data: null };
       if (!doctor) return ServiceResponse.notFound('Doctor not found');
 
-      const { error: errorTimeSlot, data: timeslot } =
-        await this.timeslotsService.findById(appointment.timeslot_id);
+      const timeslot = await this.timeslotsRepository.findById(
+        appointment.timeslot_id,
+      );
 
-      if (errorTimeSlot) return { error: errorTimeSlot, data: null };
       if (!timeslot) return ServiceResponse.notFound('Timeslot not found');
+      if (!timeslot.is_available) return ServiceResponse.forbidden();
+      if (timeslot.fk_doctor_id !== doctor.id)
+        return ServiceResponse.forbidden();
 
       const appointmentEntity: AppointmentEntity = {
         fullName: appointment.full_name,
@@ -92,8 +97,18 @@ export class AppointmentsService implements IAppointmentsService {
         patientId: patient.id,
       };
 
-      const createdAppointment =
-        await this.appointmentsRepository.create(appointmentEntity);
+      const createdAppointment = await this.transactionManager.transaction(
+        async (tx) => {
+          const createdAppointment = await this.appointmentsRepository.create(
+            appointmentEntity,
+            tx,
+          );
+
+          await this.timeslotsRepository.setUnavailable(timeslot.id);
+
+          return createdAppointment;
+        },
+      );
 
       return ServiceResponse.success<Appointment>(createdAppointment);
     } catch (err) {

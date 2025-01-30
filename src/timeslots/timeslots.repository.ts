@@ -77,4 +77,17 @@ export class TimeslotsRepository
       },
     });
   }
+
+  async setUnavailable(id: number, tx?: unknown): Promise<Timeslot> {
+    const prisma = this.getClient(tx);
+
+    return await prisma.timeslot.update({
+      where: {
+        id,
+      },
+      data: {
+        is_available: false,
+      },
+    });
+  }
 }
