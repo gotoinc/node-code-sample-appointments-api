@@ -4,9 +4,11 @@ import { Specialization } from '@prisma/client';
 import { CreateSpecializationDto } from './dto/create-specialization.dto';
 import { ISpecializationsRepository } from './specializations.repository.interface';
 import { SpecializationEntity } from './entities/specialization.entity';
+import { ILogger } from 'src/common/interfaces/logger.interface';
 
 export class SpecializationsService implements ISpecializationsService {
   constructor(
+    private readonly logger: ILogger,
     private readonly specializationsRepository: ISpecializationsRepository,
   ) {}
 
@@ -17,7 +19,7 @@ export class SpecializationsService implements ISpecializationsService {
 
       return ServiceResponse.success<Specialization[]>(specializations);
     } catch (error) {
-      console.error(error);
+      this.logger.error(error);
       return { error: { message: error.message }, data: null };
     }
   }
@@ -28,7 +30,7 @@ export class SpecializationsService implements ISpecializationsService {
 
       return ServiceResponse.success<Specialization | null>(specialization);
     } catch (error) {
-      console.error(error);
+      this.logger.error(error);
       return { error: { message: error.message }, data: null };
     }
   }
@@ -42,7 +44,7 @@ export class SpecializationsService implements ISpecializationsService {
 
       return ServiceResponse.success<Specialization | null>(specialization);
     } catch (error) {
-      console.error(error);
+      this.logger.error(error);
       return { error: { message: error.message }, data: null };
     }
   }
@@ -60,7 +62,7 @@ export class SpecializationsService implements ISpecializationsService {
 
       return ServiceResponse.success<Specialization>(createdSpecialization);
     } catch (error) {
-      console.error(error);
+      this.logger.error(error);
       return {
         error: { message: 'Error creating specialization' },
         data: null,

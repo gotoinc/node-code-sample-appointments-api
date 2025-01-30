@@ -5,9 +5,11 @@ import { IUsersService } from './users.service.interface';
 import { IUsersRepository } from './users.repository.interface';
 import { IRolesService } from 'src/roles/roles.service.interface';
 import { CreateUserDto } from './dto/create-user.dto';
+import { ILogger } from 'src/common/interfaces/logger.interface';
 
 export class UsersService implements IUsersService {
   constructor(
+    private readonly logger: ILogger,
     private readonly usersRepository: IUsersRepository,
     private readonly rolesService: IRolesService,
   ) {}
@@ -32,7 +34,7 @@ export class UsersService implements IUsersService {
 
       return ServiceResponse.success<User>(createdUser);
     } catch (error) {
-      console.error(error);
+      this.logger.error(error);
       return { error: { message: 'Error creating user' }, data: null };
     }
   }
@@ -47,7 +49,7 @@ export class UsersService implements IUsersService {
 
       return ServiceResponse.success<User & { user_role: UserRole }>(user);
     } catch (error) {
-      console.error(error);
+      this.logger.error(error);
       return { error: { message: error.message }, data: null };
     }
   }
@@ -58,7 +60,7 @@ export class UsersService implements IUsersService {
 
       return ServiceResponse.success<User[]>(users);
     } catch (error) {
-      console.error(error);
+      this.logger.error(error);
       return { error: { message: error.message }, data: null };
     }
   }

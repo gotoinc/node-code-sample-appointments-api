@@ -4,6 +4,8 @@ import { AuthProvidersServiceSymbol } from './auth-providers.service.interface';
 import { AuthProvidersService } from './auth-providers.service';
 import { AuthProvidersRepository } from './auth-providers.repository';
 import { PrismaService } from 'src/database/prisma.service';
+import { Logger } from 'nestjs-pino';
+import { ILogger } from 'src/common/interfaces/logger.interface';
 
 @Module({
   imports: [],
@@ -12,10 +14,13 @@ import { PrismaService } from 'src/database/prisma.service';
     PrismaService,
     {
       provide: AuthProvidersServiceSymbol,
-      useFactory: (authProvidersRepository: IAuthProvidersRepository) => {
-        return new AuthProvidersService(authProvidersRepository);
+      useFactory: (
+        logger: ILogger,
+        authProvidersRepository: IAuthProvidersRepository,
+      ) => {
+        return new AuthProvidersService(logger, authProvidersRepository);
       },
-      inject: [AuthProvidersRepository],
+      inject: [Logger, AuthProvidersRepository],
     },
     AuthProvidersRepository,
   ],

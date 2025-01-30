@@ -2,9 +2,11 @@ import { AuthProvider } from '@prisma/client';
 import { IServiceResponse } from 'src/common/service-response';
 import { IAuthProvidersRepository } from './auth-providers.repository.interface';
 import { IAuthProvidersService } from './auth-providers.service.interface';
+import { ILogger } from 'src/common/interfaces/logger.interface';
 
 export class AuthProvidersService implements IAuthProvidersService {
   constructor(
+    private readonly logger: ILogger,
     private readonly authProvidersRepository: IAuthProvidersRepository,
   ) {}
 
@@ -20,7 +22,7 @@ export class AuthProvidersService implements IAuthProvidersService {
 
       return { error: null, data: authProvider };
     } catch (error) {
-      console.error(error);
+      this.logger.error(error);
       return { error: { message: 'Error finding auth provider' }, data: null };
     }
   }
@@ -34,7 +36,7 @@ export class AuthProvidersService implements IAuthProvidersService {
 
       return { error: null, data: authProvider };
     } catch (error) {
-      console.error(error);
+      this.logger.error(error);
       return { error: { message: 'Error creating auth provider' }, data: null };
     }
   }

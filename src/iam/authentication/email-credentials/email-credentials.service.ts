@@ -5,9 +5,11 @@ import { IEmailCredentialsRepository } from 'src/iam/authentication/email-creden
 import { ITransactionManager } from 'src/common/interfaces/transaction-manager.interface';
 import { IEmailCredentialsService } from './email-credentials.service.interface';
 import { IRolesService } from 'src/roles/roles.service.interface';
+import { ILogger } from 'src/common/interfaces/logger.interface';
 
 export class EmailCredentialsService implements IEmailCredentialsService {
   constructor(
+    private readonly logger: ILogger,
     private readonly transactionManager: ITransactionManager,
     private readonly usersRepository: IUsersRepository,
     private readonly emailCredentialsRepository: IEmailCredentialsRepository,
@@ -52,7 +54,7 @@ export class EmailCredentialsService implements IEmailCredentialsService {
 
       return ServiceResponse.success<User>(user);
     } catch (error) {
-      console.error(error);
+      this.logger.error(error);
       return { error: { message: error.message }, data: null };
     }
   }
@@ -66,7 +68,7 @@ export class EmailCredentialsService implements IEmailCredentialsService {
 
       return ServiceResponse.success<EmailCredentials>(emailCredentials);
     } catch (error) {
-      console.error(error);
+      this.logger.error(error);
       return {
         error: { message: 'Error finding email credentials' },
         data: null,

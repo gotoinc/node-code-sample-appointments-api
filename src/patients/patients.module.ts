@@ -5,6 +5,8 @@ import { PatientsServiceSymbol } from './patients.service.interface';
 import { IPatientsRepository } from './patients.repository.interface';
 import { PatientsRepository } from './patients.repository';
 import { PrismaService } from 'src/database/prisma.service';
+import { Logger } from 'nestjs-pino';
+import { ILogger } from 'src/common/interfaces/logger.interface';
 
 @Module({
   controllers: [PatientsController],
@@ -13,10 +15,13 @@ import { PrismaService } from 'src/database/prisma.service';
     PatientsRepository,
     {
       provide: PatientsServiceSymbol,
-      useFactory: (patientsRepository: IPatientsRepository) => {
-        return new PatientsService(patientsRepository);
+      useFactory: (
+        logger: ILogger,
+        patientsRepository: IPatientsRepository,
+      ) => {
+        return new PatientsService(logger, patientsRepository);
       },
-      inject: [PatientsRepository],
+      inject: [Logger, PatientsRepository],
     },
   ],
   exports: [PatientsServiceSymbol],

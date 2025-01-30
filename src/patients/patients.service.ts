@@ -6,9 +6,13 @@ import { IPatientsRepository } from './patients.repository.interface';
 import { PatientEntity } from './entities/patient.entity';
 import { UpdatePatientDto } from './dto/update-patient.dto';
 import { ServiceResponse } from 'src/common/service-response';
+import { ILogger } from 'src/common/interfaces/logger.interface';
 
 export class PatientsService implements IPatientsService {
-  constructor(private readonly patientsRepository: IPatientsRepository) {}
+  constructor(
+    private readonly logger: ILogger,
+    private readonly patientsRepository: IPatientsRepository,
+  ) {}
 
   async create(
     patient: CreatePatientDto,
@@ -35,7 +39,7 @@ export class PatientsService implements IPatientsService {
 
       return ServiceResponse.success<Patient>(createdPatient);
     } catch (error) {
-      console.error(error);
+      this.logger.error(error);
       return { error: { message: 'Error creating patient' }, data: null };
     }
   }
@@ -46,7 +50,7 @@ export class PatientsService implements IPatientsService {
 
       return ServiceResponse.success<Patient[]>(patients);
     } catch (error) {
-      console.error(error);
+      this.logger.error(error);
       return { error: { message: 'Error finding all patients' }, data: null };
     }
   }
@@ -57,7 +61,7 @@ export class PatientsService implements IPatientsService {
 
       return ServiceResponse.success<Patient | null>(patient);
     } catch (error) {
-      console.error(error);
+      this.logger.error(error);
       return { error: { message: 'Error finding patient' }, data: null };
     }
   }
@@ -70,7 +74,7 @@ export class PatientsService implements IPatientsService {
 
       return ServiceResponse.success<Patient | null>(patient);
     } catch (error) {
-      console.error(error);
+      this.logger.error(error);
       return { error: { message: 'Error finding patient' }, data: null };
     }
   }
@@ -102,7 +106,7 @@ export class PatientsService implements IPatientsService {
 
       return ServiceResponse.success<Patient>(updatedPatient);
     } catch (error) {
-      console.error(error);
+      this.logger.error(error);
       return { error: { message: 'Error updating patient' }, data: null };
     }
   }

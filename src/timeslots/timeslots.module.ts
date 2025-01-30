@@ -10,21 +10,29 @@ import {
   IDoctorsService,
 } from 'src/doctors/doctors.service.interface';
 import { DoctorsModule } from 'src/doctors/doctors.module';
+import { Logger } from 'nestjs-pino';
+import { ILogger } from 'src/common/interfaces/logger.interface';
 
 @Module({
   imports: [DoctorsModule],
   providers: [
     PrismaService,
     TimeslotsRepository,
+    Logger,
     {
       provide: TimeslotsServiceSymbol,
       useFactory: (
+        logger: ILogger,
         timeslotsRepository: ITimeslotsRepository,
         doctorsService: IDoctorsService,
       ) => {
-        return new TimeslotsService(timeslotsRepository, doctorsService);
+        return new TimeslotsService(
+          logger,
+          timeslotsRepository,
+          doctorsService,
+        );
       },
-      inject: [TimeslotsRepository, DoctorsServiceSymbol],
+      inject: [Logger, TimeslotsRepository, DoctorsServiceSymbol],
     },
   ],
   controllers: [TimeslotsController],

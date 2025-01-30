@@ -2,9 +2,13 @@ import { UserRole } from '@prisma/client';
 import { IServiceResponse, ServiceResponse } from 'src/common/service-response';
 import { IRolesRepository } from './roles.repository.interface';
 import { IRolesService } from './roles.service.interface';
+import { ILogger } from 'src/common/interfaces/logger.interface';
 
 export class RolesService implements IRolesService {
-  constructor(private readonly rolesRepository: IRolesRepository) {}
+  constructor(
+    private readonly logger: ILogger,
+    private readonly rolesRepository: IRolesRepository,
+  ) {}
 
   async create(roleName: string): Promise<IServiceResponse<UserRole>> {
     try {
@@ -16,7 +20,7 @@ export class RolesService implements IRolesService {
 
       return ServiceResponse.success<UserRole>(role);
     } catch (error) {
-      console.error(error);
+      this.logger.error(error);
       return { error: { message: 'Error creating role' }, data: null };
     }
   }
@@ -27,7 +31,7 @@ export class RolesService implements IRolesService {
 
       return ServiceResponse.success<UserRole[]>(allRoles);
     } catch (error) {
-      console.error(error);
+      this.logger.error(error);
       return { error: { message: 'Error finding all roles' }, data: null };
     }
   }
@@ -41,7 +45,7 @@ export class RolesService implements IRolesService {
 
       return ServiceResponse.success<UserRole>(role);
     } catch (error) {
-      console.error(error);
+      this.logger.error(error);
       return { error: { message: 'Error finding role' }, data: null };
     }
   }

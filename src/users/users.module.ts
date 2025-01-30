@@ -11,6 +11,8 @@ import {
   IRolesService,
   RolesServiceSymbol,
 } from 'src/roles/roles.service.interface';
+import { Logger } from 'nestjs-pino';
+import { ILogger } from 'src/common/interfaces/logger.interface';
 
 @Module({
   imports: [RolesModule],
@@ -21,12 +23,13 @@ import {
     {
       provide: UsersServiceSymbol,
       useFactory: (
+        logger: ILogger,
         usersRepository: IUsersRepository,
         rolesService: IRolesService,
       ) => {
-        return new UsersService(usersRepository, rolesService);
+        return new UsersService(logger, usersRepository, rolesService);
       },
-      inject: [UsersRepository, RolesServiceSymbol],
+      inject: [Logger, UsersRepository, RolesServiceSymbol],
     },
     JwtAuthGuard,
   ],

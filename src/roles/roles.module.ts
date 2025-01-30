@@ -5,6 +5,8 @@ import { PrismaService } from 'src/database/prisma.service';
 import { RolesRepository } from './roles.repository';
 import { IRolesRepository } from './roles.repository.interface';
 import { RolesServiceSymbol } from './roles.service.interface';
+import { ILogger } from 'src/common/interfaces/logger.interface';
+import { Logger } from 'nestjs-pino';
 
 @Module({
   controllers: [RolesController],
@@ -13,10 +15,10 @@ import { RolesServiceSymbol } from './roles.service.interface';
     RolesRepository,
     {
       provide: RolesServiceSymbol,
-      useFactory: (rolesRepository: IRolesRepository) => {
-        return new RolesService(rolesRepository);
+      useFactory: (logger: ILogger, rolesRepository: IRolesRepository) => {
+        return new RolesService(logger, rolesRepository);
       },
-      inject: [RolesRepository],
+      inject: [Logger, RolesRepository],
     },
   ],
   exports: [RolesServiceSymbol, RolesRepository],
