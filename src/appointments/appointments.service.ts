@@ -82,9 +82,10 @@ export class AppointmentsService implements IAppointmentsService {
       );
 
       if (!timeslot) return ServiceResponse.notFound('Timeslot not found');
-      if (!timeslot.is_available) return ServiceResponse.forbidden();
+      if (!timeslot.is_available)
+        return ServiceResponse.forbidden('Timeslot is already taken');
       if (timeslot.fk_doctor_id !== doctor.id)
-        return ServiceResponse.forbidden();
+        return ServiceResponse.forbidden('Doctor does not match');
 
       const appointmentEntity: AppointmentEntity = {
         fullName: appointment.full_name,
@@ -113,7 +114,7 @@ export class AppointmentsService implements IAppointmentsService {
       return ServiceResponse.success<Appointment>(createdAppointment);
     } catch (err) {
       console.error(err);
-      return { error: { message: err.message }, data: null };
+      return { error: { message: 'Error creating appointment' }, data: null };
     }
   }
 }
