@@ -3,9 +3,11 @@ import { ITokenGenerationService } from './token-generation.service.interface';
 import { AccessTokenPayload } from '../interfaces/access-token-payload.interface';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import { ILogger } from 'src/common/interfaces/logger.interface';
 
 export class TokenGenerationService implements ITokenGenerationService {
   constructor(
+    private readonly logger: ILogger,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
   ) {}
@@ -28,7 +30,7 @@ export class TokenGenerationService implements ITokenGenerationService {
 
       return ServiceResponse.success<string>(token);
     } catch (error) {
-      console.error(error);
+      this.logger.error(error);
       return { error: { message: 'Error generating token' }, data: null };
     }
   }

@@ -5,6 +5,8 @@ import { SpecializationsService } from './specializations.service';
 import { SpecializationsRepository } from './specializations.repository';
 import { PrismaService } from 'src/database/prisma.service';
 import { SpecializationsController } from './specializations.controller';
+import { ILogger } from 'src/common/interfaces/logger.interface';
+import { Logger } from 'nestjs-pino';
 
 @Module({
   controllers: [SpecializationsController],
@@ -13,9 +15,11 @@ import { SpecializationsController } from './specializations.controller';
     SpecializationsRepository,
     {
       provide: SpecializationsServiceSymbol,
-      useFactory: (specializationsRepository: ISpecializationsRepository) =>
-        new SpecializationsService(specializationsRepository),
-      inject: [SpecializationsRepository],
+      useFactory: (
+        logger: ILogger,
+        specializationsRepository: ISpecializationsRepository,
+      ) => new SpecializationsService(logger, specializationsRepository),
+      inject: [Logger, SpecializationsRepository],
     },
   ],
   exports: [SpecializationsServiceSymbol],

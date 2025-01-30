@@ -6,9 +6,11 @@ import { CreateTimeslotDto } from './dto/create-timeslot.dto';
 import { TimeslotEntity } from './entities/timeslot.entity';
 import { IDoctorsService } from 'src/doctors/doctors.service.interface';
 import { FromToQueryDto } from './dto/from-to-query.dto';
+import { ILogger } from 'src/common/interfaces/logger.interface';
 
 export class TimeslotsService implements ITimeslotsService {
   constructor(
+    private readonly logger: ILogger,
     private readonly timeslotsRepository: ITimeslotsRepository,
     private readonly doctorsService: IDoctorsService,
   ) {}
@@ -44,7 +46,7 @@ export class TimeslotsService implements ITimeslotsService {
 
       return ServiceResponse.success<Timeslot>(timeslot);
     } catch (error) {
-      console.error(error);
+      this.logger.error(error);
       return {
         error: { message: 'Error creating doctor timeslots' },
         data: null,
@@ -69,7 +71,7 @@ export class TimeslotsService implements ITimeslotsService {
 
       return ServiceResponse.success<Timeslot[]>(timeslots);
     } catch (error) {
-      console.error(error);
+      this.logger.error(error);
       return {
         error: { message: 'Error finding doctor timeslots' },
         data: null,
@@ -85,7 +87,7 @@ export class TimeslotsService implements ITimeslotsService {
 
       return ServiceResponse.success<Timeslot>(timeslot);
     } catch (error) {
-      console.error(error);
+      this.logger.error(error);
       return {
         error: { message: 'Error finding timeslot' },
         data: null,

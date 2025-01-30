@@ -6,9 +6,11 @@ import { UpdateDoctorDto } from './dto/update-doctor.dto';
 import { IDoctorsRepository } from './doctors.repository.interface';
 import { DoctorEntity } from './entities/doctor.entity';
 import { ISpecializationsService } from 'src/specializations/specializations.service.interface';
+import { ILogger } from 'src/common/interfaces/logger.interface';
 
 export class DoctorsService implements IDoctorsService {
   constructor(
+    private readonly logger: ILogger,
     private readonly doctorsRepository: IDoctorsRepository,
     private readonly specializationsService: ISpecializationsService,
   ) {}
@@ -47,7 +49,7 @@ export class DoctorsService implements IDoctorsService {
 
       return ServiceResponse.success(createdDoctor);
     } catch (error) {
-      console.error(error);
+      this.logger.error(error);
       return { error: { message: 'Error creating doctor' }, data: null };
     }
   }
@@ -58,7 +60,7 @@ export class DoctorsService implements IDoctorsService {
 
       return ServiceResponse.success<Doctor[]>(doctors);
     } catch (error) {
-      console.error(error);
+      this.logger.error(error);
       return { error: { message: 'Error finding all doctors' }, data: null };
     }
   }
@@ -69,7 +71,7 @@ export class DoctorsService implements IDoctorsService {
 
       return ServiceResponse.success<Doctor | null>(doctor);
     } catch (error) {
-      console.error(error);
+      this.logger.error(error);
       return { error: { message: 'Error finding doctor' }, data: null };
     }
   }
@@ -80,7 +82,7 @@ export class DoctorsService implements IDoctorsService {
 
       return ServiceResponse.success<Doctor | null>(doctor);
     } catch (error) {
-      console.error(error);
+      this.logger.error(error);
       return { error: { message: 'Error finding doctor' }, data: null };
     }
   }
@@ -119,7 +121,7 @@ export class DoctorsService implements IDoctorsService {
 
       return ServiceResponse.success<Doctor>(updatedDoctor);
     } catch (error) {
-      console.error(error);
+      this.logger.error(error);
       return { error: { message: 'Error updating doctor' }, data: null };
     }
   }

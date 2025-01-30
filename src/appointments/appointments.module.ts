@@ -20,6 +20,8 @@ import { ITimeslotsRepository } from 'src/timeslots/timeslots.repository.interfa
 import { TimeslotsRepository } from 'src/timeslots/timeslots.repository';
 import { ITransactionManager } from 'src/common/interfaces/transaction-manager.interface';
 import { PrismaTransactionManager } from 'src/database/prisma-transaction.service';
+import { ILogger } from 'src/common/interfaces/logger.interface';
+import { Logger } from 'nestjs-pino';
 
 @Module({
   imports: [PatientsModule, TimeslotsModule, DoctorsModule],
@@ -30,6 +32,7 @@ import { PrismaTransactionManager } from 'src/database/prisma-transaction.servic
     {
       provide: AppointmentsServiceSymbol,
       useFactory: (
+        logger: ILogger,
         appointmentsRepository: IAppointmentsRepository,
         patientsService: IPatientsService,
         timeslotsRepository: ITimeslotsRepository,
@@ -37,6 +40,7 @@ import { PrismaTransactionManager } from 'src/database/prisma-transaction.servic
         transactionManager: ITransactionManager,
       ) => {
         return new AppointmentsService(
+          logger,
           appointmentsRepository,
           patientsService,
           timeslotsRepository,
@@ -45,6 +49,7 @@ import { PrismaTransactionManager } from 'src/database/prisma-transaction.servic
         );
       },
       inject: [
+        Logger,
         AppointmentsRepository,
         PatientsServiceSymbol,
         TimeslotsRepository,

@@ -10,6 +10,8 @@ import {
 } from 'src/specializations/specializations.service.interface';
 import { SpecializationsModule } from 'src/specializations/specializations.module';
 import { PrismaService } from 'src/database/prisma.service';
+import { ILogger } from 'src/common/interfaces/logger.interface';
+import { Logger } from 'nestjs-pino';
 
 @Module({
   imports: [SpecializationsModule],
@@ -20,12 +22,17 @@ import { PrismaService } from 'src/database/prisma.service';
     {
       provide: DoctorsServiceSymbol,
       useFactory: (
+        logger: ILogger,
         doctorsRepository: IDoctorsRepository,
         specializationService: ISpecializationsService,
       ) => {
-        return new DoctorsService(doctorsRepository, specializationService);
+        return new DoctorsService(
+          logger,
+          doctorsRepository,
+          specializationService,
+        );
       },
-      inject: [DoctorsRepository, SpecializationsServiceSymbol],
+      inject: [Logger, DoctorsRepository, SpecializationsServiceSymbol],
     },
   ],
   exports: [DoctorsServiceSymbol],

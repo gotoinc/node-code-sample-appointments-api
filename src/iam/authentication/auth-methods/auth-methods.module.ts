@@ -19,6 +19,8 @@ import { ITransactionManager } from 'src/common/interfaces/transaction-manager.i
 import { IAuthMethodsRepository } from './auth-methods.repository.interface';
 import { PrismaTransactionManager } from 'src/database/prisma-transaction.service';
 import { PrismaService } from 'src/database/prisma.service';
+import { ILogger } from 'src/common/interfaces/logger.interface';
+import { Logger } from 'nestjs-pino';
 
 @Module({
   imports: [AuthProvidersModule, UsersModule, RolesModule],
@@ -31,6 +33,7 @@ import { PrismaService } from 'src/database/prisma.service';
     {
       provide: AuthMethodsServiceSymbol,
       useFactory: (
+        logger: ILogger,
         transactionManager: ITransactionManager,
         rolesService: IRolesService,
         usersRepository: IUsersRepository,
@@ -38,6 +41,7 @@ import { PrismaService } from 'src/database/prisma.service';
         authProvidersService: IAuthProvidersService,
       ) => {
         return new AuthMethodsService(
+          logger,
           transactionManager,
           rolesService,
           usersRepository,
@@ -46,6 +50,7 @@ import { PrismaService } from 'src/database/prisma.service';
         );
       },
       inject: [
+        Logger,
         PrismaTransactionManager,
         RolesServiceSymbol,
         UsersRepository,

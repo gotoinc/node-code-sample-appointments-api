@@ -18,10 +18,13 @@ import {
   ITokenGenerationService,
   TokenGenerationServiceSymbol,
 } from './token-generation/token-generation.service.interface';
+import { Logger } from 'nestjs-pino';
+import { ILogger } from 'src/common/interfaces/logger.interface';
 
 @Injectable()
 export class AuthenticationService {
   constructor(
+    @Inject(Logger) private readonly logger: ILogger,
     @Inject(EmailCredentialsServiceSymbol)
     private readonly emailCredentialsService: IEmailCredentialsService,
     @Inject(UsersServiceSymbol) private readonly usersService: IUsersService,
@@ -55,9 +58,8 @@ export class AuthenticationService {
         error: null,
         data: { accessToken: token },
       };
-    } catch (error: unknown) {
-      console.error(error);
-
+    } catch (error) {
+      this.logger.error(error);
       return {
         error: { message: 'Login failed. Please try again.' },
         data: null,
@@ -96,8 +98,8 @@ export class AuthenticationService {
       if (createUserError) return { error: createUserError, data: null };
 
       return { error: null, data: user };
-    } catch (err: unknown) {
-      console.error(err);
+    } catch (error) {
+      this.logger.error(error);
       return { error: { message: 'Error while creating user' }, data: null };
     }
   }

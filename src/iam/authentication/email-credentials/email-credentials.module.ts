@@ -14,6 +14,8 @@ import {
   IRolesService,
   RolesServiceSymbol,
 } from 'src/roles/roles.service.interface';
+import { ILogger } from 'src/common/interfaces/logger.interface';
+import { Logger } from 'nestjs-pino';
 
 @Module({
   imports: [UsersModule, RolesModule],
@@ -24,12 +26,14 @@ import {
     {
       provide: EmailCredentialsServiceSymbol,
       useFactory: (
+        logger: ILogger,
         transactionManager: ITransactionManager,
         emailCredentialsRepository: IEmailCredentialsRepository,
         usersRepository: IUsersRepository,
         rolesService: IRolesService,
       ) => {
         return new EmailCredentialsService(
+          logger,
           transactionManager,
           usersRepository,
           emailCredentialsRepository,
@@ -37,6 +41,7 @@ import {
         );
       },
       inject: [
+        Logger,
         PrismaTransactionManager,
         EmailCredentialsRepository,
         UsersRepository,

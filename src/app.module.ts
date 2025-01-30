@@ -8,9 +8,17 @@ import { SpecializationsModule } from './specializations/specializations.module'
 import { PatientsModule } from './patients/patients.module';
 import { TimeslotsModule } from './timeslots/timeslots.module';
 import { AppointmentsModule } from './appointments/appointments.module';
+import { LoggerModule } from 'nestjs-pino';
 
 @Module({
   imports: [
+    LoggerModule.forRoot({
+      pinoHttp: {
+        transport: {
+          target: 'pino-pretty',
+        },
+      },
+    }),
     ConfigModule.forRoot({ isGlobal: true }),
     IamModule,
     RolesModule,

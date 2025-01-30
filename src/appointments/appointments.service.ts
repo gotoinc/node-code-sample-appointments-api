@@ -8,9 +8,11 @@ import { IDoctorsService } from 'src/doctors/doctors.service.interface';
 import { AppointmentEntity } from './entities/appointment.entity';
 import { ITransactionManager } from 'src/common/interfaces/transaction-manager.interface';
 import { ITimeslotsRepository } from 'src/timeslots/timeslots.repository.interface';
+import { ILogger } from 'src/common/interfaces/logger.interface';
 
 export class AppointmentsService implements IAppointmentsService {
   constructor(
+    private readonly logger: ILogger,
     private readonly appointmentsRepository: IAppointmentsRepository,
     private readonly patientsService: IPatientsService,
     private readonly timeslotsRepository: ITimeslotsRepository,
@@ -27,7 +29,7 @@ export class AppointmentsService implements IAppointmentsService {
 
       return ServiceResponse.success<Appointment>(appointment);
     } catch (error) {
-      console.error(error);
+      this.logger.error(error);
       return { error: { message: error.message }, data: null };
     }
   }
@@ -41,7 +43,7 @@ export class AppointmentsService implements IAppointmentsService {
 
       return ServiceResponse.success<Appointment[]>(appointments);
     } catch (err) {
-      console.error(err);
+      this.logger.error(err);
       return { error: { message: err.message }, data: null };
     }
   }
@@ -55,7 +57,7 @@ export class AppointmentsService implements IAppointmentsService {
 
       return ServiceResponse.success<Appointment[]>(appointments);
     } catch (err) {
-      console.error(err);
+      this.logger.error(err);
       return { error: { message: err.message }, data: null };
     }
   }
@@ -113,7 +115,7 @@ export class AppointmentsService implements IAppointmentsService {
 
       return ServiceResponse.success<Appointment>(createdAppointment);
     } catch (err) {
-      console.error(err);
+      this.logger.error(err);
       return { error: { message: 'Error creating appointment' }, data: null };
     }
   }

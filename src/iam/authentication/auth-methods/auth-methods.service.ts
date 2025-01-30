@@ -6,9 +6,11 @@ import { ITransactionManager } from 'src/common/interfaces/transaction-manager.i
 import { IAuthProvidersService } from './auth-providers/auth-providers.service.interface';
 import { IServiceResponse, ServiceResponse } from 'src/common/service-response';
 import { IRolesService } from 'src/roles/roles.service.interface';
+import { ILogger } from 'src/common/interfaces/logger.interface';
 
 export class AuthMethodsService implements IAuthMethodsService {
   constructor(
+    private readonly logger: ILogger,
     private readonly transactionManager: ITransactionManager,
     private readonly rolesService: IRolesService,
     private readonly usersRepository: IUsersRepository,
@@ -59,8 +61,8 @@ export class AuthMethodsService implements IAuthMethodsService {
       });
 
       return ServiceResponse.success<UserAuthMethod>(user);
-    } catch (err) {
-      console.error(err);
+    } catch (error) {
+      this.logger.error(error);
       return { error: { message: 'Error creating user' }, data: null };
     }
   }
@@ -73,7 +75,7 @@ export class AuthMethodsService implements IAuthMethodsService {
 
       return ServiceResponse.success<UserAuthMethod>(userAuthMethod);
     } catch (error) {
-      console.error(error);
+      this.logger.error(error);
       return { error: { message: 'Error finding user' }, data: null };
     }
   }
