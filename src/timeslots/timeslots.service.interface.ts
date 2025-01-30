@@ -14,4 +14,5 @@ export interface ITimeslotsService {
     doctorId: number,
     fromTo: FromToQueryDto,
   ): Promise<IServiceResponse<Timeslot[]>>;
+  findById(id: number): Promise<IServiceResponse<Timeslot>>;
 }

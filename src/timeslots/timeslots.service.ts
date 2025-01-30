@@ -76,4 +76,20 @@ export class TimeslotsService implements ITimeslotsService {
       };
     }
   }
+
+  async findById(id: number): Promise<IServiceResponse<Timeslot>> {
+    try {
+      const timeslot = await this.timeslotsRepository.findById(id);
+
+      if (!timeslot) return ServiceResponse.notFound('Timeslot not found');
+
+      return ServiceResponse.success<Timeslot>(timeslot);
+    } catch (error) {
+      console.error(error);
+      return {
+        error: { message: 'Error finding timeslot' },
+        data: null,
+      };
+    }
+  }
 }

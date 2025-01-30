@@ -27,7 +27,7 @@ import { DoctorsModule } from 'src/doctors/doctors.module';
       inject: [TimeslotsRepository, DoctorsServiceSymbol],
     },
   ],
-  exports: [],
   controllers: [TimeslotsController],
+  exports: [TimeslotsServiceSymbol, TimeslotsRepository],
 })
 export class TimeslotsModule {}

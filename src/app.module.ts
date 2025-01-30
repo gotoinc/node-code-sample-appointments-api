@@ -7,6 +7,7 @@ import { DoctorsModule } from './doctors/doctors.module';
 import { SpecializationsModule } from './specializations/specializations.module';
 import { PatientsModule } from './patients/patients.module';
 import { TimeslotsModule } from './timeslots/timeslots.module';
+import { AppointmentsModule } from './appointments/appointments.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { TimeslotsModule } from './timeslots/timeslots.module';
     SpecializationsModule,
     PatientsModule,
     TimeslotsModule,
+    AppointmentsModule,
   ],
   controllers: [],
   providers: [],
