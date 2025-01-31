@@ -14,8 +14,8 @@ model User {
   last_name        String
   created_at       DateTime          @default(now())
   updated_at       DateTime          @default(now())
-  fk_user_role_id  Int
-  user_role        UserRole          @relation(fields: [fk_user_role_id], references: [id])
+  user_role_id     Int               @map("fk_user_role_id")
+  user_role        UserRole          @relation(fields: [user_role_id], references: [id])
   user_auth_method UserAuthMethod?
   email_auth       EmailCredentials?
   patient          Patient?
@@ -39,23 +39,23 @@ model Patient {
   address       String?
   created_at    DateTime      @default(now())
   updated_at    DateTime      @default(now())
-  fk_user_id    Int           @unique
-  user          User          @relation(fields: [fk_user_id], references: [id], onDelete: Cascade)
+  user_id       Int           @unique @map("fk_user_id")
+  user          User          @relation(fields: [user_id], references: [id], onDelete: Cascade)
   appointments  Appointment[]
 
   @@map("patients")
 }
 
 model Doctor {
-  id                   Int            @id @default(autoincrement())
-  phone_number         String
-  licence_number       String
-  fk_user_id           Int            @unique
-  fk_specialization_id Int
-  user                 User           @relation(fields: [fk_user_id], references: [id], onDelete: Cascade)
-  specialization       Specialization @relation(fields: [fk_specialization_id], references: [id])
-  timeslots            Timeslot[]
-  appointments         Appointment[]
+  id                Int            @id @default(autoincrement())
+  phone_number      String
+  licence_number    String
+  user_id           Int            @unique @map("fk_user_id")
+  specialization_id Int            @map("fk_specialization_id")
+  user              User           @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  specialization    Specialization @relation(fields: [specialization_id], references: [id])
+  timeslots         Timeslot[]
+  appointments      Appointment[]
 
   @@map("doctors")
 }
@@ -77,12 +77,12 @@ model Appointment {
   reason                   String
   created_at               DateTime @default(now())
   updated_at               DateTime @default(now())
-  fk_patient_id            Int
-  fk_timeslot_id           Int      @unique
-  fk_doctor_id             Int
-  patient                  Patient  @relation(fields: [fk_patient_id], references: [id])
-  timeslot                 Timeslot @relation(fields: [fk_timeslot_id], references: [id])
-  doctor                   Doctor   @relation(fields: [fk_doctor_id], references: [id])
+  patient_id               Int      @map("fk_patient_id")
+  timeslot_id              Int      @unique @map("fk_timeslot_id")
+  doctor_id                Int      @map("fk_doctor_id")
+  patient                  Patient  @relation(fields: [patient_id], references: [id])
+  timeslot                 Timeslot @relation(fields: [timeslot_id], references: [id])
+  doctor                   Doctor   @relation(fields: [doctor_id], references: [id])
 
   @@map("appointments")
 }
@@ -92,8 +92,8 @@ model Timeslot {
   start_time   DateTime
   end_time     DateTime
   is_available Boolean      @default(true)
-  fk_doctor_id Int
-  doctor       Doctor       @relation(fields: [fk_doctor_id], references: [id])
+  doctor_id    Int          @map("fk_doctor_id")
+  doctor       Doctor       @relation(fields: [doctor_id], references: [id])
   appointments Appointment?
 
   @@map("timeslots")
@@ -103,8 +103,8 @@ model EmailCredentials {
   id            Int    @id @default(autoincrement())
   email         String @unique
   password_hash String
-  fk_user_id    Int    @unique
-  user          User   @relation(fields: [fk_user_id], references: [id], onDelete: Cascade)
+  user_id       Int    @unique @map("fk_user_id")
+  user          User   @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
   @@map("email_credentials")
 }
@@ -118,12 +118,12 @@ model AuthProvider {
 }
 
 model UserAuthMethod {
-  id                  Int          @id @default(autoincrement())
-  email               String       @unique
-  fk_user_id          Int          @unique
-  fk_auth_provider_id Int
-  user                User         @relation(fields: [fk_user_id], references: [id], onDelete: Cascade)
-  auth_provider       AuthProvider @relation(fields: [fk_auth_provider_id], references: [id])
+  id               Int          @id @default(autoincrement())
+  email            String       @unique
+  user_id          Int          @unique @map("fk_user_id")
+  auth_provider_id Int          @map("fk_auth_provider_id")
+  user             User         @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  auth_provider    AuthProvider @relation(fields: [auth_provider_id], references: [id])
 
   @@map("user_auth_methods")
 }

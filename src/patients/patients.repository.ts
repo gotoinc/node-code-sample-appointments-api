@@ -26,7 +26,7 @@ export class PatientsRepository
         date_of_birth: patient.dateOfBirth,
         gender: patient.gender,
         address: patient.address,
-        fk_user_id: userId,
+        user_id: userId,
       },
     });
   }
@@ -52,7 +52,7 @@ export class PatientsRepository
 
     return await prisma.patient.findUnique({
       where: {
-        fk_user_id: userId,
+        user_id: userId,
       },
     });
   }

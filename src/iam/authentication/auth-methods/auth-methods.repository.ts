@@ -23,8 +23,8 @@ export class AuthMethodsRepository
     return await prisma.userAuthMethod.create({
       data: {
         email: userAuthMethod.email,
-        fk_user_id: userAuthMethod.userId,
-        fk_auth_provider_id: userAuthMethod.authProviderId,
+        user_id: userAuthMethod.userId,
+        auth_provider_id: userAuthMethod.authProviderId,
       },
     });
   }

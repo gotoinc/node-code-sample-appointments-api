@@ -21,8 +21,8 @@ export class DoctorsRepository
       data: {
         phone_number: doctor.phoneNumber,
         licence_number: doctor.licenceNumber,
-        fk_specialization_id: doctor.specializationId,
-        fk_user_id: userId,
+        specialization_id: doctor.specializationId,
+        user_id: userId,
       },
     });
   }
@@ -44,7 +44,7 @@ export class DoctorsRepository
 
     return await prisma.doctor.findUnique({
       where: {
-        fk_user_id: userId,
+        user_id: userId,
       },
     });
   }
@@ -63,7 +63,7 @@ export class DoctorsRepository
       data: {
         phone_number: doctor.phoneNumber,
         licence_number: doctor.licenceNumber,
-        fk_specialization_id: doctor.specializationId,
+        specialization_id: doctor.specializationId,
       },
     });
   }

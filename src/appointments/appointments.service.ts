@@ -86,7 +86,7 @@ export class AppointmentsService implements IAppointmentsService {
       if (!timeslot) return ServiceResponse.notFound('Timeslot not found');
       if (!timeslot.is_available)
         return ServiceResponse.forbidden('Timeslot is already taken');
-      if (timeslot.fk_doctor_id !== doctor.id)
+      if (timeslot.doctor_id !== doctor.id)
         return ServiceResponse.forbidden('Doctor does not match');
 
       const appointmentEntity: AppointmentEntity = {

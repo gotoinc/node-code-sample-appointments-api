@@ -97,8 +97,7 @@ export class DoctorsService implements IDoctorsService {
       if (!exisingDoctor)
         return ServiceResponse.notFound('Doctor profile not found');
 
-      if (userId !== exisingDoctor.fk_user_id)
-        return ServiceResponse.forbidden();
+      if (userId !== exisingDoctor.user_id) return ServiceResponse.forbidden();
 
       const { error: errorSpecialization, data: specialization } =
         await this.specializationsService.findOne(

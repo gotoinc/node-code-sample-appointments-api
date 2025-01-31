@@ -90,7 +90,7 @@ export class PatientsService implements IPatientsService {
       if (!existingPatient)
         return ServiceResponse.notFound('Patient not found');
 
-      if (userId !== existingPatient.fk_user_id)
+      if (userId !== existingPatient.user_id)
         return ServiceResponse.forbidden();
 
       const patientEntity: PatientEntity = {
