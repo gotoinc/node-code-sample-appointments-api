@@ -20,7 +20,7 @@ export class AppointmentsService implements IAppointmentsService {
     private readonly transactionManager: ITransactionManager,
   ) {}
 
-  async getById(id: number): Promise<IServiceResponse<Appointment>> {
+  async findById(id: number): Promise<IServiceResponse<Appointment>> {
     try {
       const appointment = await this.appointmentsRepository.findById(id);
 
@@ -34,7 +34,7 @@ export class AppointmentsService implements IAppointmentsService {
     }
   }
 
-  async getByDoctorId(
+  async findByDoctorId(
     doctorId: number,
   ): Promise<IServiceResponse<Appointment[]>> {
     try {
@@ -48,7 +48,7 @@ export class AppointmentsService implements IAppointmentsService {
     }
   }
 
-  async getByPatientId(
+  async findByPatientId(
     patientId: number,
   ): Promise<IServiceResponse<Appointment[]>> {
     try {
@@ -112,7 +112,6 @@ export class AppointmentsService implements IAppointmentsService {
           return createdAppointment;
         },
       );
-
       return ServiceResponse.success<Appointment>(createdAppointment);
     } catch (err) {
       this.logger.error(err);

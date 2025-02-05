@@ -28,7 +28,7 @@ export class AppointmentsController {
 
   @Get(':id')
   async findById(@Param() { id }: IdParamDto) {
-    const { error, data } = await this.appointmentsService.getById(id);
+    const { error, data } = await this.appointmentsService.findById(id);
 
     const exception = handleServiceError(error);
     if (exception) throw exception;
@@ -39,7 +39,7 @@ export class AppointmentsController {
   @Get('doctors/:doctorId')
   async findByDoctorId(@Param() { doctorId }: DoctorIdParamDto) {
     const { error, data } =
-      await this.appointmentsService.getByDoctorId(doctorId);
+      await this.appointmentsService.findByDoctorId(doctorId);
 
     const exception = handleServiceError(error);
     if (exception) throw exception;
@@ -51,7 +51,7 @@ export class AppointmentsController {
   @Get('patients/:patientId')
   async findByPatientId(@Param() { patientId }: PatientIdParamDto) {
     const { error, data } =
-      await this.appointmentsService.getByPatientId(patientId);
+      await this.appointmentsService.findByPatientId(patientId);
 
     const exception = handleServiceError(error);
     if (exception) throw exception;

@@ -5,9 +5,9 @@ import { CreateAppointmentDto } from './dto/create-appointment.dto';
 export const AppointmentsServiceSymbol = Symbol('APPOINTMENTS_SERVICE');
 
 export interface IAppointmentsService {
-  getById(id: number): Promise<IServiceResponse<Appointment>>;
-  getByDoctorId(doctorId: number): Promise<IServiceResponse<Appointment[]>>;
-  getByPatientId(patientId: number): Promise<IServiceResponse<Appointment[]>>;
+  findById(id: number): Promise<IServiceResponse<Appointment>>;
+  findByDoctorId(doctorId: number): Promise<IServiceResponse<Appointment[]>>;
+  findByPatientId(patientId: number): Promise<IServiceResponse<Appointment[]>>;
   create(
     appointment: CreateAppointmentDto,
     userId: number,
