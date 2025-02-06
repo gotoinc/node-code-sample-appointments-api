@@ -104,8 +104,10 @@ export class DoctorsService implements IDoctorsService {
           doctorToUpdate.specializationId,
         );
 
-      if (errorSpecialization || !specialization)
+      if (errorSpecialization)
         return { error: errorSpecialization, data: null };
+      if (!specialization)
+        return ServiceResponse.invalidData('Specialization not found');
 
       const doctorEntity: DoctorEntity = {
         phoneNumber: doctorToUpdate.phone_number,
