@@ -29,12 +29,10 @@ describe('RolesService', () => {
 
   describe('create', () => {
     it('should return conflict error if role already exists', async () => {
-      mockRolesRepository.findByName.mockReturnValueOnce(
-        Promise.resolve({
-          id: 1,
-          role_name: 'doctor',
-        }),
-      );
+      mockRolesRepository.findByName.mockResolvedValueOnce({
+        id: 1,
+        role_name: 'doctor',
+      });
 
       const role = await service.create('doctor');
 
@@ -42,8 +40,8 @@ describe('RolesService', () => {
     });
 
     it('should return error on repository error', async () => {
-      mockRolesRepository.findByName.mockReturnValueOnce(
-        Promise.reject(new Error('Error finding role')),
+      mockRolesRepository.findByName.mockRejectedValueOnce(
+        'Error finding role',
       );
 
       const role = await service.create('doctor');
@@ -53,14 +51,12 @@ describe('RolesService', () => {
     });
 
     it('should return success response', async () => {
-      mockRolesRepository.findByName.mockReturnValueOnce(Promise.resolve(null));
+      mockRolesRepository.findByName.mockResolvedValueOnce(null);
 
-      mockRolesRepository.create.mockReturnValueOnce(
-        Promise.resolve({
-          id: 1,
-          role_name: 'doctor',
-        }),
-      );
+      mockRolesRepository.create.mockResolvedValueOnce({
+        id: 1,
+        role_name: 'doctor',
+      });
 
       const role = await service.create('doctor');
 

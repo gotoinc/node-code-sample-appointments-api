@@ -30,7 +30,7 @@ export class AppointmentsService implements IAppointmentsService {
       return ServiceResponse.success<Appointment>(appointment);
     } catch (error) {
       this.logger.error(error);
-      return { error: { message: error.message }, data: null };
+      return { error: { message: 'Error finding appointment' }, data: null };
     }
   }
 
@@ -42,9 +42,9 @@ export class AppointmentsService implements IAppointmentsService {
         await this.appointmentsRepository.findByDoctorId(doctorId);
 
       return ServiceResponse.success<Appointment[]>(appointments);
-    } catch (err) {
-      this.logger.error(err);
-      return { error: { message: err.message }, data: null };
+    } catch (error) {
+      this.logger.error(error);
+      return { error: { message: 'Error finding appointments' }, data: null };
     }
   }
 
@@ -56,9 +56,9 @@ export class AppointmentsService implements IAppointmentsService {
         await this.appointmentsRepository.findByPatientId(patientId);
 
       return ServiceResponse.success<Appointment[]>(appointments);
-    } catch (err) {
-      this.logger.error(err);
-      return { error: { message: err.message }, data: null };
+    } catch (error) {
+      this.logger.error(error);
+      return { error: { message: 'Error finding appointments' }, data: null };
     }
   }
 
@@ -113,8 +113,8 @@ export class AppointmentsService implements IAppointmentsService {
         },
       );
       return ServiceResponse.success<Appointment>(createdAppointment);
-    } catch (err) {
-      this.logger.error(err);
+    } catch (error) {
+      this.logger.error(error);
       return { error: { message: 'Error creating appointment' }, data: null };
     }
   }

@@ -64,21 +64,19 @@ describe('AppointmentsService', () => {
 
   describe('findById', () => {
     it('should return appointment by id', async () => {
-      mockAppointmentsRepository.findById.mockReturnValueOnce(
-        Promise.resolve({
-          id: 1,
-          full_name: 'John Doe',
-          email: 'john@doe.com',
-          phone_number: '+1234567890',
-          patient_insurance_number: '1234567890',
-          reason: 'Test reason',
-          timeslot_id: 1,
-          doctor_id: 1,
-          patient_id: 1,
-          created_at: new Date(),
-          updated_at: new Date(),
-        }),
-      );
+      mockAppointmentsRepository.findById.mockResolvedValueOnce({
+        id: 1,
+        full_name: 'John Doe',
+        email: 'john@doe.com',
+        phone_number: '+1234567890',
+        patient_insurance_number: '1234567890',
+        reason: 'Test reason',
+        timeslot_id: 1,
+        doctor_id: 1,
+        patient_id: 1,
+        created_at: new Date(),
+        updated_at: new Date(),
+      });
 
       const appointment = await service.findById(1);
 
@@ -88,9 +86,7 @@ describe('AppointmentsService', () => {
     });
 
     it('should return not found service response', async () => {
-      mockAppointmentsRepository.findById.mockReturnValueOnce(
-        Promise.resolve(null),
-      );
+      mockAppointmentsRepository.findById.mockResolvedValueOnce(null);
 
       const appointment = await service.findById(1);
 
@@ -98,9 +94,9 @@ describe('AppointmentsService', () => {
       expect(appointment.error?.status).toBe(ResponseStatus.NotFound);
     });
 
-    it('should return service response with error', async () => {
-      mockAppointmentsRepository.findById.mockReturnValueOnce(
-        Promise.reject(new Error('Error finding appointment')),
+    it('should return service response with error on appointment repository error', async () => {
+      mockAppointmentsRepository.findById.mockRejectedValueOnce(
+        'Error finding appointment',
       );
 
       const appointment = await service.findById(1);
@@ -112,23 +108,21 @@ describe('AppointmentsService', () => {
 
   describe('findByDoctorId', () => {
     it('should find by doctor id', async () => {
-      mockAppointmentsRepository.findByDoctorId.mockReturnValueOnce(
-        Promise.resolve([
-          {
-            id: 1,
-            full_name: 'John Doe',
-            email: 'john@doe.com',
-            phone_number: '+1234567890',
-            patient_insurance_number: '1234567890',
-            reason: 'Test reason',
-            timeslot_id: 1,
-            doctor_id: 1,
-            patient_id: 1,
-            created_at: new Date(),
-            updated_at: new Date(),
-          },
-        ]),
-      );
+      mockAppointmentsRepository.findByDoctorId.mockResolvedValueOnce([
+        {
+          id: 1,
+          full_name: 'John Doe',
+          email: 'john@doe.com',
+          phone_number: '+1234567890',
+          patient_insurance_number: '1234567890',
+          reason: 'Test reason',
+          timeslot_id: 1,
+          doctor_id: 1,
+          patient_id: 1,
+          created_at: new Date(),
+          updated_at: new Date(),
+        },
+      ]);
 
       const appointments = await service.findByDoctorId(1);
 
@@ -139,9 +133,7 @@ describe('AppointmentsService', () => {
     });
 
     it('should return empty array data', async () => {
-      mockAppointmentsRepository.findByDoctorId.mockReturnValueOnce(
-        Promise.resolve([]),
-      );
+      mockAppointmentsRepository.findByDoctorId.mockResolvedValueOnce([]);
 
       const appointments = await service.findByDoctorId(1);
 
@@ -149,8 +141,8 @@ describe('AppointmentsService', () => {
     });
 
     it('should return service response with error', async () => {
-      mockAppointmentsRepository.findByDoctorId.mockReturnValueOnce(
-        Promise.reject(new Error('Error finding appointments')),
+      mockAppointmentsRepository.findByDoctorId.mockRejectedValueOnce(
+        'Error finding appointments',
       );
 
       const appointments = await service.findByDoctorId(1);
@@ -162,23 +154,21 @@ describe('AppointmentsService', () => {
 
   describe('findByPatientId', () => {
     it('should find by patient id', async () => {
-      mockAppointmentsRepository.findByPatientId.mockReturnValueOnce(
-        Promise.resolve([
-          {
-            id: 1,
-            full_name: 'John Doe',
-            email: 'john@doe.com',
-            phone_number: '+1234567890',
-            patient_insurance_number: '1234567890',
-            reason: 'Test reason',
-            timeslot_id: 1,
-            doctor_id: 1,
-            patient_id: 1,
-            created_at: new Date(),
-            updated_at: new Date(),
-          },
-        ]),
-      );
+      mockAppointmentsRepository.findByPatientId.mockResolvedValueOnce([
+        {
+          id: 1,
+          full_name: 'John Doe',
+          email: 'john@doe.com',
+          phone_number: '+1234567890',
+          patient_insurance_number: '1234567890',
+          reason: 'Test reason',
+          timeslot_id: 1,
+          doctor_id: 1,
+          patient_id: 1,
+          created_at: new Date(),
+          updated_at: new Date(),
+        },
+      ]);
 
       const appointments = await service.findByPatientId(1);
 
@@ -189,9 +179,7 @@ describe('AppointmentsService', () => {
     });
 
     it('should return empty array data', async () => {
-      mockAppointmentsRepository.findByPatientId.mockReturnValueOnce(
-        Promise.resolve([]),
-      );
+      mockAppointmentsRepository.findByPatientId.mockResolvedValueOnce([]);
 
       const appointments = await service.findByPatientId(1);
 
@@ -199,8 +187,8 @@ describe('AppointmentsService', () => {
     });
 
     it('should return service response with error', async () => {
-      mockAppointmentsRepository.findByPatientId.mockReturnValueOnce(
-        Promise.reject(new Error('Error finding appointments')),
+      mockAppointmentsRepository.findByPatientId.mockRejectedValueOnce(
+        'Error finding appointments',
       );
 
       const appointments = await service.findByPatientId(1);
@@ -212,12 +200,10 @@ describe('AppointmentsService', () => {
 
   describe('create', () => {
     it('should return error finding patient', async () => {
-      mockPatientsService.findByUserId.mockReturnValueOnce(
-        Promise.resolve({
-          data: null,
-          error: { message: 'Error finding patient' },
-        }),
-      );
+      mockPatientsService.findByUserId.mockResolvedValueOnce({
+        data: null,
+        error: { message: 'Error finding patient' },
+      });
 
       const appointment = await service.create(
         {
@@ -236,12 +222,10 @@ describe('AppointmentsService', () => {
     });
 
     it('should return error patient not found', async () => {
-      mockPatientsService.findByUserId.mockReturnValueOnce(
-        Promise.resolve({
-          data: null,
-          error: null,
-        }),
-      );
+      mockPatientsService.findByUserId.mockResolvedValueOnce({
+        data: null,
+        error: null,
+      });
 
       const appointment = await service.create(
         {
@@ -260,27 +244,23 @@ describe('AppointmentsService', () => {
     });
 
     it('should return error finding doctor', async () => {
-      mockPatientsService.findByUserId.mockReturnValueOnce(
-        Promise.resolve({
-          data: {
-            id: 1,
-            date_of_birth: new Date('2022-01-01'),
-            gender: 'male',
-            address: '123 Main St',
-            user_id: 2,
-            created_at: new Date('2022-01-01'),
-            updated_at: new Date('2022-01-01'),
-          },
-          error: null,
-        }),
-      );
+      mockPatientsService.findByUserId.mockResolvedValueOnce({
+        data: {
+          id: 1,
+          date_of_birth: new Date('2022-01-01'),
+          gender: 'male',
+          address: '123 Main St',
+          user_id: 2,
+          created_at: new Date('2022-01-01'),
+          updated_at: new Date('2022-01-01'),
+        },
+        error: null,
+      });
 
-      mockDoctorsService.findOne.mockReturnValueOnce(
-        Promise.resolve({
-          data: null,
-          error: { message: 'Error finding doctor' },
-        }),
-      );
+      mockDoctorsService.findOne.mockResolvedValueOnce({
+        data: null,
+        error: { message: 'Error finding doctor' },
+      });
 
       const appointment = await service.create(
         {
@@ -299,27 +279,23 @@ describe('AppointmentsService', () => {
     });
 
     it('should return error doctor not found', async () => {
-      mockPatientsService.findByUserId.mockReturnValueOnce(
-        Promise.resolve({
-          data: {
-            id: 1,
-            date_of_birth: new Date('2022-01-01'),
-            gender: 'male',
-            address: '123 Main St',
-            user_id: 2,
-            created_at: new Date('2022-01-01'),
-            updated_at: new Date('2022-01-01'),
-          },
-          error: null,
-        }),
-      );
+      mockPatientsService.findByUserId.mockResolvedValueOnce({
+        data: {
+          id: 1,
+          date_of_birth: new Date('2022-01-01'),
+          gender: 'male',
+          address: '123 Main St',
+          user_id: 2,
+          created_at: new Date('2022-01-01'),
+          updated_at: new Date('2022-01-01'),
+        },
+        error: null,
+      });
 
-      mockDoctorsService.findOne.mockReturnValueOnce(
-        Promise.resolve({
-          data: null,
-          error: null,
-        }),
-      );
+      mockDoctorsService.findOne.mockResolvedValueOnce({
+        data: null,
+        error: null,
+      });
 
       const appointment = await service.create(
         {
@@ -338,37 +314,31 @@ describe('AppointmentsService', () => {
     });
 
     it('should return error finding timeslot', async () => {
-      mockPatientsService.findByUserId.mockReturnValueOnce(
-        Promise.resolve({
-          data: {
-            id: 1,
-            date_of_birth: new Date('2022-01-01'),
-            gender: 'male',
-            address: '123 Main St',
-            user_id: 2,
-            created_at: new Date('2022-01-01'),
-            updated_at: new Date('2022-01-01'),
-          },
-          error: null,
-        }),
-      );
+      mockPatientsService.findByUserId.mockResolvedValueOnce({
+        data: {
+          id: 1,
+          date_of_birth: new Date('2022-01-01'),
+          gender: 'male',
+          address: '123 Main St',
+          user_id: 2,
+          created_at: new Date('2022-01-01'),
+          updated_at: new Date('2022-01-01'),
+        },
+        error: null,
+      });
 
-      mockDoctorsService.findOne.mockReturnValueOnce(
-        Promise.resolve({
-          data: {
-            id: 1,
-            phone_number: '+1234567890',
-            user_id: 3,
-            licence_number: '1234567890',
-            specialization_id: 2,
-          },
-          error: null,
-        }),
-      );
+      mockDoctorsService.findOne.mockResolvedValueOnce({
+        data: {
+          id: 1,
+          phone_number: '+1234567890',
+          user_id: 3,
+          licence_number: '1234567890',
+          specialization_id: 2,
+        },
+        error: null,
+      });
 
-      mockTimeslotsRepository.findById.mockReturnValueOnce(
-        Promise.resolve(null),
-      );
+      mockTimeslotsRepository.findById.mockResolvedValueOnce(null);
 
       const appointment = await service.create(
         {
@@ -388,43 +358,37 @@ describe('AppointmentsService', () => {
     });
 
     it('should return forbidden error if slot is not available', async () => {
-      mockPatientsService.findByUserId.mockReturnValueOnce(
-        Promise.resolve({
-          data: {
-            id: 1,
-            date_of_birth: new Date('2022-01-01'),
-            gender: 'male',
-            address: '123 Main St',
-            user_id: 2,
-            created_at: new Date('2022-01-01'),
-            updated_at: new Date('2022-01-01'),
-          },
-          error: null,
-        }),
-      );
-
-      mockDoctorsService.findOne.mockReturnValueOnce(
-        Promise.resolve({
-          data: {
-            id: 1,
-            phone_number: '+1234567890',
-            user_id: 3,
-            licence_number: '1234567890',
-            specialization_id: 2,
-          },
-          error: null,
-        }),
-      );
-
-      mockTimeslotsRepository.findById.mockReturnValueOnce(
-        Promise.resolve({
+      mockPatientsService.findByUserId.mockResolvedValueOnce({
+        data: {
           id: 1,
-          doctor_id: 1,
-          start_time: new Date('2022-01-01'),
-          end_time: new Date('2022-01-01'),
-          is_available: false,
-        }),
-      );
+          date_of_birth: new Date('2022-01-01'),
+          gender: 'male',
+          address: '123 Main St',
+          user_id: 2,
+          created_at: new Date('2022-01-01'),
+          updated_at: new Date('2022-01-01'),
+        },
+        error: null,
+      });
+
+      mockDoctorsService.findOne.mockResolvedValueOnce({
+        data: {
+          id: 1,
+          phone_number: '+1234567890',
+          user_id: 3,
+          licence_number: '1234567890',
+          specialization_id: 2,
+        },
+        error: null,
+      });
+
+      mockTimeslotsRepository.findById.mockResolvedValueOnce({
+        id: 1,
+        doctor_id: 1,
+        start_time: new Date('2022-01-01'),
+        end_time: new Date('2022-01-01'),
+        is_available: false,
+      });
 
       const appointment = await service.create(
         {
@@ -443,43 +407,37 @@ describe('AppointmentsService', () => {
     });
 
     it('should return forbidden error if doctor does not match', async () => {
-      mockPatientsService.findByUserId.mockReturnValueOnce(
-        Promise.resolve({
-          data: {
-            id: 1,
-            date_of_birth: new Date('2022-01-01'),
-            gender: 'male',
-            address: '123 Main St',
-            user_id: 2,
-            created_at: new Date('2022-01-01'),
-            updated_at: new Date('2022-01-01'),
-          },
-          error: null,
-        }),
-      );
-
-      mockDoctorsService.findOne.mockReturnValueOnce(
-        Promise.resolve({
-          data: {
-            id: 1,
-            phone_number: '+1234567890',
-            user_id: 3,
-            licence_number: '1234567890',
-            specialization_id: 2,
-          },
-          error: null,
-        }),
-      );
-
-      mockTimeslotsRepository.findById.mockReturnValueOnce(
-        Promise.resolve({
+      mockPatientsService.findByUserId.mockResolvedValueOnce({
+        data: {
           id: 1,
-          doctor_id: 2,
-          start_time: new Date('2022-01-01'),
-          end_time: new Date('2022-01-01'),
-          is_available: true,
-        }),
-      );
+          date_of_birth: new Date('2022-01-01'),
+          gender: 'male',
+          address: '123 Main St',
+          user_id: 2,
+          created_at: new Date('2022-01-01'),
+          updated_at: new Date('2022-01-01'),
+        },
+        error: null,
+      });
+
+      mockDoctorsService.findOne.mockResolvedValueOnce({
+        data: {
+          id: 1,
+          phone_number: '+1234567890',
+          user_id: 3,
+          licence_number: '1234567890',
+          specialization_id: 2,
+        },
+        error: null,
+      });
+
+      mockTimeslotsRepository.findById.mockResolvedValueOnce({
+        id: 1,
+        doctor_id: 2,
+        start_time: new Date('2022-01-01'),
+        end_time: new Date('2022-01-01'),
+        is_available: true,
+      });
 
       const appointment = await service.create(
         {
@@ -498,8 +456,8 @@ describe('AppointmentsService', () => {
     });
 
     it('should return default error message on unexpected error', async () => {
-      mockPatientsService.findByUserId.mockReturnValueOnce(
-        Promise.reject(new Error('Error finding patient')),
+      mockPatientsService.findByUserId.mockRejectedValueOnce(
+        'Error finding patient',
       );
 
       const appointment = await service.create(
@@ -519,43 +477,37 @@ describe('AppointmentsService', () => {
     });
 
     it('should successfully create appointment', async () => {
-      mockPatientsService.findByUserId.mockReturnValueOnce(
-        Promise.resolve({
-          data: {
-            id: 1,
-            date_of_birth: new Date('2022-01-01'),
-            gender: 'male',
-            address: '123 Main St',
-            user_id: 2,
-            created_at: new Date('2022-01-01'),
-            updated_at: new Date('2022-01-01'),
-          },
-          error: null,
-        }),
-      );
-
-      mockDoctorsService.findOne.mockReturnValueOnce(
-        Promise.resolve({
-          data: {
-            id: 1,
-            phone_number: '+1234567890',
-            user_id: 3,
-            licence_number: '1234567890',
-            specialization_id: 2,
-          },
-          error: null,
-        }),
-      );
-
-      mockTimeslotsRepository.findById.mockReturnValueOnce(
-        Promise.resolve({
+      mockPatientsService.findByUserId.mockResolvedValueOnce({
+        data: {
           id: 1,
-          doctor_id: 1,
-          start_time: new Date('2022-01-01'),
-          end_time: new Date('2022-01-01'),
-          is_available: true,
-        }),
-      );
+          date_of_birth: new Date('2022-01-01'),
+          gender: 'male',
+          address: '123 Main St',
+          user_id: 2,
+          created_at: new Date('2022-01-01'),
+          updated_at: new Date('2022-01-01'),
+        },
+        error: null,
+      });
+
+      mockDoctorsService.findOne.mockResolvedValueOnce({
+        data: {
+          id: 1,
+          phone_number: '+1234567890',
+          user_id: 3,
+          licence_number: '1234567890',
+          specialization_id: 2,
+        },
+        error: null,
+      });
+
+      mockTimeslotsRepository.findById.mockResolvedValueOnce({
+        id: 1,
+        doctor_id: 1,
+        start_time: new Date('2022-01-01'),
+        end_time: new Date('2022-01-01'),
+        is_available: true,
+      });
 
       mockTransactionManager.transaction.mockImplementationOnce(
         async (callback) => {
@@ -563,31 +515,27 @@ describe('AppointmentsService', () => {
         },
       );
 
-      mockAppointmentsRepository.create.mockReturnValueOnce(
-        Promise.resolve({
-          id: 1,
-          full_name: 'John Doe',
-          email: 'john@doe.com',
-          phone_number: '+1234567890',
-          patient_insurance_number: '1234567890',
-          reason: 'Test reason',
-          timeslot_id: 1,
-          doctor_id: 1,
-          patient_id: 1,
-          created_at: new Date(),
-          updated_at: new Date(),
-        }),
-      );
+      mockAppointmentsRepository.create.mockResolvedValueOnce({
+        id: 1,
+        full_name: 'John Doe',
+        email: 'john@doe.com',
+        phone_number: '+1234567890',
+        patient_insurance_number: '1234567890',
+        reason: 'Test reason',
+        timeslot_id: 1,
+        doctor_id: 1,
+        patient_id: 1,
+        created_at: new Date(),
+        updated_at: new Date(),
+      });
 
-      mockTimeslotsRepository.setUnavailable.mockReturnValueOnce(
-        Promise.resolve({
-          id: 1,
-          doctor_id: 1,
-          start_time: new Date(),
-          end_time: new Date(),
-          is_available: false,
-        }),
-      );
+      mockTimeslotsRepository.setUnavailable.mockResolvedValueOnce({
+        id: 1,
+        doctor_id: 1,
+        start_time: new Date(),
+        end_time: new Date(),
+        is_available: false,
+      });
 
       const appointment = await service.create(
         {
