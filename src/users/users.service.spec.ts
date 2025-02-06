@@ -36,7 +36,10 @@ describe('RolesService', () => {
 
   describe('create', () => {
     it('should return error on roles service error', async () => {
-      mockRolesService.findByName.mockRejectedValueOnce('Error finding role');
+      mockRolesService.findByName.mockResolvedValueOnce({
+        error: { message: 'Error finding role' },
+        data: null,
+      });
 
       const user = await service.create({
         email: 'test@test.com',

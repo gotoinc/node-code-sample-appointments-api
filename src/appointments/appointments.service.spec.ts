@@ -13,12 +13,14 @@ const mockLogger: jest.Mocked<ILogger> = {
   error: jest.fn(),
   warn: jest.fn(),
 };
+
 const mockAppointmentsRepository: jest.Mocked<IAppointmentsRepository> = {
   findById: jest.fn(),
   findByDoctorId: jest.fn(),
   findByPatientId: jest.fn(),
   create: jest.fn(),
 };
+
 const mockPatientsService: jest.Mocked<IPatientsService> = {
   findByUserId: jest.fn(),
   findById: jest.fn(),
@@ -26,6 +28,7 @@ const mockPatientsService: jest.Mocked<IPatientsService> = {
   update: jest.fn(),
   create: jest.fn(),
 };
+
 const mockTimeslotsRepository: jest.Mocked<ITimeslotsRepository> = {
   findById: jest.fn(),
   setUnavailable: jest.fn(),
@@ -33,6 +36,7 @@ const mockTimeslotsRepository: jest.Mocked<ITimeslotsRepository> = {
   findManyByDoctorId: jest.fn(),
   findCollisions: jest.fn(),
 };
+
 const mockDoctorsService: jest.Mocked<IDoctorsService> = {
   findOne: jest.fn(),
   findByUserId: jest.fn(),
@@ -40,6 +44,7 @@ const mockDoctorsService: jest.Mocked<IDoctorsService> = {
   create: jest.fn(),
   update: jest.fn(),
 };
+
 const mockTransactionManager: jest.Mocked<ITransactionManager> = {
   transaction: jest.fn(),
 };
