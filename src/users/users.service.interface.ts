@@ -11,5 +11,5 @@ export interface IUsersService {
     email: string,
   ): Promise<IServiceResponse<User & { user_role: UserRole }>>;
 
-  getUsers(): Promise<IServiceResponse<User[]>>;
+  findAll(): Promise<IServiceResponse<User[]>>;
 }
