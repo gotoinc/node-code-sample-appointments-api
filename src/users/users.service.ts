@@ -44,7 +44,7 @@ export class UsersService implements IUsersService {
     try {
       const user = await this.usersRepository.findOne(email);
 
-      if (!user) return ServiceResponse.notFound('User not found');
+      if (!user) return { error: null, data: null };
 
       return ServiceResponse.success<User & { user_role: UserRole }>(user);
     } catch (error) {
