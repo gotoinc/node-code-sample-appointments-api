@@ -7,6 +7,7 @@ import { PatientEntity } from './entities/patient.entity';
 import { UpdatePatientDto } from './dto/update-patient.dto';
 import { ServiceResponse } from 'src/common/service-response';
 import { ILogger } from 'src/common/interfaces/logger.interface';
+import { PatientDto } from './dto/patient.dto';
 
 export class PatientsService implements IPatientsService {
   constructor(
@@ -17,7 +18,7 @@ export class PatientsService implements IPatientsService {
   async create(
     patient: CreatePatientDto,
     userId: number,
-  ): Promise<IServiceResponse<Patient>> {
+  ): Promise<IServiceResponse<PatientDto>> {
     try {
       const exisingPatient = await this.patientsRepository.findByUserId(userId);
 
@@ -37,29 +38,29 @@ export class PatientsService implements IPatientsService {
         userId,
       );
 
-      return ServiceResponse.success<Patient>(createdPatient);
+      return ServiceResponse.success<PatientDto>(createdPatient);
     } catch (error) {
       this.logger.error(error);
       return { error: { message: 'Error creating patient' }, data: null };
     }
   }
 
-  async findAll(): Promise<IServiceResponse<Patient[]>> {
+  async findAll(): Promise<IServiceResponse<PatientDto[]>> {
     try {
       const patients: Patient[] = await this.patientsRepository.findAll();
 
-      return ServiceResponse.success<Patient[]>(patients);
+      return ServiceResponse.success<PatientDto[]>(patients);
     } catch (error) {
       this.logger.error(error);
       return { error: { message: 'Error finding all patients' }, data: null };
     }
   }
 
-  async findById(id: number): Promise<IServiceResponse<Patient | null>> {
+  async findById(id: number): Promise<IServiceResponse<PatientDto | null>> {
     try {
       const patient = await this.patientsRepository.findById(id);
 
-      return ServiceResponse.success<Patient | null>(patient);
+      return ServiceResponse.success<PatientDto | null>(patient);
     } catch (error) {
       this.logger.error(error);
       return { error: { message: 'Error finding patient' }, data: null };
@@ -68,11 +69,11 @@ export class PatientsService implements IPatientsService {
 
   async findByUserId(
     userId: number,
-  ): Promise<IServiceResponse<Patient | null>> {
+  ): Promise<IServiceResponse<PatientDto | null>> {
     try {
       const patient = await this.patientsRepository.findByUserId(userId);
 
-      return ServiceResponse.success<Patient | null>(patient);
+      return ServiceResponse.success<PatientDto | null>(patient);
     } catch (error) {
       this.logger.error(error);
       return { error: { message: 'Error finding patient' }, data: null };
@@ -82,7 +83,7 @@ export class PatientsService implements IPatientsService {
   async update(
     patientToUpdate: UpdatePatientDto,
     userId: number,
-  ): Promise<IServiceResponse<Patient>> {
+  ): Promise<IServiceResponse<PatientDto>> {
     try {
       const existingPatient =
         await this.patientsRepository.findByUserId(userId);
@@ -104,7 +105,7 @@ export class PatientsService implements IPatientsService {
         patientEntity,
       );
 
-      return ServiceResponse.success<Patient>(updatedPatient);
+      return ServiceResponse.success<PatientDto>(updatedPatient);
     } catch (error) {
       this.logger.error(error);
       return { error: { message: 'Error updating patient' }, data: null };

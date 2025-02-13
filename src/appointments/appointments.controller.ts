@@ -6,6 +6,7 @@ import {
   Param,
   Post,
   Req,
+  ServiceUnavailableException,
 } from '@nestjs/common';
 import { IdParamDto } from 'src/common/dto/id-param.dto';
 import { DoctorIdParamDto } from 'src/timeslots/dto/doctor-id-param.dto';
@@ -18,6 +19,12 @@ import {
 } from './appointments.service.interface';
 import { Request } from 'express';
 import { Roles } from 'src/iam/authorization/decorators/roles.decorator';
+import { AppointmentDto } from './dto/appointment.dto';
+import {
+  ApiForbiddenResponse,
+  ApiNotFoundResponse,
+  ApiServiceUnavailableResponse,
+} from '@nestjs/swagger';
 
 @Controller('appointments')
 export class AppointmentsController {
@@ -26,42 +33,64 @@ export class AppointmentsController {
     private readonly appointmentsService: IAppointmentsService,
   ) {}
 
+  @ApiServiceUnavailableResponse({ description: 'Error finding appointment' })
+  @ApiNotFoundResponse({ description: 'Appointment not found' })
   @Get(':id')
-  async findById(@Param() { id }: IdParamDto) {
+  async findById(@Param() { id }: IdParamDto): Promise<AppointmentDto> {
     const { error, data } = await this.appointmentsService.findById(id);
 
     const exception = handleServiceError(error);
     if (exception) throw exception;
+    if (!data)
+      throw new ServiceUnavailableException('Error finding appointment');
 
     return data;
   }
 
+  @ApiServiceUnavailableResponse({ description: 'Error finding appointments' })
   @Get('doctors/:doctorId')
-  async findByDoctorId(@Param() { doctorId }: DoctorIdParamDto) {
+  async findByDoctorId(
+    @Param() { doctorId }: DoctorIdParamDto,
+  ): Promise<AppointmentDto[]> {
     const { error, data } =
       await this.appointmentsService.findByDoctorId(doctorId);
 
     const exception = handleServiceError(error);
     if (exception) throw exception;
+    if (!data)
+      throw new ServiceUnavailableException('Error finding appointment');
 
     return data;
   }
 
+  @ApiServiceUnavailableResponse({ description: 'Error finding appointments' })
   @Roles('doctor')
   @Get('patients/:patientId')
-  async findByPatientId(@Param() { patientId }: PatientIdParamDto) {
+  async findByPatientId(
+    @Param() { patientId }: PatientIdParamDto,
+  ): Promise<AppointmentDto[]> {
     const { error, data } =
       await this.appointmentsService.findByPatientId(patientId);
 
     const exception = handleServiceError(error);
     if (exception) throw exception;
+    if (!data)
+      throw new ServiceUnavailableException('Error finding appointments');
 
     return data;
   }
 
+  @ApiServiceUnavailableResponse({ description: 'Error creating appointment' })
+  @ApiNotFoundResponse({ description: 'Doctor, Patient or Timeslot not found' })
+  @ApiForbiddenResponse({
+    description: 'Timeslot is already taken or Doctor does not match',
+  })
   @Roles('patient')
   @Post()
-  async create(@Body() body: CreateAppointmentDto, @Req() req: Request) {
+  async create(
+    @Body() body: CreateAppointmentDto,
+    @Req() req: Request,
+  ): Promise<AppointmentDto> {
     const user = req.user!;
 
     const { error, data } = await this.appointmentsService.create(
@@ -71,6 +100,8 @@ export class AppointmentsController {
 
     const exception = handleServiceError(error);
     if (exception) throw exception;
+    if (!data)
+      throw new ServiceUnavailableException('Error creating appointment');
 
     return data;
   }

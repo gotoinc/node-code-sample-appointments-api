@@ -71,7 +71,7 @@ export class AuthMethodsService implements IAuthMethodsService {
     try {
       const userAuthMethod = await this.authMethodsRepository.findOne(email);
 
-      if (!userAuthMethod) return ServiceResponse.notFound('User not found');
+      if (!userAuthMethod) return { error: null, data: null };
 
       return ServiceResponse.success<UserAuthMethod>(userAuthMethod);
     } catch (error) {
