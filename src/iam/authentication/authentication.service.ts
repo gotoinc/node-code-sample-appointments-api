@@ -20,6 +20,7 @@ import {
 } from './token-generation/token-generation.service.interface';
 import { Logger } from 'nestjs-pino';
 import { ILogger } from 'src/common/interfaces/logger.interface';
+import { RegisterUserResponseDto } from './dto/register-user-response.dto';
 
 @Injectable()
 export class AuthenticationService {
@@ -69,7 +70,7 @@ export class AuthenticationService {
 
   async register(
     registerUserDto: RegisterUserDto,
-  ): Promise<IServiceResponse<User>> {
+  ): Promise<IServiceResponse<RegisterUserResponseDto>> {
     try {
       const { first_name, last_name, email, password, role } = registerUserDto;
 
@@ -96,8 +97,19 @@ export class AuthenticationService {
         );
 
       if (createUserError) return { error: createUserError, data: null };
+      if (!user)
+        return { error: { message: 'Error while creating user' }, data: null };
 
-      return { error: null, data: user };
+      return {
+        error: null,
+        data: {
+          id: user.id,
+          email: user.email,
+          first_name: user.first_name,
+          last_name: user.last_name,
+          user_role_id: user.user_role_id,
+        },
+      };
     } catch (error) {
       this.logger.error(error);
       return { error: { message: 'Error while creating user' }, data: null };

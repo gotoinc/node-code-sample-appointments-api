@@ -1,4 +1,3 @@
-import { Appointment } from '@prisma/client';
 import { IServiceResponse, ServiceResponse } from 'src/common/service-response';
 import { IAppointmentsService } from './appointments.service.interface';
 import { CreateAppointmentDto } from './dto/create-appointment.dto';
@@ -9,6 +8,7 @@ import { AppointmentEntity } from './entities/appointment.entity';
 import { ITransactionManager } from 'src/common/interfaces/transaction-manager.interface';
 import { ITimeslotsRepository } from 'src/timeslots/timeslots.repository.interface';
 import { ILogger } from 'src/common/interfaces/logger.interface';
+import { AppointmentDto } from './dto/appointment.dto';
 
 export class AppointmentsService implements IAppointmentsService {
   constructor(
@@ -20,52 +20,52 @@ export class AppointmentsService implements IAppointmentsService {
     private readonly transactionManager: ITransactionManager,
   ) {}
 
-  async getById(id: number): Promise<IServiceResponse<Appointment>> {
+  async findById(id: number): Promise<IServiceResponse<AppointmentDto>> {
     try {
       const appointment = await this.appointmentsRepository.findById(id);
 
       if (!appointment)
         return ServiceResponse.notFound('Appointment not found');
 
-      return ServiceResponse.success<Appointment>(appointment);
+      return ServiceResponse.success<AppointmentDto>(appointment);
     } catch (error) {
       this.logger.error(error);
-      return { error: { message: error.message }, data: null };
+      return { error: { message: 'Error finding appointment' }, data: null };
     }
   }
 
-  async getByDoctorId(
+  async findByDoctorId(
     doctorId: number,
-  ): Promise<IServiceResponse<Appointment[]>> {
+  ): Promise<IServiceResponse<AppointmentDto[]>> {
     try {
       const appointments =
         await this.appointmentsRepository.findByDoctorId(doctorId);
 
-      return ServiceResponse.success<Appointment[]>(appointments);
-    } catch (err) {
-      this.logger.error(err);
-      return { error: { message: err.message }, data: null };
+      return ServiceResponse.success<AppointmentDto[]>(appointments);
+    } catch (error) {
+      this.logger.error(error);
+      return { error: { message: 'Error finding appointments' }, data: null };
     }
   }
 
-  async getByPatientId(
+  async findByPatientId(
     patientId: number,
-  ): Promise<IServiceResponse<Appointment[]>> {
+  ): Promise<IServiceResponse<AppointmentDto[]>> {
     try {
       const appointments =
         await this.appointmentsRepository.findByPatientId(patientId);
 
-      return ServiceResponse.success<Appointment[]>(appointments);
-    } catch (err) {
-      this.logger.error(err);
-      return { error: { message: err.message }, data: null };
+      return ServiceResponse.success<AppointmentDto[]>(appointments);
+    } catch (error) {
+      this.logger.error(error);
+      return { error: { message: 'Error finding appointments' }, data: null };
     }
   }
 
   async create(
     appointment: CreateAppointmentDto,
     userId: number,
-  ): Promise<IServiceResponse<Appointment>> {
+  ): Promise<IServiceResponse<AppointmentDto>> {
     try {
       const { error: errorPatient, data: patient } =
         await this.patientsService.findByUserId(userId);
@@ -86,7 +86,7 @@ export class AppointmentsService implements IAppointmentsService {
       if (!timeslot) return ServiceResponse.notFound('Timeslot not found');
       if (!timeslot.is_available)
         return ServiceResponse.forbidden('Timeslot is already taken');
-      if (timeslot.fk_doctor_id !== doctor.id)
+      if (timeslot.doctor_id !== doctor.id)
         return ServiceResponse.forbidden('Doctor does not match');
 
       const appointmentEntity: AppointmentEntity = {
@@ -112,10 +112,9 @@ export class AppointmentsService implements IAppointmentsService {
           return createdAppointment;
         },
       );
-
-      return ServiceResponse.success<Appointment>(createdAppointment);
-    } catch (err) {
-      this.logger.error(err);
+      return ServiceResponse.success<AppointmentDto>(createdAppointment);
+    } catch (error) {
+      this.logger.error(error);
       return { error: { message: 'Error creating appointment' }, data: null };
     }
   }

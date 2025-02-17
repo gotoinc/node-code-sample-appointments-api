@@ -19,9 +19,8 @@ export class UsersService implements IUsersService {
       const { error: errorRole, data: role } =
         await this.rolesService.findByName(user.role);
 
-      if (!role || errorRole) {
-        return { error: errorRole, data: null };
-      }
+      if (errorRole) return { error: errorRole, data: null };
+      if (!role) return ServiceResponse.notFound('Role not found');
 
       const userEntity: UserEntity = {
         email: user.email,
@@ -45,7 +44,7 @@ export class UsersService implements IUsersService {
     try {
       const user = await this.usersRepository.findOne(email);
 
-      if (!user) return ServiceResponse.notFound('User not found');
+      if (!user) return { error: null, data: null };
 
       return ServiceResponse.success<User & { user_role: UserRole }>(user);
     } catch (error) {
@@ -54,7 +53,7 @@ export class UsersService implements IUsersService {
     }
   }
 
-  async getUsers(): Promise<IServiceResponse<User[]>> {
+  async findAll(): Promise<IServiceResponse<User[]>> {
     try {
       const users: User[] = await this.usersRepository.findAll();
 

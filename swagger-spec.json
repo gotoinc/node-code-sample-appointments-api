@@ -1,0 +1,1239 @@
+{
+  "openapi": "3.0.0",
+  "paths": {
+    "/auth/login": {
+      "post": {
+        "description": "Logs in a user and returns an access token.",
+        "operationId": "AuthController_login",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "JWT token is returned in the header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginUserDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginUserResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid email or password"
+          }
+        },
+        "summary": "User login",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/auth/register": {
+      "post": {
+        "description": "Registers a new user and returns user data.",
+        "operationId": "AuthController_register",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterUserDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RegisterUserResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ValidationError"
+                    },
+                    {
+                      "type": "object",
+                      "required": [
+                        "statusCode",
+                        "message",
+                        "error"
+                      ],
+                      "properties": {
+                        "statusCode": {
+                          "type": "number",
+                          "example": 400
+                        },
+                        "message": {
+                          "type": "string",
+                          "example": "Error while creating user"
+                        },
+                        "error": {
+                          "type": "string",
+                          "example": "Bad Request"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "503": {
+            "description": ""
+          }
+        },
+        "summary": "User registration",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/roles": {
+      "get": {
+        "operationId": "RolesController_findAll",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RoleDto"
+                  }
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Error finding all roles"
+          }
+        },
+        "tags": [
+          "Roles"
+        ]
+      }
+    },
+    "/auth/google": {
+      "get": {
+        "operationId": "GoogleOauthController_auth",
+        "parameters": [
+          {
+            "name": "role",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "patient",
+                "doctor"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "name": "action",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "login",
+                "register"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "GoogleOauth"
+        ]
+      }
+    },
+    "/auth/google/callback": {
+      "get": {
+        "operationId": "GoogleOauthController_callback",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "GoogleOauth"
+        ]
+      }
+    },
+    "/doctors": {
+      "post": {
+        "operationId": "DoctorsController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateDoctorDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DoctorDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "503": {
+            "description": "Error creating doctor"
+          }
+        },
+        "tags": [
+          "Doctors"
+        ]
+      },
+      "get": {
+        "operationId": "DoctorsController_findAll",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DoctorDto"
+                  }
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Error finding all doctors"
+          }
+        },
+        "tags": [
+          "Doctors"
+        ]
+      }
+    },
+    "/doctors/me": {
+      "get": {
+        "operationId": "DoctorsController_findDoctorsProfileOfUser",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DoctorDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Doctor not found"
+          },
+          "503": {
+            "description": "Error finding doctor"
+          }
+        },
+        "tags": [
+          "Doctors"
+        ]
+      },
+      "put": {
+        "operationId": "DoctorsController_update",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateDoctorDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DoctorDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Specialization not found"
+          },
+          "403": {
+            "description": "Doctor profile id and user id do not match"
+          },
+          "404": {
+            "description": "Doctor not found"
+          },
+          "503": {
+            "description": "Error updating doctor"
+          }
+        },
+        "tags": [
+          "Doctors"
+        ]
+      }
+    },
+    "/doctors/{id}": {
+      "get": {
+        "operationId": "DoctorsController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "minimum": 1,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DoctorDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Doctor not found"
+          },
+          "503": {
+            "description": "Error finding doctor"
+          }
+        },
+        "tags": [
+          "Doctors"
+        ]
+      }
+    },
+    "/specializations": {
+      "get": {
+        "operationId": "SpecializationsController_findAll",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Specializations"
+        ]
+      }
+    },
+    "/specializations/{id}": {
+      "get": {
+        "operationId": "SpecializationsController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "minimum": 1,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Specializations"
+        ]
+      }
+    },
+    "/patients": {
+      "post": {
+        "operationId": "PatientsController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePatientDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PatientDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": ""
+          },
+          "503": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Patients"
+        ]
+      },
+      "get": {
+        "operationId": "PatientsController_findAll",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PatientDto"
+                  }
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Error finding all patients"
+          }
+        },
+        "tags": [
+          "Patients"
+        ]
+      }
+    },
+    "/patients/me": {
+      "get": {
+        "operationId": "PatientsController_findPatientsProfileOfUser",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PatientDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Patient not found"
+          },
+          "503": {
+            "description": "Error finding patient"
+          }
+        },
+        "tags": [
+          "Patients"
+        ]
+      },
+      "put": {
+        "operationId": "PatientsController_update",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePatientDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PatientDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Specialization not found"
+          },
+          "403": {
+            "description": "Patient profile user id and user id do not match"
+          },
+          "404": {
+            "description": "Patient not found"
+          },
+          "503": {
+            "description": "Error updating patient"
+          }
+        },
+        "tags": [
+          "Patients"
+        ]
+      }
+    },
+    "/patients/{id}": {
+      "get": {
+        "operationId": "PatientsController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "minimum": 1,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PatientDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Patient not found"
+          },
+          "503": {
+            "description": "Error finding patient"
+          }
+        },
+        "tags": [
+          "Patients"
+        ]
+      }
+    },
+    "/timeslots/doctors/{doctorId}": {
+      "get": {
+        "operationId": "TimeslotsController_getDoctorTimeslots",
+        "parameters": [
+          {
+            "name": "doctorId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "minimum": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "from",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "to",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TimeslotDto"
+                  }
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Error finding timeslots"
+          }
+        },
+        "tags": [
+          "Timeslots"
+        ]
+      }
+    },
+    "/timeslots": {
+      "post": {
+        "operationId": "TimeslotsController_createDoctorTimeslots",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateTimeslotDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TimeslotDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Doctor not found"
+          },
+          "409": {
+            "description": "Timeslots collision"
+          },
+          "503": {
+            "description": "Error creating timeslot"
+          }
+        },
+        "tags": [
+          "Timeslots"
+        ]
+      }
+    },
+    "/appointments/{id}": {
+      "get": {
+        "operationId": "AppointmentsController_findById",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "minimum": 1,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AppointmentDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Appointment not found"
+          },
+          "503": {
+            "description": "Error finding appointment"
+          }
+        },
+        "tags": [
+          "Appointments"
+        ]
+      }
+    },
+    "/appointments/doctors/{doctorId}": {
+      "get": {
+        "operationId": "AppointmentsController_findByDoctorId",
+        "parameters": [
+          {
+            "name": "doctorId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "minimum": 1,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AppointmentDto"
+                  }
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Error finding appointments"
+          }
+        },
+        "tags": [
+          "Appointments"
+        ]
+      }
+    },
+    "/appointments/patients/{patientId}": {
+      "get": {
+        "operationId": "AppointmentsController_findByPatientId",
+        "parameters": [
+          {
+            "name": "patientId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "minimum": 1,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AppointmentDto"
+                  }
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Error finding appointments"
+          }
+        },
+        "tags": [
+          "Appointments"
+        ]
+      }
+    },
+    "/appointments": {
+      "post": {
+        "operationId": "AppointmentsController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateAppointmentDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AppointmentDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Timeslot is already taken or Doctor does not match"
+          },
+          "404": {
+            "description": "Doctor, Patient or Timeslot not found"
+          },
+          "503": {
+            "description": "Error creating appointment"
+          }
+        },
+        "tags": [
+          "Appointments"
+        ]
+      }
+    }
+  },
+  "info": {
+    "title": "Appointments service API",
+    "description": "",
+    "version": "1.0",
+    "contact": {}
+  },
+  "tags": [],
+  "servers": [],
+  "components": {
+    "schemas": {
+      "LoginUserDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "password": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "email",
+          "password"
+        ]
+      },
+      "LoginUserResponseDto": {
+        "type": "object",
+        "properties": {
+          "access_token": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "access_token"
+        ]
+      },
+      "RegisterUserDto": {
+        "type": "object",
+        "properties": {
+          "first_name": {
+            "type": "string"
+          },
+          "last_name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "password": {
+            "type": "string",
+            "minLength": 8
+          },
+          "role": {
+            "type": "object"
+          }
+        },
+        "required": [
+          "first_name",
+          "last_name",
+          "email",
+          "password",
+          "role"
+        ]
+      },
+      "RegisterUserResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "email": {
+            "type": "string"
+          },
+          "first_name": {
+            "type": "string"
+          },
+          "last_name": {
+            "type": "string"
+          },
+          "user_role_id": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "id",
+          "email",
+          "first_name",
+          "last_name",
+          "user_role_id"
+        ]
+      },
+      "RoleDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name"
+        ]
+      },
+      "CreateDoctorDto": {
+        "type": "object",
+        "properties": {
+          "phone_number": {
+            "type": "string"
+          },
+          "licence_number": {
+            "type": "string"
+          },
+          "specializationId": {
+            "type": "number",
+            "minimum": 1
+          }
+        },
+        "required": [
+          "phone_number",
+          "licence_number",
+          "specializationId"
+        ]
+      },
+      "DoctorDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "phone_number": {
+            "type": "string"
+          },
+          "licence_number": {
+            "type": "string"
+          },
+          "specialization_id": {
+            "type": "number"
+          },
+          "user_id": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "id",
+          "phone_number",
+          "licence_number",
+          "specialization_id",
+          "user_id"
+        ]
+      },
+      "UpdateDoctorDto": {
+        "type": "object",
+        "properties": {
+          "phone_number": {
+            "type": "string"
+          },
+          "licence_number": {
+            "type": "string"
+          },
+          "specializationId": {
+            "type": "number",
+            "minimum": 1
+          }
+        },
+        "required": [
+          "phone_number",
+          "licence_number",
+          "specializationId"
+        ]
+      },
+      "CreatePatientDto": {
+        "type": "object",
+        "properties": {
+          "date_of_birth": {
+            "type": "string"
+          },
+          "gender": {
+            "type": "string"
+          },
+          "address": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "date_of_birth",
+          "gender",
+          "address"
+        ]
+      },
+      "PatientDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "user_id": {
+            "type": "number"
+          },
+          "date_of_birth": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "gender": {
+            "type": "string"
+          },
+          "address": {
+            "type": "string",
+            "nullable": true
+          },
+          "created_at": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "user_id",
+          "date_of_birth",
+          "gender",
+          "address",
+          "created_at",
+          "updated_at"
+        ]
+      },
+      "UpdatePatientDto": {
+        "type": "object",
+        "properties": {
+          "date_of_birth": {
+            "type": "string"
+          },
+          "gender": {
+            "type": "string"
+          },
+          "address": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "date_of_birth",
+          "gender",
+          "address"
+        ]
+      },
+      "TimeslotDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "start_time": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "end_time": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "is_available": {
+            "type": "boolean"
+          },
+          "doctor_id": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "id",
+          "start_time",
+          "end_time",
+          "is_available",
+          "doctor_id"
+        ]
+      },
+      "CreateTimeslotDto": {
+        "type": "object",
+        "properties": {
+          "startTime": {
+            "type": "string"
+          },
+          "endTime": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "startTime",
+          "endTime"
+        ]
+      },
+      "AppointmentDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "full_name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "phone_number": {
+            "type": "string"
+          },
+          "patient_insurance_number": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "timeslot_id": {
+            "type": "number"
+          },
+          "doctor_id": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "id",
+          "full_name",
+          "email",
+          "phone_number",
+          "patient_insurance_number",
+          "reason",
+          "timeslot_id",
+          "doctor_id"
+        ]
+      },
+      "CreateAppointmentDto": {
+        "type": "object",
+        "properties": {
+          "full_name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "phone_number": {
+            "type": "string"
+          },
+          "patient_insurance_number": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "timeslot_id": {
+            "type": "number"
+          },
+          "doctor_id": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "full_name",
+          "email",
+          "phone_number",
+          "patient_insurance_number",
+          "reason",
+          "timeslot_id",
+          "doctor_id"
+        ]
+      },
+      "ValidationError": {
+        "type": "object",
+        "properties": {
+          "statusCode": {
+            "type": "number",
+            "example": 400
+          },
+          "message": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "example": [
+              "email must be an email",
+              "password must be longer than or equal to 8 characters"
+            ]
+          },
+          "error": {
+            "type": "string",
+            "example": "Bad Request"
+          }
+        }
+      }
+    }
+  }
+}

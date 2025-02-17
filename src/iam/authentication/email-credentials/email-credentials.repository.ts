@@ -24,7 +24,7 @@ export class EmailCredentialsRepository
       data: {
         email: emailCredentials.email,
         password_hash: emailCredentials.passwordHash,
-        fk_user_id: emailCredentials.userId,
+        user_id: emailCredentials.userId,
       },
     });
   }

@@ -1,9 +1,42 @@
-version: '3'
 services:
-  db:
+  postgres-db:
     image: postgres
     restart: always
     ports:
       - '5432:5432'
     environment:
       - POSTGRES_PASSWORD=postgres-password
+    volumes:
+      - ./sql/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres']
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    networks:
+      - appointments-network
+
+  appointments-api:
+    build: .
+    ports:
+      - '3000:3000'
+    depends_on:
+      postgres-db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: 'postgresql://postgres:postgres-password@postgres-db:5432/postgres?schema=public'
+
+      JWT_SECRET: 'Jdi61rQn6M6eFeGzu6YBTQ57j3t1Zqqc'
+      JWT_ACCESS_TOKEN_EXPIRES_IN: 86400
+      JWT_ISSUER: 'localhost:3000'
+      JWT_AUDIENCE: 'localhost:3001'
+
+      GOOGLE_OAUTH_CLIENT_ID: '173577146725-a3c91tebt5i36g2cb87sd7e1qqh8o184.apps.googleusercontent.com'
+      GOOGLE_OAUTH_CLIENT_SECRET: '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'
+      GOOGLE_OAUTH_REDIRECT_URI: 'http://localhost:3000/auth/google/callback'
+    networks:
+      - appointments-network
+
+networks:
+  appointments-network:
+    driver: bridge

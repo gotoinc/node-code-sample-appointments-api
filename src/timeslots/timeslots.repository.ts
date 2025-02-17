@@ -22,7 +22,7 @@ export class TimeslotsRepository
       data: {
         start_time: timeslot.startTime,
         end_time: timeslot.endTime,
-        fk_doctor_id: timeslot.doctorId,
+        doctor_id: timeslot.doctorId,
       },
     });
   }
@@ -36,7 +36,7 @@ export class TimeslotsRepository
 
     return await prisma.timeslot.findMany({
       where: {
-        fk_doctor_id: doctorId,
+        doctor_id: doctorId,
         start_time: { gte: from },
         end_time: { lte: to },
       },

@@ -27,7 +27,7 @@ export class GoogleOauthService implements IGoogleOauthService {
 
     const { error: errorTokenGeneration, data: token } =
       await this.tokenGenerationService.generateToken(
-        userAuthMethod.fk_user_id,
+        userAuthMethod.user_id,
         email,
         user.user_role.role_name,
       );

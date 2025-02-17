@@ -21,6 +21,13 @@ import { IdParamDto } from 'src/common/dto/id-param.dto';
 import { Request } from 'express';
 import { UpdatePatientDto } from './dto/update-patient.dto';
 import { handleServiceError } from 'src/common/handle-service-error';
+import { PatientDto } from './dto/patient.dto';
+import {
+  ApiBadRequestResponse,
+  ApiForbiddenResponse,
+  ApiNotFoundResponse,
+  ApiServiceUnavailableResponse,
+} from '@nestjs/swagger';
 
 @Controller('patients')
 export class PatientsController {
@@ -29,9 +36,14 @@ export class PatientsController {
     private readonly patientsService: IPatientsService,
   ) {}
 
+  @ApiBadRequestResponse()
+  @ApiServiceUnavailableResponse()
   @Roles('patient')
   @Post()
-  async create(@Body() body: CreatePatientDto, @Req() req: Request) {
+  async create(
+    @Body() body: CreatePatientDto,
+    @Req() req: Request,
+  ): Promise<PatientDto> {
     const user = req.user!;
 
     const { error, data } = await this.patientsService.create(
@@ -39,44 +51,61 @@ export class PatientsController {
       user.userId,
     );
     if (error) throw new BadRequestException(error.message);
+    if (!data) throw new ServiceUnavailableException('Error creating patient');
 
     return data;
   }
 
+  @ApiServiceUnavailableResponse({ description: 'Error finding all patients' })
   @Get()
-  async findAll() {
+  async findAll(): Promise<PatientDto[]> {
     const { error, data } = await this.patientsService.findAll();
 
     if (error) throw new ServiceUnavailableException(error.message);
+    if (!data)
+      throw new ServiceUnavailableException('Error finding all patients');
 
     return data;
   }
 
+  @ApiServiceUnavailableResponse({ description: 'Error finding patient' })
+  @ApiNotFoundResponse({ description: 'Patient not found' })
   @Get('me')
-  async findPatientsProfileOfUser(@Req() req: Request) {
+  async findPatientsProfileOfUser(@Req() req: Request): Promise<PatientDto> {
     const user = req.user!;
 
     const { error, data } = await this.patientsService.findByUserId(
       user.userId,
     );
-    if (!data) throw new NotFoundException('Patient not found');
     if (error) throw new ServiceUnavailableException(error.message);
+    if (!data) throw new NotFoundException('Patient not found');
 
     return data;
   }
 
+  @ApiServiceUnavailableResponse({ description: 'Error finding patient' })
+  @ApiNotFoundResponse({ description: 'Patient not found' })
   @Get(':id')
-  async findOne(@Param() { id }: IdParamDto) {
+  async findOne(@Param() { id }: IdParamDto): Promise<PatientDto> {
     const { error, data } = await this.patientsService.findById(id);
-    if (!data) throw new NotFoundException('Patient not found');
     if (error) throw new ServiceUnavailableException(error.message);
+    if (!data) throw new NotFoundException('Patient not found');
 
     return data;
   }
 
+  @ApiServiceUnavailableResponse({ description: 'Error updating patient' })
+  @ApiNotFoundResponse({ description: 'Patient not found' })
+  @ApiForbiddenResponse({
+    description: 'Patient profile user id and user id do not match',
+  })
+  @ApiBadRequestResponse({ description: 'Specialization not found' })
   @Roles('patient')
   @Put('me')
-  async update(@Body() body: UpdatePatientDto, @Req() req: Request) {
+  async update(
+    @Body() body: UpdatePatientDto,
+    @Req() req: Request,
+  ): Promise<PatientDto> {
     const user = req.user!;
 
     const { error, data } = await this.patientsService.update(
@@ -86,6 +115,8 @@ export class PatientsController {
 
     const exception = handleServiceError(error);
     if (exception) throw exception;
+
+    if (!data) throw new ServiceUnavailableException('Error updating patient');
 
     return data;
   }

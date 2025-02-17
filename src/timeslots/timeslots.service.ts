@@ -1,4 +1,3 @@
-import { Timeslot } from '@prisma/client';
 import { IServiceResponse, ServiceResponse } from 'src/common/service-response';
 import { ITimeslotsService } from './timeslots.service.interface';
 import { ITimeslotsRepository } from './timeslots.repository.interface';
@@ -7,6 +6,7 @@ import { TimeslotEntity } from './entities/timeslot.entity';
 import { IDoctorsService } from 'src/doctors/doctors.service.interface';
 import { FromToQueryDto } from './dto/from-to-query.dto';
 import { ILogger } from 'src/common/interfaces/logger.interface';
+import { TimeslotDto } from './dto/timeslot.dto';
 
 export class TimeslotsService implements ITimeslotsService {
   constructor(
@@ -18,7 +18,7 @@ export class TimeslotsService implements ITimeslotsService {
   async create(
     timeslotDto: CreateTimeslotDto,
     userId: number,
-  ): Promise<IServiceResponse<Timeslot>> {
+  ): Promise<IServiceResponse<TimeslotDto>> {
     try {
       const { error: errorDoctor, data: doctor } =
         await this.doctorsService.findByUserId(userId);
@@ -44,7 +44,7 @@ export class TimeslotsService implements ITimeslotsService {
 
       const timeslot = await this.timeslotsRepository.create(timeslotEntity);
 
-      return ServiceResponse.success<Timeslot>(timeslot);
+      return ServiceResponse.success<TimeslotDto>(timeslot);
     } catch (error) {
       this.logger.error(error);
       return {
@@ -57,7 +57,7 @@ export class TimeslotsService implements ITimeslotsService {
   async findByDoctorId(
     doctorId: number,
     { from, to }: FromToQueryDto,
-  ): Promise<IServiceResponse<Timeslot[]>> {
+  ): Promise<IServiceResponse<TimeslotDto[]>> {
     try {
       const fromToEntity = {
         from: new Date(from),
@@ -69,7 +69,7 @@ export class TimeslotsService implements ITimeslotsService {
         fromToEntity,
       );
 
-      return ServiceResponse.success<Timeslot[]>(timeslots);
+      return ServiceResponse.success<TimeslotDto[]>(timeslots);
     } catch (error) {
       this.logger.error(error);
       return {
@@ -79,13 +79,13 @@ export class TimeslotsService implements ITimeslotsService {
     }
   }
 
-  async findById(id: number): Promise<IServiceResponse<Timeslot>> {
+  async findById(id: number): Promise<IServiceResponse<TimeslotDto>> {
     try {
       const timeslot = await this.timeslotsRepository.findById(id);
 
       if (!timeslot) return ServiceResponse.notFound('Timeslot not found');
 
-      return ServiceResponse.success<Timeslot>(timeslot);
+      return ServiceResponse.success<TimeslotDto>(timeslot);
     } catch (error) {
       this.logger.error(error);
       return {

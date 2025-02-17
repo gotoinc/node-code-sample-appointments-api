@@ -7,6 +7,7 @@ import { IDoctorsRepository } from './doctors.repository.interface';
 import { DoctorEntity } from './entities/doctor.entity';
 import { ISpecializationsService } from 'src/specializations/specializations.service.interface';
 import { ILogger } from 'src/common/interfaces/logger.interface';
+import { DoctorDto } from './dto/doctor.dto';
 
 export class DoctorsService implements IDoctorsService {
   constructor(
@@ -18,7 +19,7 @@ export class DoctorsService implements IDoctorsService {
   async create(
     doctor: CreateDoctorDto,
     userId: number,
-  ): Promise<IServiceResponse<Doctor>> {
+  ): Promise<IServiceResponse<DoctorDto>> {
     try {
       const { error: errorSpecialization, data: specialization } =
         await this.specializationsService.findOne(doctor.specializationId);
@@ -54,7 +55,7 @@ export class DoctorsService implements IDoctorsService {
     }
   }
 
-  async findAll(): Promise<IServiceResponse<Doctor[]>> {
+  async findAll(): Promise<IServiceResponse<DoctorDto[]>> {
     try {
       const doctors = await this.doctorsRepository.findAll();
 
@@ -65,7 +66,7 @@ export class DoctorsService implements IDoctorsService {
     }
   }
 
-  async findOne(id: number): Promise<IServiceResponse<Doctor | null>> {
+  async findOne(id: number): Promise<IServiceResponse<DoctorDto | null>> {
     try {
       const doctor = await this.doctorsRepository.findOne(id);
 
@@ -76,7 +77,9 @@ export class DoctorsService implements IDoctorsService {
     }
   }
 
-  async findByUserId(userId: number): Promise<IServiceResponse<Doctor | null>> {
+  async findByUserId(
+    userId: number,
+  ): Promise<IServiceResponse<DoctorDto | null>> {
     try {
       const doctor = await this.doctorsRepository.findByUserId(userId);
 
@@ -90,23 +93,24 @@ export class DoctorsService implements IDoctorsService {
   async update(
     doctorToUpdate: UpdateDoctorDto,
     userId: number,
-  ): Promise<IServiceResponse<Doctor>> {
+  ): Promise<IServiceResponse<DoctorDto>> {
     try {
       const exisingDoctor = await this.doctorsRepository.findByUserId(userId);
 
       if (!exisingDoctor)
         return ServiceResponse.notFound('Doctor profile not found');
 
-      if (userId !== exisingDoctor.fk_user_id)
-        return ServiceResponse.forbidden();
+      if (userId !== exisingDoctor.user_id) return ServiceResponse.forbidden();
 
       const { error: errorSpecialization, data: specialization } =
         await this.specializationsService.findOne(
           doctorToUpdate.specializationId,
         );
 
-      if (errorSpecialization || !specialization)
+      if (errorSpecialization)
         return { error: errorSpecialization, data: null };
+      if (!specialization)
+        return ServiceResponse.invalidData('Specialization not found');
 
       const doctorEntity: DoctorEntity = {
         phoneNumber: doctorToUpdate.phone_number,

@@ -29,7 +29,7 @@ export class AppointmentsRepository
 
     return await prisma.appointment.findMany({
       where: {
-        fk_doctor_id: doctorId,
+        doctor_id: doctorId,
       },
     });
   }
@@ -42,7 +42,7 @@ export class AppointmentsRepository
 
     return await prisma.appointment.findMany({
       where: {
-        fk_patient_id: patientId,
+        patient_id: patientId,
       },
     });
   }
@@ -60,9 +60,9 @@ export class AppointmentsRepository
         phone_number: appointment.phoneNumber,
         patient_insurance_number: appointment.patientInsuranceNumber,
         reason: appointment.reason,
-        fk_timeslot_id: appointment.timeslotId,
-        fk_doctor_id: appointment.doctorId,
-        fk_patient_id: appointment.patientId,
+        timeslot_id: appointment.timeslotId,
+        doctor_id: appointment.doctorId,
+        patient_id: appointment.patientId,
       },
     });
   }

@@ -22,7 +22,7 @@ export class UsersRepository
         email: user.email,
         first_name: user.firstName,
         last_name: user.lastName,
-        fk_user_role_id: user.roleId,
+        user_role_id: user.roleId,
       },
     });
   }

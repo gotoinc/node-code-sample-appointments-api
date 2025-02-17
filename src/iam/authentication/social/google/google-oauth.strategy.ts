@@ -57,17 +57,23 @@ export class GoogleOauthStrategy extends PassportStrategy(Strategy, 'google') {
       if (!role)
         throw new HttpException('Role is required', HttpStatus.UNAUTHORIZED);
 
-      const { error, data: user } = await this.googleOauthService.register(
-        email,
-        given_name,
-        family_name,
-        role,
-      );
+      const { error: registerError, data: user } =
+        await this.googleOauthService.register(
+          email,
+          given_name,
+          family_name,
+          role,
+        );
 
-      if (error)
-        throw new HttpException(error.message, HttpStatus.UNAUTHORIZED);
+      if (registerError || !user)
+        throw new HttpException('Error creating user', HttpStatus.UNAUTHORIZED);
 
-      return user;
+      const { error: loginError, data: loginData } =
+        await this.googleOauthService.login(user.email);
+      if (loginError || !loginData)
+        throw new HttpException('Cannot login user', HttpStatus.UNAUTHORIZED);
+
+      return { access_token: loginData.access_token };
     }
 
     throw new HttpException('Operation failed', HttpStatus.UNAUTHORIZED);
