@@ -28,7 +28,6 @@ services:
 
       JWT_SECRET: 'Jdi61rQn6M6eFeGzu6YBTQ57j3t1Zqqc'
       JWT_ACCESS_TOKEN_EXPIRES_IN: 86400
-      JWT_REFRESH_TOKEN_EXPIRES_IN: 86400
       JWT_ISSUER: 'localhost:3000'
       JWT_AUDIENCE: 'localhost:3001'
 
