@@ -209,10 +209,11 @@ describe('AuthenticationService', () => {
 
     it('should successfully register a new user', async () => {
       const registeredUser = {
-        ...mockUser,
-        email: registerDto.email,
-        first_name: registerDto.first_name,
-        last_name: registerDto.last_name,
+        id: 1,
+        email: 'test@example.com',
+        first_name: 'John',
+        last_name: 'Doe',
+        user_role_id: 1,
       };
 
       mockUsersService.findOne.mockResolvedValue({
@@ -222,7 +223,15 @@ describe('AuthenticationService', () => {
       mockHashingService.hash.mockReturnValue('hashed-password');
       mockEmailCredentialsService.createNewUser.mockResolvedValue({
         error: null,
-        data: registeredUser,
+        data: {
+          id: 1,
+          email: 'test@example.com',
+          first_name: 'John',
+          last_name: 'Doe',
+          created_at: new Date(),
+          updated_at: new Date(),
+          user_role_id: 1,
+        },
       });
 
       const result = await service.register(registerDto);

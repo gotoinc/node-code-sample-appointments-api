@@ -48,7 +48,7 @@ describe('EmailCredentialsService', () => {
 
   describe('createNewUser', () => {
     it('should create a new user successfully', async () => {
-      const role = { id: 1, role_name: 'patient' };
+      const role = { id: 1, name: 'patient' };
       const user: User = {
         id: 1,
         email: 'test@example.com',
@@ -116,7 +116,7 @@ describe('EmailCredentialsService', () => {
 
     it('should return an error if transaction fails', async () => {
       rolesService.findByName.mockResolvedValue(
-        ServiceResponse.success({ id: 1, role_name: 'patient' }),
+        ServiceResponse.success({ id: 1, name: 'patient' }),
       );
       transactionManager.transaction.mockRejectedValue(
         new Error('Transaction failed'),

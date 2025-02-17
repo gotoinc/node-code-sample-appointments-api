@@ -1,4 +1,3 @@
-import { ResponseStatus } from 'src/common/service-response';
 import { AuthMethodsService } from './auth-methods.service';
 import { UserAuthMethod } from '@prisma/client';
 
@@ -25,6 +24,7 @@ describe('AuthMethodsService', () => {
 
   afterEach(() => {
     jest.clearAllMocks();
+    jest.resetAllMocks();
   });
 
   describe('createNewUser', () => {
@@ -137,7 +137,8 @@ describe('AuthMethodsService', () => {
 
       const result = await service.findOne('test@example.com');
 
-      expect(result.error?.status).toBe(ResponseStatus.NotFound);
+      expect(result.data).toBe(null);
+      expect(result.error).toBe(null);
     });
 
     it('should return success response if user auth method exists', async () => {

@@ -20,7 +20,7 @@ const mockUsersRepository: jest.Mocked<IUsersRepository> = {
 const mockRolesService: jest.Mocked<IRolesService> = {
   findByName: jest.fn(),
   findAll: jest.fn(),
-  create: jest.fn(),
+  // create: jest.fn(),
 };
 
 describe('RolesService', () => {
@@ -72,7 +72,7 @@ describe('RolesService', () => {
         error: null,
         data: {
           id: 1,
-          role_name: 'doctor',
+          name: 'doctor',
         },
       });
       mockUsersRepository.create.mockRejectedValueOnce('Error creating user');
@@ -92,7 +92,7 @@ describe('RolesService', () => {
         error: null,
         data: {
           id: 1,
-          role_name: 'doctor',
+          name: 'doctor',
         },
       });
 
