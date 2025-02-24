@@ -9,6 +9,7 @@ import { PatientsModule } from './patients/patients.module';
 import { TimeslotsModule } from './timeslots/timeslots.module';
 import { AppointmentsModule } from './appointments/appointments.module';
 import { LoggerModule } from 'nestjs-pino';
+import { ChatModule } from './chat/chat.module';
 
 @Module({
   imports: [
@@ -28,8 +29,8 @@ import { LoggerModule } from 'nestjs-pino';
     PatientsModule,
     TimeslotsModule,
     AppointmentsModule,
+    ChatModule,
   ],
   controllers: [],
-  providers: [],
 })
 export class AppModule {}
