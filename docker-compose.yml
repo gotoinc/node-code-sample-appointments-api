@@ -16,6 +16,13 @@ services:
     networks:
       - appointments-network
 
+  redis-db:
+    image: redis:latest
+    ports:
+      - '6379:6379'
+    networks:
+      - appointments-network
+
   appointments-api:
     build: .
     ports:

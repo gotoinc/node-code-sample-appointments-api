@@ -1,5 +1,5 @@
 export const AIServiceSymbol = Symbol('AIService');
 
 export interface IAIService {
-  generateResponse(message: string): Promise<string>;
+  generateResponse(message: string, tuningPrompt?: string): Promise<string>;
 }

@@ -13,9 +13,10 @@ import { Logger } from 'nestjs-pino';
 import { IncomingHttpHeaders } from 'http';
 import { ChatServiceSymbol, IChatService } from './chat.service.interface';
 import { Inject } from '@nestjs/common';
+import { AccessTokenPayload } from 'src/iam/authentication/interfaces/access-token-payload.interface';
 
 @WebSocketGateway({
-  path: '/ws',
+  path: '/chat',
 })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer() server: Server;
@@ -29,27 +30,49 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('chat-message')
   async handleMessage(client: WebSocket, payload: any): Promise<void> {
     console.log('Received:', payload);
-    const response = await this.chatService.handleMessage(payload);
+    console.log('Session ID:', client.sessionId);
+    const response = await this.chatService.handleMessage(
+      client.sessionId,
+      payload,
+    );
     client.send(JSON.stringify({ event: 'chat-response', data: response }));
+  }
+
+  @SubscribeMessage('chat-finish')
+  async handleFinish(client: WebSocket, payload: any): Promise<void> {
+    console.log('Received:', payload);
+    console.log('Session ID:', client.sessionId);
+    const response = await this.chatService.finish(client.sessionId);
+    client.send(JSON.stringify({ event: 'chat-finished', data: response }));
   }
 
   async handleConnection(client: WebSocket, request: IncomingMessage) {
     const headers = request.headers;
-    const decoded = await this.authenticate(headers).catch((err) => {
+
+    try {
+      const decoded = await this.authenticate(headers);
+      if ((decoded as AccessTokenPayload).role !== 'patient')
+        return client.close();
+
+      const userId = (decoded as AccessTokenPayload).sub;
+
+      const sessionId = await this.chatService.start(userId);
+      client.sessionId = sessionId;
+
+      client.send(
+        JSON.stringify({
+          event: 'chat-started',
+          data: 'Chat started',
+        }),
+      );
+    } catch (err) {
       this.logger.error(err);
       return client.close();
-    });
-    console.log({ decoded });
-    client.send(
-      JSON.stringify({
-        event: 'welcome',
-        data: 'Connected to WebSocket server',
-      }),
-    );
+    }
   }
 
-  handleDisconnect(/* client: WebSocket */) {
-    console.log('Client disconnected');
+  async handleDisconnect(/* client: WebSocket */) {
+    this.logger.log(`Client disconnected`);
   }
 
   private authenticate(headers: IncomingHttpHeaders) {
