@@ -1,5 +1,16 @@
 # Code samples appointments app
 
+Appointements app API allows users to login and register through email and password and google OAuth, create profiles and open timeslots for doctors and create profile create an appointments for patients.
+
+## Technologies
+
+- NestJS
+- Typescript
+- PostgreSQL
+- Prisma
+- PassportJS
+- jsonwebtoken
+
 ## How to run app and database
 
 1. Clone the repo
@@ -28,5 +39,3 @@ SQL schema is located in `sql/init.sql`
 ## How to run tests
 
 1. Run `npm run test`
-
-
