@@ -20,7 +20,6 @@ const mockUsersRepository: jest.Mocked<IUsersRepository> = {
 const mockRolesService: jest.Mocked<IRolesService> = {
   findByName: jest.fn(),
   findAll: jest.fn(),
-  // create: jest.fn(),
 };
 
 describe('RolesService', () => {

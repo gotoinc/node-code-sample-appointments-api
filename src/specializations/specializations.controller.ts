@@ -1,11 +1,8 @@
 import {
-  // BadRequestException,
-  // Body,
   Controller,
   Get,
   Inject,
   Param,
-  // Post,
   ServiceUnavailableException,
 } from '@nestjs/common';
 import {
@@ -13,7 +10,6 @@ import {
   SpecializationsServiceSymbol,
 } from './specializations.service.interface';
 import { IdParamDto } from 'src/common/dto/id-param.dto';
-// import { CreateSpecializationDto } from './dto/create-specialization.dto';
 
 @Controller('specializations')
 export class SpecializationsController {
@@ -39,12 +35,4 @@ export class SpecializationsController {
     }
     return data;
   }
-
-  // @Post()
-  // async create(@Body() body: CreateSpecializationDto) {
-  //   const { error, data } = await this.specializationsService.create(body);
-  //   if (error) throw new BadRequestException(error.message);
-
-  //   return data;
-  // }
 }

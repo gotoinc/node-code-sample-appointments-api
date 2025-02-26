@@ -26,44 +26,6 @@ describe('RolesService', () => {
     expect(service).toBeDefined();
   });
 
-  // describe('create', () => {
-  //   it('should return conflict error if role already exists', async () => {
-  //     mockRolesRepository.findByName.mockResolvedValueOnce({
-  //       id: 1,
-  //       role_name: 'doctor',
-  //     });
-
-  //     const role = await service.create('doctor');
-
-  //     expect(role.error?.status).toBe(ResponseStatus.Conflict);
-  //   });
-
-  //   it('should return error on repository error', async () => {
-  //     mockRolesRepository.findByName.mockRejectedValueOnce(
-  //       'Error finding role',
-  //     );
-
-  //     const role = await service.create('doctor');
-
-  //     expect(role.data).toBeNull();
-  //     expect(role.error?.message).toBe('Error creating role');
-  //   });
-
-  //   it('should return success response', async () => {
-  //     mockRolesRepository.findByName.mockResolvedValueOnce(null);
-
-  //     mockRolesRepository.create.mockResolvedValueOnce({
-  //       id: 1,
-  //       role_name: 'doctor',
-  //     });
-
-  //     const role = await service.create('doctor');
-
-  //     expect(role.error).toBeNull();
-  //     expect(role.data?.id).toBe(1);
-  //   });
-  // });
-
   describe('findAll', () => {
     it('should return all roles', async () => {
       mockRolesRepository.findAll.mockResolvedValue(

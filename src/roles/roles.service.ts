@@ -43,22 +43,4 @@ export class RolesService implements IRolesService {
       return { error: { message: 'Error finding role' }, data: null };
     }
   }
-
-  // async create(roleName: string): Promise<IServiceResponse<RoleDto>> {
-  //   try {
-  //     const existingRole = await this.rolesRepository.findByName(roleName);
-
-  //     if (existingRole) return ServiceResponse.conflict('Role already exists');
-
-  //     const role = await this.rolesRepository.create(roleName);
-
-  //     return ServiceResponse.success<RoleDto>({
-  //       id: role.id,
-  //       name: role.role_name,
-  //     });
-  //   } catch (error) {
-  //     this.logger.error(error);
-  //     return { error: { message: 'Error creating role' }, data: null };
-  //   }
-  // }
 }
