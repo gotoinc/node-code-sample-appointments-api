@@ -21,6 +21,11 @@ export class AppointmentsRepository
       where: {
         id,
       },
+      include: {
+        doctor: true,
+        patient: true,
+        timeslot: true,
+      },
     });
   }
 
@@ -30,6 +35,11 @@ export class AppointmentsRepository
     return await prisma.appointment.findMany({
       where: {
         doctor_id: doctorId,
+      },
+      include: {
+        doctor: true,
+        patient: true,
+        timeslot: true,
       },
     });
   }
@@ -43,6 +53,11 @@ export class AppointmentsRepository
     return await prisma.appointment.findMany({
       where: {
         patient_id: patientId,
+      },
+      include: {
+        doctor: true,
+        patient: true,
+        timeslot: true,
       },
     });
   }

@@ -4,11 +4,12 @@ import { GoogleOauthQueryParamsDto } from './dto/google-oauth-query-params.dto';
 import * as passport from 'passport';
 import { Request, Response } from 'express';
 import { Auth } from 'src/iam/authentication/decorators/auth.decorator';
+import { ConfigService } from '@nestjs/config';
 
 @Auth('None')
 @Controller('auth/google')
 export class GoogleOauthController {
-  constructor() {}
+  constructor(private readonly configService: ConfigService) {}
 
   @Get()
   async auth(
@@ -28,9 +29,11 @@ export class GoogleOauthController {
   async callback(
     @Req() req: Request & { user: { access_token: string } },
     @Res({ passthrough: true }) res: Response,
-  ): Promise<{ access_token: string }> {
+  ): Promise<void> {
+    const redirectUrl = this.configService.get<string>(
+      'GOOGLE_FE_REDIRECT_URL',
+    )!;
     const user = req.user;
-    res.setHeader('Authorization', `Bearer ${user.access_token}`);
-    return user;
+    res.redirect(`${redirectUrl}?token=${user.access_token}`);
   }
 }

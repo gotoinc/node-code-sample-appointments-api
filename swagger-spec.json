@@ -129,6 +129,27 @@
         ]
       }
     },
+    "/users/me": {
+      "get": {
+        "operationId": "UsersController_findOne",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Users"
+        ]
+      }
+    },
     "/roles": {
       "get": {
         "operationId": "RolesController_findAll",
