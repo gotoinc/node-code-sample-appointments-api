@@ -29,8 +29,8 @@ export class TimeslotsService implements ITimeslotsService {
       const doctorId = doctor.id;
 
       const timeslotEntity: TimeslotEntity = {
-        startTime: new Date(timeslotDto.startTime),
-        endTime: new Date(timeslotDto.endTime),
+        startTime: new Date(timeslotDto.start_time),
+        endTime: new Date(timeslotDto.end_time),
         doctorId,
       };
 

@@ -1145,16 +1145,16 @@
       "CreateTimeslotDto": {
         "type": "object",
         "properties": {
-          "startTime": {
+          "start_time": {
             "type": "string"
           },
-          "endTime": {
+          "end_time": {
             "type": "string"
           }
         },
         "required": [
-          "startTime",
-          "endTime"
+          "start_time",
+          "end_time"
         ]
       },
       "AppointmentDto": {
@@ -1183,6 +1183,15 @@
           },
           "doctor_id": {
             "type": "number"
+          },
+          "patient": {
+            "$ref": "#/components/schemas/PatientDto"
+          },
+          "doctor": {
+            "$ref": "#/components/schemas/DoctorDto"
+          },
+          "timeslot": {
+            "$ref": "#/components/schemas/TimeslotDto"
           }
         },
         "required": [
@@ -1193,7 +1202,10 @@
           "patient_insurance_number",
           "reason",
           "timeslot_id",
-          "doctor_id"
+          "doctor_id",
+          "patient",
+          "doctor",
+          "timeslot"
         ]
       },
       "CreateAppointmentDto": {

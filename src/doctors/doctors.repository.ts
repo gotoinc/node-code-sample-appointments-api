@@ -1,7 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaBaseRepository } from 'src/database/prisma-base.repository';
-import { IDoctorsRepository } from './doctors.repository.interface';
-import { Doctor } from '@prisma/client';
+import {
+  DoctorReturnType,
+  IDoctorsRepository,
+} from './doctors.repository.interface';
 import { DoctorEntity } from './entities/doctor.entity';
 import { PrismaService } from 'src/database/prisma.service';
 
@@ -14,7 +16,11 @@ export class DoctorsRepository
     super(prismaClient);
   }
 
-  create(doctor: DoctorEntity, userId: number, tx?: unknown): Promise<Doctor> {
+  create(
+    doctor: DoctorEntity,
+    userId: number,
+    tx?: unknown,
+  ): Promise<DoctorReturnType> {
     const prisma = this.getClient(tx);
 
     return prisma.doctor.create({
@@ -24,28 +30,38 @@ export class DoctorsRepository
         specialization_id: doctor.specializationId,
         user_id: userId,
       },
+      include: { user: true, specialization: true },
     });
   }
 
-  async findAll(tx?: unknown): Promise<Doctor[]> {
+  async findAll(tx?: unknown): Promise<DoctorReturnType[]> {
     const prisma = this.getClient(tx);
 
-    return await prisma.doctor.findMany();
+    return await prisma.doctor.findMany({
+      include: { user: true, specialization: true },
+    });
   }
 
-  async findOne(id: number, tx?: unknown): Promise<Doctor | null> {
+  async findOne(id: number, tx?: unknown): Promise<DoctorReturnType | null> {
     const prisma = this.getClient(tx);
 
-    return await prisma.doctor.findUnique({ where: { id } });
+    return await prisma.doctor.findUnique({
+      where: { id },
+      include: { user: true, specialization: true },
+    });
   }
 
-  async findByUserId(userId: number, tx?: unknown): Promise<Doctor | null> {
+  async findByUserId(
+    userId: number,
+    tx?: unknown,
+  ): Promise<DoctorReturnType | null> {
     const prisma = this.getClient(tx);
 
     return await prisma.doctor.findUnique({
       where: {
         user_id: userId,
       },
+      include: { user: true, specialization: true },
     });
   }
 
@@ -53,7 +69,7 @@ export class DoctorsRepository
     id: number,
     doctor: DoctorEntity,
     tx?: unknown,
-  ): Promise<Doctor> {
+  ): Promise<DoctorReturnType> {
     const prisma = this.getClient(tx);
 
     return await prisma.doctor.update({
@@ -65,6 +81,7 @@ export class DoctorsRepository
         licence_number: doctor.licenceNumber,
         specialization_id: doctor.specializationId,
       },
+      include: { user: true, specialization: true },
     });
   }
 }

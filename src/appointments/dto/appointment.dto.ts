@@ -1,3 +1,7 @@
+import { DoctorDto } from 'src/doctors/dto/doctor.dto';
+import { PatientDto } from 'src/patients/dto/patient.dto';
+import { TimeslotDto } from 'src/timeslots/dto/timeslot.dto';
+
 export class AppointmentDto {
   id: number;
   full_name: string;
@@ -7,4 +11,7 @@ export class AppointmentDto {
   reason: string;
   timeslot_id: number;
   doctor_id: number;
+  patient: PatientDto;
+  doctor: DoctorDto;
+  timeslot: TimeslotDto;
 }

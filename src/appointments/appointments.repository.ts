@@ -1,6 +1,8 @@
 import { PrismaBaseRepository } from 'src/database/prisma-base.repository';
-import { IAppointmentsRepository } from './appointments.repository.interface';
-import { Appointment } from '@prisma/client';
+import {
+  AppointmentReturnType,
+  IAppointmentsRepository,
+} from './appointments.repository.interface';
 import { AppointmentEntity } from './entities/appointment.entity';
 import { PrismaService } from 'src/database/prisma.service';
 import { Injectable } from '@nestjs/common';
@@ -14,7 +16,10 @@ export class AppointmentsRepository
     super(prismaClient);
   }
 
-  async findById(id: number, tx?: unknown): Promise<Appointment | null> {
+  async findById(
+    id: number,
+    tx?: unknown,
+  ): Promise<AppointmentReturnType | null> {
     const prisma = this.getClient(tx);
 
     return await prisma.appointment.findUnique({
@@ -22,14 +27,26 @@ export class AppointmentsRepository
         id,
       },
       include: {
-        doctor: true,
-        patient: true,
+        doctor: {
+          include: {
+            specialization: true,
+            user: true,
+          },
+        },
+        patient: {
+          include: {
+            user: true,
+          },
+        },
         timeslot: true,
       },
     });
   }
 
-  async findByDoctorId(doctorId: number, tx?: unknown): Promise<Appointment[]> {
+  async findByDoctorId(
+    doctorId: number,
+    tx?: unknown,
+  ): Promise<AppointmentReturnType[]> {
     const prisma = this.getClient(tx);
 
     return await prisma.appointment.findMany({
@@ -37,8 +54,17 @@ export class AppointmentsRepository
         doctor_id: doctorId,
       },
       include: {
-        doctor: true,
-        patient: true,
+        doctor: {
+          include: {
+            specialization: true,
+            user: true,
+          },
+        },
+        patient: {
+          include: {
+            user: true,
+          },
+        },
         timeslot: true,
       },
     });
@@ -47,7 +73,7 @@ export class AppointmentsRepository
   async findByPatientId(
     patientId: number,
     tx?: unknown,
-  ): Promise<Appointment[]> {
+  ): Promise<AppointmentReturnType[]> {
     const prisma = this.getClient(tx);
 
     return await prisma.appointment.findMany({
@@ -55,8 +81,17 @@ export class AppointmentsRepository
         patient_id: patientId,
       },
       include: {
-        doctor: true,
-        patient: true,
+        doctor: {
+          include: {
+            specialization: true,
+            user: true,
+          },
+        },
+        patient: {
+          include: {
+            user: true,
+          },
+        },
         timeslot: true,
       },
     });
@@ -65,7 +100,7 @@ export class AppointmentsRepository
   async create(
     appointment: AppointmentEntity,
     tx?: unknown,
-  ): Promise<Appointment> {
+  ): Promise<AppointmentReturnType> {
     const prisma = this.getClient(tx);
 
     return await prisma.appointment.create({
@@ -78,6 +113,20 @@ export class AppointmentsRepository
         timeslot_id: appointment.timeslotId,
         doctor_id: appointment.doctorId,
         patient_id: appointment.patientId,
+      },
+      include: {
+        doctor: {
+          include: {
+            specialization: true,
+            user: true,
+          },
+        },
+        patient: {
+          include: {
+            user: true,
+          },
+        },
+        timeslot: true,
       },
     });
   }

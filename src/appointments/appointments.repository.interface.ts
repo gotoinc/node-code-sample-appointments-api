@@ -1,9 +1,24 @@
-import { Appointment } from '@prisma/client';
+import { Appointment, Doctor, Patient, Timeslot } from '@prisma/client';
 import { AppointmentEntity } from './entities/appointment.entity';
 
+export type AppointmentReturnType = Appointment & {
+  patient: Patient;
+  doctor: Doctor;
+  timeslot: Timeslot;
+};
+
 export interface IAppointmentsRepository {
-  findById(id: number, tx?: unknown): Promise<Appointment | null>;
-  findByDoctorId(doctorId: number, tx?: unknown): Promise<Appointment[]>;
-  findByPatientId(patientId: number, tx?: unknown): Promise<Appointment[]>;
-  create(appointment: AppointmentEntity, tx?: unknown): Promise<Appointment>;
+  findById(id: number, tx?: unknown): Promise<AppointmentReturnType | null>;
+  findByDoctorId(
+    doctorId: number,
+    tx?: unknown,
+  ): Promise<AppointmentReturnType[]>;
+  findByPatientId(
+    patientId: number,
+    tx?: unknown,
+  ): Promise<AppointmentReturnType[]>;
+  create(
+    appointment: AppointmentEntity,
+    tx?: unknown,
+  ): Promise<AppointmentReturnType>;
 }

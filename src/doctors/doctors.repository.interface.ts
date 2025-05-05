@@ -1,10 +1,23 @@
-import { Doctor } from '@prisma/client';
+import { Doctor, Specialization, User } from '@prisma/client';
 import { DoctorEntity } from './entities/doctor.entity';
 
+export type DoctorReturnType = Doctor & {
+  specialization: Specialization;
+  user: User;
+};
+
 export interface IDoctorsRepository {
-  create(doctor: DoctorEntity, userId: number, tx?: unknown): Promise<Doctor>;
-  findAll(tx?: unknown): Promise<Doctor[]>;
-  findOne(id: number, tx?: unknown): Promise<Doctor | null>;
-  findByUserId(userId: number, tx?: unknown): Promise<Doctor | null>;
-  update(id: number, doctor: DoctorEntity, tx?: unknown): Promise<Doctor>;
+  create(
+    doctor: DoctorEntity,
+    userId: number,
+    tx?: unknown,
+  ): Promise<DoctorReturnType>;
+  findAll(tx?: unknown): Promise<DoctorReturnType[]>;
+  findOne(id: number, tx?: unknown): Promise<DoctorReturnType | null>;
+  findByUserId(userId: number, tx?: unknown): Promise<DoctorReturnType | null>;
+  update(
+    id: number,
+    doctor: DoctorEntity,
+    tx?: unknown,
+  ): Promise<DoctorReturnType>;
 }

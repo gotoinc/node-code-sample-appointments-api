@@ -2,8 +2,8 @@ import { IsDateString } from 'class-validator';
 
 export class CreateTimeslotDto {
   @IsDateString()
-  startTime: string;
+  start_time: string;
 
   @IsDateString()
-  endTime: string;
+  end_time: string;
 }
