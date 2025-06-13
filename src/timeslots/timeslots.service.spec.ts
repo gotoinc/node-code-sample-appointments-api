@@ -50,8 +50,8 @@ describe('TimeslotsService', () => {
 
       const timeslot = await service.create(
         {
-          startTime: '2022-01-01:00:00:00',
-          endTime: '2022-01-01:00:00:00',
+          start_time: '2022-01-01:00:00:00',
+          end_time: '2022-01-01:00:00:00',
         },
         1,
       );
@@ -78,8 +78,8 @@ describe('TimeslotsService', () => {
 
       const timeslot = await service.create(
         {
-          startTime: '2022-01-01:00:00:00',
-          endTime: '2022-01-01:00:00:00',
+          start_time: '2022-01-01:00:00:00',
+          end_time: '2022-01-01:00:00:00',
         },
         1,
       );
@@ -112,8 +112,8 @@ describe('TimeslotsService', () => {
 
       const timeslot = await service.create(
         {
-          startTime: '2022-01-01:00:00:00',
-          endTime: '2022-01-01:00:00:00',
+          start_time: '2022-01-01:00:00:00',
+          end_time: '2022-01-01:00:00:00',
         },
         1,
       );
@@ -141,8 +141,8 @@ describe('TimeslotsService', () => {
 
       const timeslot = await service.create(
         {
-          startTime: '2022-01-01:00:00:00',
-          endTime: '2022-01-01:00:00:00',
+          start_time: '2022-01-01:00:00:00',
+          end_time: '2022-01-01:00:00:00',
         },
         1,
       );
@@ -172,8 +172,8 @@ describe('TimeslotsService', () => {
       });
       const timeslot = await service.create(
         {
-          startTime: '2022-01-01:00:00:00',
-          endTime: '2022-01-01:00:00:00',
+          start_time: '2022-01-01:00:00:00',
+          end_time: '2022-01-01:00:00:00',
         },
         1,
       );

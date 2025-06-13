@@ -1,9 +1,36 @@
 import { DoctorsService } from './doctors.service';
-import { IDoctorsRepository } from './doctors.repository.interface';
+import {
+  DoctorReturnType,
+  IDoctorsRepository,
+} from './doctors.repository.interface';
 import { ILogger } from 'src/common/interfaces/logger.interface';
 import { IDoctorsService } from './doctors.service.interface';
 import { ISpecializationsService } from 'src/specializations/specializations.service.interface';
 import { ResponseStatus } from 'src/common/service-response';
+
+function createMockDoctor(overrides = {}): DoctorReturnType {
+  return {
+    id: 1,
+    phone_number: '1234567890',
+    licence_number: 'XYZ123',
+    specialization_id: 1,
+    user_id: 1,
+    specialization: {
+      id: 1,
+      name: 'Doctor',
+    },
+    user: {
+      id: 1,
+      email: 'doctor@example.com',
+      first_name: 'John',
+      last_name: 'Doe',
+      created_at: new Date(),
+      updated_at: new Date(),
+      user_role_id: 2,
+    },
+    ...overrides,
+  };
+}
 
 const mockLogger: jest.Mocked<ILogger> = {
   log: jest.fn(),
@@ -84,13 +111,9 @@ describe('DoctorsService', () => {
         error: null,
       });
 
-      mockDoctorsRepository.findByUserId.mockResolvedValueOnce({
-        id: 1,
-        user_id: 1,
-        phone_number: '+1234567890',
-        licence_number: '1234567890',
-        specialization_id: 1,
-      });
+      mockDoctorsRepository.findByUserId.mockResolvedValueOnce(
+        createMockDoctor({ id: 1 }),
+      );
 
       const doctor = await service.create(
         {
@@ -141,13 +164,13 @@ describe('DoctorsService', () => {
 
       mockDoctorsRepository.findByUserId.mockResolvedValueOnce(null);
 
-      mockDoctorsRepository.create.mockResolvedValueOnce({
-        id: 1,
-        user_id: 1,
-        phone_number: '+1234567890',
-        licence_number: '1234567890',
-        specialization_id: 1,
-      });
+      mockDoctorsRepository.create.mockResolvedValueOnce(
+        createMockDoctor({
+          phone_number: '+1234567890',
+          licence_number: '1234567890',
+          specializationId: 1,
+        }),
+      );
 
       const doctor = await service.create(
         {
@@ -166,20 +189,8 @@ describe('DoctorsService', () => {
   describe('findAll', () => {
     it('should return all doctors', async () => {
       mockDoctorsRepository.findAll.mockResolvedValueOnce([
-        {
-          id: 1,
-          user_id: 1,
-          phone_number: '+1234567890',
-          licence_number: '1234567890',
-          specialization_id: 1,
-        },
-        {
-          id: 2,
-          user_id: 2,
-          phone_number: '+1234567890',
-          licence_number: '1234567890',
-          specialization_id: 2,
-        },
+        createMockDoctor({ id: 1 }),
+        createMockDoctor({ id: 2 }),
       ]);
 
       const doctors = await service.findAll();
@@ -202,13 +213,12 @@ describe('DoctorsService', () => {
 
   describe('findOne', () => {
     it('should return doctor by id', async () => {
-      mockDoctorsRepository.findOne.mockResolvedValueOnce({
-        id: 1,
-        user_id: 1,
-        phone_number: '+1234567890',
-        licence_number: '1234567890',
-        specialization_id: 1,
-      });
+      mockDoctorsRepository.findOne.mockResolvedValueOnce(
+        createMockDoctor({
+          id: 1,
+          phone_number: '+1234567890',
+        }),
+      );
 
       const doctor = await service.findOne(1);
 
@@ -230,13 +240,12 @@ describe('DoctorsService', () => {
 
   describe('findByUserId', () => {
     it('should return doctor by user id', async () => {
-      mockDoctorsRepository.findByUserId.mockResolvedValueOnce({
-        id: 1,
-        user_id: 1,
-        phone_number: '+1234567890',
-        licence_number: '1234567890',
-        specialization_id: 1,
-      });
+      mockDoctorsRepository.findByUserId.mockResolvedValueOnce(
+        createMockDoctor({
+          id: 1,
+          phone_number: '+1234567890',
+        }),
+      );
 
       const doctor = await service.findByUserId(1);
 
@@ -258,13 +267,9 @@ describe('DoctorsService', () => {
 
   describe('update', () => {
     it('should update a doctor if they exist', async () => {
-      mockDoctorsRepository.findByUserId.mockResolvedValueOnce({
-        id: 1,
-        user_id: 1,
-        phone_number: '+1234567890',
-        licence_number: '1234567890',
-        specialization_id: 1,
-      });
+      mockDoctorsRepository.findByUserId.mockResolvedValueOnce(
+        createMockDoctor(),
+      );
 
       mockSpecializationsService.findOne.mockResolvedValueOnce({
         data: {
@@ -274,13 +279,13 @@ describe('DoctorsService', () => {
         error: null,
       });
 
-      mockDoctorsRepository.update.mockResolvedValueOnce({
-        id: 1,
-        user_id: 1,
-        phone_number: '+4444444444',
-        licence_number: '1234567890',
-        specialization_id: 1,
-      });
+      mockDoctorsRepository.update.mockResolvedValueOnce(
+        createMockDoctor({
+          phone_number: '+4444444444',
+          licence_number: '1234567890',
+          specializationId: 1,
+        }),
+      );
 
       const doctor = await service.update(
         {
@@ -296,13 +301,15 @@ describe('DoctorsService', () => {
     });
 
     it('should return error if user does not match', async () => {
-      mockDoctorsRepository.findByUserId.mockResolvedValueOnce({
-        id: 1,
-        user_id: 2,
-        phone_number: '+1234567890',
-        licence_number: '1234567890',
-        specialization_id: 1,
-      });
+      mockDoctorsRepository.findByUserId.mockResolvedValueOnce(
+        createMockDoctor({
+          id: 1,
+          user_id: 2,
+          phone_number: '+1234567890',
+          licence_number: '1234567890',
+          specialization_id: 1,
+        }),
+      );
 
       const doctor = await service.update(
         {
@@ -317,13 +324,9 @@ describe('DoctorsService', () => {
     });
 
     it('should return error if repository throws error', async () => {
-      mockDoctorsRepository.findByUserId.mockResolvedValueOnce({
-        id: 1,
-        user_id: 1,
-        phone_number: '+1234567890',
-        licence_number: '1234567890',
-        specialization_id: 1,
-      });
+      mockDoctorsRepository.findByUserId.mockResolvedValueOnce(
+        createMockDoctor(),
+      );
 
       mockDoctorsRepository.update.mockRejectedValueOnce(
         'Error updating doctor',
@@ -359,13 +362,9 @@ describe('DoctorsService', () => {
     });
 
     it('should return error if specialization not found', async () => {
-      mockDoctorsRepository.findByUserId.mockResolvedValueOnce({
-        id: 1,
-        user_id: 1,
-        phone_number: '+1234567890',
-        licence_number: '1234567890',
-        specialization_id: 1,
-      });
+      mockDoctorsRepository.findByUserId.mockResolvedValueOnce(
+        createMockDoctor(),
+      );
 
       mockSpecializationsService.findOne.mockResolvedValueOnce({
         data: null,
@@ -386,13 +385,9 @@ describe('DoctorsService', () => {
     });
 
     it('should return error if specialization service return error', async () => {
-      mockDoctorsRepository.findByUserId.mockResolvedValueOnce({
-        id: 1,
-        user_id: 1,
-        phone_number: '+1234567890',
-        licence_number: '1234567890',
-        specialization_id: 1,
-      });
+      mockDoctorsRepository.findByUserId.mockResolvedValueOnce(
+        createMockDoctor(),
+      );
 
       mockSpecializationsService.findOne.mockResolvedValueOnce({
         data: null,
