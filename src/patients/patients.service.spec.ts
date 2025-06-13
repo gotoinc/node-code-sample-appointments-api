@@ -1,8 +1,33 @@
 import { PatientsService } from './patients.service';
-import { IPatientsRepository } from './patients.repository.interface';
+import {
+  IPatientsRepository,
+  PatientReturnType,
+} from './patients.repository.interface';
 import { ILogger } from 'src/common/interfaces/logger.interface';
 import { IPatientsService } from './patients.service.interface';
 import { ResponseStatus } from 'src/common/service-response';
+
+function createMockPatient(overrides = {}): PatientReturnType {
+  return {
+    id: 1,
+    user_id: 1,
+    address: 'address',
+    date_of_birth: new Date(),
+    gender: 'male',
+    user: {
+      user_role_id: 1,
+      id: 1,
+      first_name: 'John',
+      last_name: 'Doe',
+      email: 'patient@test.com',
+      created_at: new Date(),
+      updated_at: new Date(),
+    },
+    created_at: new Date(),
+    updated_at: new Date(),
+    ...overrides,
+  };
+}
 
 const mockLogger: jest.Mocked<ILogger> = {
   log: jest.fn(),
@@ -27,15 +52,9 @@ describe('PatientsService', () => {
 
   describe('create', () => {
     it('should return conflict if patient already exists', async () => {
-      mockPatientsRepository.findByUserId.mockResolvedValueOnce({
-        id: 1,
-        user_id: 1,
-        date_of_birth: new Date(),
-        gender: 'male',
-        address: '123 Main St',
-        created_at: new Date(),
-        updated_at: new Date(),
-      });
+      mockPatientsRepository.findByUserId.mockResolvedValueOnce(
+        createMockPatient(),
+      );
 
       const patient = await service.create(
         { date_of_birth: '1990-01-01', gender: 'male', address: '123 Main St' },
@@ -48,15 +67,9 @@ describe('PatientsService', () => {
     it('should return success response', async () => {
       mockPatientsRepository.findByUserId.mockResolvedValueOnce(null);
 
-      mockPatientsRepository.create.mockResolvedValueOnce({
-        id: 1,
-        user_id: 1,
-        date_of_birth: new Date('1990-01-01'),
-        gender: 'male',
-        address: '123 Main St',
-        created_at: new Date(),
-        updated_at: new Date(),
-      });
+      mockPatientsRepository.create.mockResolvedValueOnce(
+        createMockPatient({ address: '123 Main St' }),
+      );
 
       const patient = await service.create(
         { date_of_birth: '1990-01-01', gender: 'male', address: '123 Main St' },
@@ -85,24 +98,8 @@ describe('PatientsService', () => {
   describe('findAll', () => {
     it('should return all patients', async () => {
       mockPatientsRepository.findAll.mockResolvedValueOnce([
-        {
-          id: 1,
-          user_id: 1,
-          date_of_birth: new Date('1990-01-01'),
-          gender: 'male',
-          address: '123 Main St',
-          created_at: new Date(),
-          updated_at: new Date(),
-        },
-        {
-          id: 2,
-          user_id: 2,
-          date_of_birth: new Date('1990-01-02'),
-          gender: 'female',
-          address: '456 New St',
-          created_at: new Date(),
-          updated_at: new Date(),
-        },
+        createMockPatient({ id: 1, user_id: 1, address: '123 Main St' }),
+        createMockPatient({ id: 2, user_id: 2, address: '456 New St' }),
       ]);
 
       const patients = await service.findAll();
@@ -125,15 +122,9 @@ describe('PatientsService', () => {
 
   describe('findById', () => {
     it('should return patient by id', async () => {
-      mockPatientsRepository.findById.mockResolvedValueOnce({
-        id: 1,
-        user_id: 1,
-        date_of_birth: new Date('1990-01-01'),
-        gender: 'male',
-        address: '123 Main St',
-        created_at: new Date(),
-        updated_at: new Date(),
-      });
+      mockPatientsRepository.findById.mockResolvedValueOnce(
+        createMockPatient({ id: 1, address: '123 Main St' }),
+      );
 
       const patient = await service.findById(1);
 
@@ -155,15 +146,9 @@ describe('PatientsService', () => {
 
   describe('findByUserId', () => {
     it('should return patient by user id', async () => {
-      mockPatientsRepository.findByUserId.mockResolvedValueOnce({
-        id: 1,
-        user_id: 1,
-        date_of_birth: new Date('1990-01-01'),
-        gender: 'male',
-        address: '123 Main St',
-        created_at: new Date(),
-        updated_at: new Date(),
-      });
+      mockPatientsRepository.findByUserId.mockResolvedValueOnce(
+        createMockPatient({ user_id: 1, address: '123 Main St' }),
+      );
 
       const patient = await service.findByUserId(1);
 
@@ -185,25 +170,13 @@ describe('PatientsService', () => {
 
   describe('update', () => {
     it('should update a patient if they exist', async () => {
-      mockPatientsRepository.findByUserId.mockResolvedValueOnce({
-        id: 1,
-        user_id: 1,
-        date_of_birth: new Date('1990-01-01'),
-        gender: 'male',
-        address: '123 Main St',
-        created_at: new Date(),
-        updated_at: new Date(),
-      });
+      mockPatientsRepository.findByUserId.mockResolvedValueOnce(
+        createMockPatient(),
+      );
 
-      mockPatientsRepository.update.mockResolvedValueOnce({
-        id: 1,
-        user_id: 1,
-        date_of_birth: new Date('1990-01-01'),
-        gender: 'male',
-        address: '456 New St',
-        created_at: new Date(),
-        updated_at: new Date(),
-      });
+      mockPatientsRepository.update.mockResolvedValueOnce(
+        createMockPatient({ address: '456 New St' }),
+      );
 
       const patient = await service.update(
         { date_of_birth: '1990-01-01', gender: 'male', address: '456 New St' },
@@ -241,15 +214,9 @@ describe('PatientsService', () => {
     });
 
     it('should return error if user does not match', async () => {
-      mockPatientsRepository.findByUserId.mockResolvedValueOnce({
-        id: 1,
-        user_id: 2,
-        date_of_birth: new Date('1990-01-01'),
-        gender: 'male',
-        address: '123 Main St',
-        created_at: new Date(),
-        updated_at: new Date(),
-      });
+      mockPatientsRepository.findByUserId.mockResolvedValueOnce(
+        createMockPatient({ user_id: 2 }),
+      );
 
       const patient = await service.update(
         { date_of_birth: '1990-01-01', gender: 'male', address: '456 New St' },
@@ -260,15 +227,9 @@ describe('PatientsService', () => {
     });
 
     it('should return error on update repository error', async () => {
-      mockPatientsRepository.findByUserId.mockResolvedValueOnce({
-        id: 1,
-        user_id: 1,
-        date_of_birth: new Date('1990-01-01'),
-        gender: 'male',
-        address: '123 Main St',
-        created_at: new Date(),
-        updated_at: new Date(),
-      });
+      mockPatientsRepository.findByUserId.mockResolvedValueOnce(
+        createMockPatient(),
+      );
 
       mockPatientsRepository.update.mockRejectedValueOnce(
         'Error updating patient',
