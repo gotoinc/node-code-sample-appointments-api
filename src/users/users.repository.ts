@@ -39,6 +39,12 @@ export class UsersRepository
       },
       include: {
         user_role: true,
+        doctor: {
+          include: {
+            specialization: true,
+          },
+        },
+        patient: true,
       },
     });
   }
