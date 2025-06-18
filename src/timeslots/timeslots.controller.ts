@@ -25,6 +25,7 @@ import {
   ApiNotFoundResponse,
   ApiServiceUnavailableResponse,
 } from '@nestjs/swagger';
+import { CreateScheduleDto } from './dto/create-schedule.dto';
 
 @Controller('timeslots')
 export class TimeslotsController {
@@ -70,6 +71,29 @@ export class TimeslotsController {
     const exception = handleServiceError(error);
     if (exception) throw exception;
     if (!data) throw new ServiceUnavailableException('Error creating timeslot');
+
+    return data;
+  }
+
+  @ApiServiceUnavailableResponse({ description: 'Error creating schedule' })
+  @ApiNotFoundResponse({ description: 'Doctor not found' })
+  @ApiConflictResponse({ description: 'Timeslots collision' })
+  @Roles('doctor')
+  @Post('/schedule')
+  async createSchedule(
+    @Body() body: CreateScheduleDto,
+    @Req() req: Request,
+  ): Promise<{ count: number }> {
+    const user = req.user!;
+
+    const { error, data } = await this.timeslotsService.createSchedule(
+      body,
+      user.userId,
+    );
+
+    const exception = handleServiceError(error);
+    if (exception) throw exception;
+    if (!data) throw new ServiceUnavailableException('Error creating schedule');
 
     return data;
   }

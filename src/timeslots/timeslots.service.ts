@@ -7,6 +7,7 @@ import { IDoctorsService } from 'src/doctors/doctors.service.interface';
 import { FromToQueryDto } from './dto/from-to-query.dto';
 import { ILogger } from 'src/common/interfaces/logger.interface';
 import { TimeslotDto } from './dto/timeslot.dto';
+import { CreateScheduleDto } from './dto/create-schedule.dto';
 
 export class TimeslotsService implements ITimeslotsService {
   constructor(
@@ -90,6 +91,52 @@ export class TimeslotsService implements ITimeslotsService {
       this.logger.error(error);
       return {
         error: { message: 'Error finding timeslot' },
+        data: null,
+      };
+    }
+  }
+
+  async createSchedule(
+    timeslotsDto: CreateScheduleDto,
+    userId: number,
+  ): Promise<IServiceResponse<{ count: number }>> {
+    console.log(timeslotsDto);
+    try {
+      const { error: errorDoctor, data: doctor } =
+        await this.doctorsService.findByUserId(userId);
+      if (errorDoctor) return { error: errorDoctor, data: null };
+      if (!doctor) return ServiceResponse.notFound('Doctor not found');
+
+      const doctorId = doctor.id;
+
+      const timeslotEntities: TimeslotEntity[] = timeslotsDto.timeslots.map(
+        (dto) => ({
+          startTime: new Date(dto.start_time),
+          endTime: new Date(dto.end_time),
+          doctorId,
+        }),
+      );
+
+      for (const entity of timeslotEntities) {
+        const collisions = await this.timeslotsRepository.findCollisions(
+          entity.startTime,
+          entity.endTime,
+        );
+        if (collisions.length > 0) {
+          return ServiceResponse.conflict(
+            `Timeslot collision for ${entity.startTime.toISOString()}`,
+          );
+        }
+      }
+
+      const result =
+        await this.timeslotsRepository.createMany(timeslotEntities);
+
+      return ServiceResponse.success<{ count: number }>(result);
+    } catch (error) {
+      this.logger.error(error);
+      return {
+        error: { message: 'Error creating doctor schedule' },
         data: null,
       };
     }

@@ -709,6 +709,39 @@
         ]
       }
     },
+    "/timeslots/schedule": {
+      "post": {
+        "operationId": "TimeslotsController_createSchedule",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateScheduleDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          },
+          "404": {
+            "description": "Doctor not found"
+          },
+          "409": {
+            "description": "Timeslots collision"
+          },
+          "503": {
+            "description": "Error creating schedule"
+          }
+        },
+        "tags": [
+          "Timeslots"
+        ]
+      }
+    },
     "/appointments/{id}": {
       "get": {
         "operationId": "AppointmentsController_findById",
@@ -1155,6 +1188,20 @@
         "required": [
           "start_time",
           "end_time"
+        ]
+      },
+      "CreateScheduleDto": {
+        "type": "object",
+        "properties": {
+          "timeslots": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CreateTimeslotDto"
+            }
+          }
+        },
+        "required": [
+          "timeslots"
         ]
       },
       "AppointmentDto": {

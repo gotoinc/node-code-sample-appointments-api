@@ -90,4 +90,19 @@ export class TimeslotsRepository
       },
     });
   }
+  async createMany(
+    timeslots: TimeslotEntity[],
+    tx?: unknown,
+  ): Promise<{ count: number }> {
+    const prisma = this.getClient(tx);
+
+    return await prisma.timeslot.createMany({
+      data: timeslots.map((ts) => ({
+        start_time: ts.startTime,
+        end_time: ts.endTime,
+        doctor_id: ts.doctorId,
+      })),
+      skipDuplicates: true,
+    });
+  }
 }
