@@ -21,6 +21,9 @@ import {
 import { Logger } from 'nestjs-pino';
 import { ILogger } from 'src/common/interfaces/logger.interface';
 import { RegisterUserResponseDto } from './dto/register-user-response.dto';
+import { UpdatePasswordDto } from './dto/update-password.dto';
+import { UpdatePasswordResponseDto } from './dto/update-password-response.dto';
+import { AuthenticatedUser } from 'src/common/interfaces/authenticated-user.interface';
 
 @Injectable()
 export class AuthenticationService {
@@ -127,19 +130,23 @@ export class AuthenticationService {
   > {
     const { error, data: userCredentials } =
       await this.emailCredentialsService.findOne(email);
+    console.log(userCredentials, error);
 
     if (!userCredentials || error) return null;
+
+    console.log('p', pass, userCredentials.password_hash);
 
     const isValidCredentials = this.hashingService.verify(
       pass,
       userCredentials.password_hash,
     );
-
+    console.log(isValidCredentials, 2);
     if (!isValidCredentials) return null;
 
     const { error: errorFindUser, data: user } =
       await this.usersService.findOne(email);
 
+    console.log(errorFindUser, 'errorFindUser');
     if (errorFindUser || !user) return null;
 
     const result = {
@@ -151,5 +158,50 @@ export class AuthenticationService {
     };
 
     return result;
+  }
+
+  async updatePassword(
+    user: AuthenticatedUser,
+    updatePasswordDto: UpdatePasswordDto,
+  ): Promise<IServiceResponse<UpdatePasswordResponseDto>> {
+    const { email } = user;
+    try {
+      const existingUser = await this.validateUser(
+        email,
+        updatePasswordDto.old_password,
+      );
+      console.log(existingUser);
+
+      if (!existingUser) {
+        return { error: { message: 'Wrong old password' }, data: null };
+      }
+
+      const hashedPassword = await this.hashingService.hash(
+        updatePasswordDto.new_password,
+      );
+      const { error: updateError, data: updatedUser } =
+        await this.emailCredentialsService.updatePassword(
+          email,
+          hashedPassword,
+        );
+
+      if (updateError) {
+        return { error: updateError, data: null };
+      }
+      if (!updatedUser) {
+        return { error: { message: 'Failed to update password' }, data: null };
+      }
+
+      return {
+        error: null,
+        data: { message: 'Succes' },
+      };
+    } catch (error) {
+      this.logger.error(error);
+      return {
+        error: { message: 'Password update failed. Please try again.' },
+        data: null,
+      };
+    }
   }
 }
