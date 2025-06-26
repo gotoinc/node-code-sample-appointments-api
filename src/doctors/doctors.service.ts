@@ -41,6 +41,9 @@ export class DoctorsService implements IDoctorsService {
         phoneNumber: doctor.phone_number,
         licenceNumber: doctor.licence_number,
         specializationId: specialization.id,
+        hospital_address: doctor.hospital_address,
+        hospital_name: doctor.hospital_name,
+        professional_since: doctor.professional_since,
       };
 
       const createdDoctor = await this.doctorsRepository.create(
@@ -116,6 +119,9 @@ export class DoctorsService implements IDoctorsService {
         phoneNumber: doctorToUpdate.phone_number,
         licenceNumber: doctorToUpdate.licence_number,
         specializationId: specialization.id,
+        hospital_address: doctorToUpdate.hospital_address,
+        hospital_name: doctorToUpdate.hospital_name,
+        professional_since: doctorToUpdate.professional_since,
       };
 
       const updatedDoctor = await this.doctorsRepository.update(

@@ -19,6 +19,9 @@ function createMockAppointment(overrides = {}): AppointmentReturnType {
       licence_number: 'XYZ123',
       specialization_id: 1,
       user_id: 1,
+      hospital_address: 'hospital adress test',
+      hospital_name: 'hospital name test',
+      professional_since: new Date('2016-10-30T00:00:00.000Z'),
     },
     patient: {
       id: 1,

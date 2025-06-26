@@ -13,6 +13,9 @@ function createMockDoctor(overrides = {}): DoctorReturnType {
     id: 1,
     phone_number: '1234567890',
     licence_number: 'XYZ123',
+    hospital_address: 'hospital adress test',
+    hospital_name: 'hospital name test',
+    professional_since: new Date('2016-10-30T00:00:00.000Z'),
     specialization_id: 1,
     user_id: 1,
     specialization: {
@@ -76,6 +79,9 @@ describe('DoctorsService', () => {
           phone_number: '+1234567890',
           licence_number: '1234567890',
           specializationId: 1,
+          hospital_address: 'hospital adress test',
+          hospital_name: 'hospital name test',
+          professional_since: new Date('2016-10-30T00:00:00.000Z'),
         },
         1,
       );
@@ -94,6 +100,10 @@ describe('DoctorsService', () => {
           phone_number: '+1234567890',
           licence_number: '1234567890',
           specializationId: 1,
+
+          hospital_address: 'hospital adress test',
+          hospital_name: 'hospital name test',
+          professional_since: new Date('2016-10-30T00:00:00.000Z'),
         },
         1,
       );
@@ -120,6 +130,9 @@ describe('DoctorsService', () => {
           phone_number: '+1234567890',
           licence_number: '1234567890',
           specializationId: 1,
+          hospital_address: 'hospital adress test',
+          hospital_name: 'hospital name test',
+          professional_since: new Date('2016-10-30T00:00:00.000Z'),
         },
         1,
       );
@@ -145,6 +158,9 @@ describe('DoctorsService', () => {
           phone_number: '+1234567890',
           licence_number: '1234567890',
           specializationId: 1,
+          hospital_address: 'hospital adress test',
+          hospital_name: 'hospital name test',
+          professional_since: new Date('2016-10-30T00:00:00.000Z'),
         },
         1,
       );
@@ -177,6 +193,9 @@ describe('DoctorsService', () => {
           phone_number: '+1234567890',
           licence_number: '1234567890',
           specializationId: 1,
+          hospital_address: 'hospital adress test',
+          hospital_name: 'hospital name test',
+          professional_since: new Date('2016-10-30T00:00:00.000Z'),
         },
         1,
       );
@@ -292,6 +311,9 @@ describe('DoctorsService', () => {
           phone_number: '+4444444444',
           licence_number: '1234567890',
           specializationId: 1,
+          hospital_address: 'hospital adress test',
+          hospital_name: 'hospital name test',
+          professional_since: new Date('2016-10-30T00:00:00.000Z'),
         },
         1,
       );
@@ -316,6 +338,9 @@ describe('DoctorsService', () => {
           phone_number: '+1234567890',
           licence_number: '1234567890',
           specializationId: 1,
+          hospital_address: 'hospital adress test',
+          hospital_name: 'hospital name test',
+          professional_since: new Date('2016-10-30T00:00:00.000Z'),
         },
         1,
       );
@@ -337,6 +362,10 @@ describe('DoctorsService', () => {
           phone_number: '+1234567890',
           licence_number: '1234567890',
           specializationId: 1,
+
+          hospital_address: 'hospital adress test',
+          hospital_name: 'hospital name test',
+          professional_since: new Date('2016-10-30T00:00:00.000Z'),
         },
         1,
       );
@@ -353,6 +382,9 @@ describe('DoctorsService', () => {
           phone_number: '+1234567890',
           licence_number: '1234567890',
           specializationId: 1,
+          hospital_address: 'hospital adress test',
+          hospital_name: 'hospital name test',
+          professional_since: new Date('2016-10-30T00:00:00.000Z'),
         },
         1,
       );
@@ -376,6 +408,9 @@ describe('DoctorsService', () => {
           phone_number: '+1234567890',
           licence_number: '1234567890',
           specializationId: 1,
+          hospital_address: 'hospital adress test',
+          hospital_name: 'hospital name test',
+          professional_since: new Date('2016-10-30T00:00:00.000Z'),
         },
         1,
       );
@@ -399,6 +434,9 @@ describe('DoctorsService', () => {
           phone_number: '+1234567890',
           licence_number: '1234567890',
           specializationId: 1,
+          hospital_address: 'hospital adress test',
+          hospital_name: 'hospital name test',
+          professional_since: new Date('2016-10-30T00:00:00.000Z'),
         },
         1,
       );
