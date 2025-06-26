@@ -981,12 +981,24 @@
           "specializationId": {
             "type": "number",
             "minimum": 1
+          },
+          "hospital_address": {
+            "type": "object"
+          },
+          "hospital_name": {
+            "type": "object"
+          },
+          "professional_since": {
+            "type": "object"
           }
         },
         "required": [
           "phone_number",
           "licence_number",
-          "specializationId"
+          "specializationId",
+          "hospital_address",
+          "hospital_name",
+          "professional_since"
         ]
       },
       "DoctorDto": {
@@ -1028,12 +1040,24 @@
           "specializationId": {
             "type": "number",
             "minimum": 1
+          },
+          "hospital_address": {
+            "type": "object"
+          },
+          "hospital_name": {
+            "type": "object"
+          },
+          "professional_since": {
+            "type": "object"
           }
         },
         "required": [
           "phone_number",
           "licence_number",
-          "specializationId"
+          "specializationId",
+          "hospital_address",
+          "hospital_name",
+          "professional_since"
         ]
       },
       "CreatePatientDto": {
