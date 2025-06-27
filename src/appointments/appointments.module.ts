@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { AppointmentsController } from './appointments.controller';
 import { IAppointmentsRepository } from './appointments.repository.interface';
 import {
@@ -24,7 +24,11 @@ import { ILogger } from 'src/common/interfaces/logger.interface';
 import { Logger } from 'nestjs-pino';
 
 @Module({
-  imports: [PatientsModule, TimeslotsModule, DoctorsModule],
+  imports: [
+    PatientsModule,
+    forwardRef(() => TimeslotsModule),
+    forwardRef(() => DoctorsModule),
+  ],
   providers: [
     PrismaService,
     AppointmentsRepository,
@@ -58,6 +62,7 @@ import { Logger } from 'nestjs-pino';
       ],
     },
   ],
+  exports: [AppointmentsServiceSymbol, AppointmentsRepository],
   controllers: [AppointmentsController],
 })
 export class AppointmentsModule {}
