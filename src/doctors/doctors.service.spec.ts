@@ -7,6 +7,7 @@ import { ILogger } from 'src/common/interfaces/logger.interface';
 import { IDoctorsService } from './doctors.service.interface';
 import { ISpecializationsService } from 'src/specializations/specializations.service.interface';
 import { ResponseStatus } from 'src/common/service-response';
+import { IAppointmentsRepository } from 'src/appointments/appointments.repository.interface';
 
 function createMockDoctor(overrides = {}): DoctorReturnType {
   return {
@@ -56,6 +57,15 @@ const mockSpecializationsService: jest.Mocked<ISpecializationsService> = {
   findOne: jest.fn(),
 };
 
+const mockAppointmentsRepository: jest.Mocked<IAppointmentsRepository> = {
+  countAppointmentsByDoctorId: jest.fn(),
+  countPatientsByDoctorId: jest.fn(),
+  create: jest.fn(),
+  findByDoctorId: jest.fn(),
+  findById: jest.fn(),
+  findByPatientId: jest.fn(),
+};
+
 describe('DoctorsService', () => {
   let service: IDoctorsService;
 
@@ -64,6 +74,7 @@ describe('DoctorsService', () => {
       mockLogger,
       mockDoctorsRepository,
       mockSpecializationsService,
+      mockAppointmentsRepository,
     );
   });
 
@@ -238,6 +249,15 @@ describe('DoctorsService', () => {
           phone_number: '+1234567890',
         }),
       );
+      mockAppointmentsRepository.countAppointmentsByDoctorId.mockResolvedValueOnce(
+        {
+          count: 1,
+        },
+      );
+
+      mockAppointmentsRepository.countPatientsByDoctorId.mockResolvedValueOnce({
+        count: 1,
+      });
 
       const doctor = await service.findOne(1);
 

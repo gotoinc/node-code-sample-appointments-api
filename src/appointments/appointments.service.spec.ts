@@ -65,6 +65,8 @@ const mockAppointmentsRepository: jest.Mocked<IAppointmentsRepository> = {
   findByDoctorId: jest.fn(),
   findByPatientId: jest.fn(),
   create: jest.fn(),
+  countAppointmentsByDoctorId: jest.fn(),
+  countPatientsByDoctorId: jest.fn(),
 };
 
 const mockPatientsService: jest.Mocked<IPatientsService> = {
