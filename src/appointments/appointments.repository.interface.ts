@@ -1,5 +1,12 @@
-import { Appointment, Doctor, Patient, Timeslot } from '@prisma/client';
+import {
+  Appointment,
+  AppointmentResult,
+  Doctor,
+  Patient,
+  Timeslot,
+} from '@prisma/client';
 import { AppointmentEntity } from './entities/appointment.entity';
+import { AppointmentResultEntity } from './entities/appointmentResult.entity';
 
 export type AppointmentReturnType = Appointment & {
   patient: Patient;
@@ -21,4 +28,8 @@ export interface IAppointmentsRepository {
     appointment: AppointmentEntity,
     tx?: unknown,
   ): Promise<AppointmentReturnType>;
+  addResult(
+    appointmentResult: AppointmentResultEntity,
+    tx?: unknown,
+  ): Promise<AppointmentResult & { appointment: AppointmentReturnType }>;
 }

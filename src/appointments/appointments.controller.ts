@@ -25,6 +25,8 @@ import {
   ApiNotFoundResponse,
   ApiServiceUnavailableResponse,
 } from '@nestjs/swagger';
+import { AppointmentResultDto } from './dto/appointment-result.dto';
+import { AddAppointmentResultDto } from './dto/add-appointment-result.dto';
 
 @Controller('appointments')
 export class AppointmentsController {
@@ -102,6 +104,27 @@ export class AppointmentsController {
     if (exception) throw exception;
     if (!data)
       throw new ServiceUnavailableException('Error creating appointment');
+
+    return data;
+  }
+
+  @ApiServiceUnavailableResponse({
+    description: 'Error creating appointment result',
+  })
+  @ApiNotFoundResponse({ description: 'Appointment not found' })
+  @Roles('doctor')
+  @Post('result')
+  async addResult(
+    @Body() body: AddAppointmentResultDto,
+  ): Promise<AppointmentResultDto> {
+    const { error, data } = await this.appointmentsService.addResult(body);
+
+    const exception = handleServiceError(error);
+    if (exception) throw exception;
+    if (!data)
+      throw new ServiceUnavailableException(
+        'Error creating appointment result',
+      );
 
     return data;
   }

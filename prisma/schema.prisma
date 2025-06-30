@@ -69,20 +69,21 @@ model Specialization {
 }
 
 model Appointment {
-  id                       Int      @id @default(autoincrement())
+  id                       Int                @id @default(autoincrement())
   full_name                String
   email                    String
   phone_number             String
   patient_insurance_number String
   reason                   String
-  created_at               DateTime @default(now())
-  updated_at               DateTime @default(now())
-  patient_id               Int      @map("fk_patient_id")
-  timeslot_id              Int      @unique @map("fk_timeslot_id")
-  doctor_id                Int      @map("fk_doctor_id")
-  patient                  Patient  @relation(fields: [patient_id], references: [id])
-  timeslot                 Timeslot @relation(fields: [timeslot_id], references: [id])
-  doctor                   Doctor   @relation(fields: [doctor_id], references: [id])
+  created_at               DateTime           @default(now())
+  updated_at               DateTime           @default(now())
+  patient_id               Int                @map("fk_patient_id")
+  timeslot_id              Int                @unique @map("fk_timeslot_id")
+  doctor_id                Int                @map("fk_doctor_id")
+  patient                  Patient            @relation(fields: [patient_id], references: [id])
+  timeslot                 Timeslot           @relation(fields: [timeslot_id], references: [id])
+  doctor                   Doctor             @relation(fields: [doctor_id], references: [id])
+  appointment_result       AppointmentResult?
 
   @@map("appointments")
 }
@@ -126,4 +127,14 @@ model UserAuthMethod {
   auth_provider    AuthProvider @relation(fields: [auth_provider_id], references: [id])
 
   @@map("user_auth_methods")
+}
+
+model AppointmentResult {
+  id              Int         @id @default(autoincrement())
+  appointment_id  Int         @unique
+  appointment     Appointment @relation(fields: [appointment_id], references: [id])
+  diagnosis       String
+  recommendations String
+
+  @@map("appointment_result")
 }

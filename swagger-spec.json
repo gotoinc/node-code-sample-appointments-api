@@ -859,6 +859,43 @@
           "Appointments"
         ]
       }
+    },
+    "/appointments/result": {
+      "post": {
+        "operationId": "AppointmentsController_addResult",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddAppointmentResultDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AppointmentResultDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Appointment not found"
+          },
+          "503": {
+            "description": "Error creating appointment result"
+          }
+        },
+        "tags": [
+          "Appointments"
+        ]
+      }
     }
   },
   "info": {
@@ -1242,6 +1279,52 @@
           "reason",
           "timeslot_id",
           "doctor_id"
+        ]
+      },
+      "AddAppointmentResultDto": {
+        "type": "object",
+        "properties": {
+          "appointmentId": {
+            "type": "number"
+          },
+          "diagnosis": {
+            "type": "string"
+          },
+          "recommendations": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "appointmentId",
+          "diagnosis",
+          "recommendations"
+        ]
+      },
+      "AppointmentResultDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "diagnosis": {
+            "type": "string"
+          },
+          "recommendations": {
+            "type": "string"
+          },
+          "appointment_id": {
+            "type": "number"
+          },
+          "appointment": {
+            "$ref": "#/components/schemas/AppointmentDto"
+          }
+        },
+        "required": [
+          "id",
+          "diagnosis",
+          "recommendations",
+          "appointment_id",
+          "appointment"
         ]
       },
       "ValidationError": {

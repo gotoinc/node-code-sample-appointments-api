@@ -62,6 +62,7 @@ const mockAppointmentsRepository: jest.Mocked<IAppointmentsRepository> = {
   findByDoctorId: jest.fn(),
   findByPatientId: jest.fn(),
   create: jest.fn(),
+  addResult: jest.fn(),
 };
 
 const mockPatientsService: jest.Mocked<IPatientsService> = {
@@ -556,6 +557,66 @@ describe('AppointmentsService', () => {
 
       expect(appointment.error).toBeNull();
       expect(appointment.data?.email).toBe('john@doe.com');
+    });
+
+    describe('addResult', () => {
+      it('should return not found if appointment does not exist', async () => {
+        mockAppointmentsRepository.findById.mockResolvedValueOnce(null);
+
+        const result = await service.addResult({
+          appointmentId: 1,
+          diagnosis: 'Diagnosis',
+          recommendations: 'Recommendations',
+        });
+
+        expect(result.data).toBeNull();
+        expect(result.error?.status).toBe(ResponseStatus.NotFound);
+        expect(result.error?.message).toBe('Appointment not found');
+      });
+
+      it('should return error if repository throws', async () => {
+        mockAppointmentsRepository.findById.mockRejectedValueOnce(
+          new Error('DB error'),
+        );
+
+        const result = await service.addResult({
+          appointmentId: 1,
+          diagnosis: 'Diagnosis',
+          recommendations: 'Recommendations',
+        });
+
+        expect(result.data).toBeNull();
+        expect(result.error?.message).toBe('Error creating appointment result');
+      });
+
+      it('should add result and return success', async () => {
+        const appointment = createMockAppointment();
+        const appointmentResult = {
+          id: 1,
+          appointmentId: appointment.id,
+          diagnosis: 'Diagnosis',
+          recommendations: 'Recommendations',
+        };
+        const appointmentWithResult = {
+          appointment: appointment,
+          diagnosis: appointmentResult.diagnosis,
+          recommendations: appointmentResult.recommendations,
+          appointment_id: appointmentResult.appointmentId,
+          id: appointmentResult.id,
+        };
+
+        mockAppointmentsRepository.findById.mockResolvedValueOnce(appointment);
+        mockAppointmentsRepository.addResult.mockResolvedValueOnce(
+          appointmentWithResult,
+        );
+
+        const result = await service.addResult(appointmentResult);
+
+        expect(result.error).toBeNull();
+        expect(result.data).not.toBeNull();
+        expect(result.data?.diagnosis).toBe('Diagnosis');
+        expect(result.data?.recommendations).toBe('Recommendations');
+      });
     });
   });
 });
