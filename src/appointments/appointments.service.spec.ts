@@ -78,6 +78,7 @@ const mockTimeslotsRepository: jest.Mocked<ITimeslotsRepository> = {
   create: jest.fn(),
   findManyByDoctorId: jest.fn(),
   findCollisions: jest.fn(),
+  createMany: jest.fn(),
 };
 
 const mockDoctorsService: jest.Mocked<IDoctorsService> = {
