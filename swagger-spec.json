@@ -892,6 +892,63 @@
           "Appointments"
         ]
       }
+    },
+    "/templates/doctors/{doctorId}": {
+      "get": {
+        "operationId": "TemplateScheduleController_getDoctorTemplates",
+        "parameters": [
+          {
+            "name": "doctorId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "minimum": 1,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "503": {
+            "description": "Error finding template"
+          }
+        },
+        "tags": [
+          "TemplateSchedule"
+        ]
+      }
+    },
+    "/templates": {
+      "post": {
+        "operationId": "TemplateScheduleController_createDoctorTimeslots",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateTemplateScheduleDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          },
+          "404": {
+            "description": "Doctor not found"
+          },
+          "503": {
+            "description": "Error creating template"
+          }
+        },
+        "tags": [
+          "TemplateSchedule"
+        ]
+      }
     }
   },
   "info": {
@@ -1289,6 +1346,25 @@
           "reason",
           "timeslot_id",
           "doctor_id"
+        ]
+      },
+      "CreateTemplateScheduleDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "slotDuration": {
+            "type": "number"
+          },
+          "schedule": {
+            "type": "object"
+          }
+        },
+        "required": [
+          "name",
+          "slotDuration",
+          "schedule"
         ]
       },
       "ValidationError": {

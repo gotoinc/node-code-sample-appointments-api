@@ -47,15 +47,16 @@ model Patient {
 }
 
 model Doctor {
-  id                Int            @id @default(autoincrement())
+  id                Int                @id @default(autoincrement())
   phone_number      String
   licence_number    String
-  user_id           Int            @unique @map("fk_user_id")
-  specialization_id Int            @map("fk_specialization_id")
-  user              User           @relation(fields: [user_id], references: [id], onDelete: Cascade)
-  specialization    Specialization @relation(fields: [specialization_id], references: [id])
+  user_id           Int                @unique @map("fk_user_id")
+  specialization_id Int                @map("fk_specialization_id")
+  user              User               @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  specialization    Specialization     @relation(fields: [specialization_id], references: [id])
   timeslots         Timeslot[]
   appointments      Appointment[]
+  TemplateSchedule  TemplateSchedule[]
 
   @@map("doctors")
 }
@@ -126,4 +127,15 @@ model UserAuthMethod {
   auth_provider    AuthProvider @relation(fields: [auth_provider_id], references: [id])
 
   @@map("user_auth_methods")
+}
+
+model TemplateSchedule {
+  id           Int    @id @default(autoincrement())
+  name         String
+  slotDuration Int
+  schedule     Json
+  doctor_id    Int
+  doctor       Doctor @relation(fields: [doctor_id], references: [id], onDelete: Cascade)
+
+  @@map("template_schedule")
 }
