@@ -27,6 +27,7 @@ import {
 } from '@nestjs/swagger';
 import { AppointmentResultDto } from './dto/appointment-result.dto';
 import { AddAppointmentResultDto } from './dto/add-appointment-result.dto';
+import { DeclineAppointmentDto } from './dto/decline-appointment.dto';
 
 @Controller('appointments')
 export class AppointmentsController {
@@ -125,6 +126,27 @@ export class AppointmentsController {
       throw new ServiceUnavailableException(
         'Error creating appointment result',
       );
+
+    return data;
+  }
+  @ApiServiceUnavailableResponse({ description: 'Error declining appointment' })
+  @ApiNotFoundResponse({ description: 'Appointment not found' })
+  @Post('decline')
+  @Roles('doctor', 'patient')
+  async declineAppointment(
+    @Body() { appointmentId }: DeclineAppointmentDto,
+    @Req() req: Request,
+  ) {
+    const user = req.user!;
+
+    const { error, data } = await this.appointmentsService.declineAppointment(
+      appointmentId,
+      user.userId,
+    );
+
+    const exception = handleServiceError(error);
+    if (exception) throw exception;
+    if (!data) throw new ServiceUnavailableException();
 
     return data;
   }

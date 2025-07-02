@@ -154,4 +154,47 @@ export class AppointmentsService implements IAppointmentsService {
       };
     }
   }
+
+  async declineAppointment(
+    appointmentId: number,
+    userId: number,
+  ): Promise<IServiceResponse<AppointmentDto>> {
+    try {
+      const appointment =
+        await this.appointmentsRepository.findById(appointmentId);
+
+      if (!appointment) {
+        return ServiceResponse.notFound('Appointment not found');
+      }
+
+      if (appointment.declined_by_doctor || appointment.declined_by_patient) {
+        return ServiceResponse.conflict('Appointment already declined');
+      }
+
+      const { error: errorPatient, data: patient } =
+        await this.patientsService.findByUserId(userId);
+
+      const { error: errorDoctor, data: doctor } =
+        await this.doctorsService.findByUserId(userId);
+
+      if (errorPatient && errorDoctor)
+        return ServiceResponse.notFound('User not found');
+
+      let updatedAppointment: AppointmentDto | null = null;
+      if (!errorDoctor && doctor) {
+        updatedAppointment =
+          await this.appointmentsRepository.declineByDoctor(appointmentId);
+      } else if (!errorPatient && patient) {
+        updatedAppointment =
+          await this.appointmentsRepository.declineByPatient(appointmentId);
+      } else {
+        return ServiceResponse.forbidden('Unknown user role');
+      }
+
+      return ServiceResponse.success<AppointmentDto>(updatedAppointment);
+    } catch (error) {
+      this.logger.error(error);
+      return { error: { message: 'Error declining appointment' }, data: null };
+    }
+  }
 }

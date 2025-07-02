@@ -11,8 +11,26 @@ import { ITransactionManager } from 'src/common/interfaces/transaction-manager.i
 import { IPatientsService } from 'src/patients/patients.service.interface';
 import { ResponseStatus } from 'src/common/service-response';
 
+const testDoctor = {
+  id: 1,
+  phone_number: '1234567890',
+  licence_number: 'XYZ123',
+  specialization_id: 1,
+  user_id: 1,
+};
+const testPatient = {
+  id: 1,
+  user_id: 1,
+  address: 'address',
+  date_of_birth: new Date(),
+  gender: 'male',
+  created_at: new Date(),
+  updated_at: new Date(),
+};
 function createMockAppointment(overrides = {}): AppointmentReturnType {
   return {
+    declined_by_doctor: null,
+    declined_by_patient: null,
     doctor: {
       id: 1,
       phone_number: '1234567890',
@@ -63,6 +81,8 @@ const mockAppointmentsRepository: jest.Mocked<IAppointmentsRepository> = {
   findByPatientId: jest.fn(),
   create: jest.fn(),
   addResult: jest.fn(),
+  declineByDoctor: jest.fn(),
+  declineByPatient: jest.fn(),
 };
 
 const mockPatientsService: jest.Mocked<IPatientsService> = {
@@ -616,6 +636,149 @@ describe('AppointmentsService', () => {
         expect(result.data).not.toBeNull();
         expect(result.data?.diagnosis).toBe('Diagnosis');
         expect(result.data?.recommendations).toBe('Recommendations');
+      });
+
+      describe('declineAppointment', () => {
+        it('should return not found if appointment does not exist', async () => {
+          mockAppointmentsRepository.findById.mockResolvedValueOnce(null);
+
+          const result = await service.declineAppointment(1, 1);
+
+          expect(result.data).toBeNull();
+          expect(result.error?.status).toBe(ResponseStatus.NotFound);
+          expect(result.error?.message).toBe('Appointment not found');
+        });
+
+        it('should return conflict if appointment already declined', async () => {
+          mockAppointmentsRepository.findById.mockResolvedValueOnce({
+            ...createMockAppointment(),
+            declined_by_doctor: true,
+            declined_by_patient: false,
+          });
+
+          const result = await service.declineAppointment(1, 1);
+
+          expect(result.data).toBeNull();
+          expect(result.error?.status).toBe(ResponseStatus.Conflict);
+          expect(result.error?.message).toBe('Appointment already declined');
+        });
+
+        it('should return not found if user is not found', async () => {
+          mockAppointmentsRepository.findById.mockResolvedValueOnce({
+            ...createMockAppointment(),
+            declined_by_doctor: false,
+            declined_by_patient: false,
+          });
+          mockPatientsService.findByUserId.mockResolvedValueOnce({
+            data: null,
+            error: { message: 'Not found' },
+          });
+          mockDoctorsService.findByUserId.mockResolvedValueOnce({
+            data: null,
+            error: { message: 'Not found' },
+          });
+
+          const result = await service.declineAppointment(1, 1);
+
+          expect(result.data).toBeNull();
+          expect(result.error?.status).toBe(ResponseStatus.NotFound);
+          expect(result.error?.message).toBe('User not found');
+        });
+
+        it('should decline by doctor if user is doctor', async () => {
+          mockAppointmentsRepository.findById.mockResolvedValueOnce({
+            ...createMockAppointment(),
+            declined_by_doctor: false,
+            declined_by_patient: false,
+          });
+          mockPatientsService.findByUserId.mockResolvedValueOnce({
+            data: null,
+            error: { message: 'Not found' },
+          });
+          mockDoctorsService.findByUserId.mockResolvedValueOnce({
+            data: testDoctor,
+            error: null,
+          });
+          const declinedAppointment = {
+            ...createMockAppointment(),
+            declined_by_doctor: true,
+          };
+          mockAppointmentsRepository.declineByDoctor = jest
+            .fn()
+            .mockResolvedValueOnce(declinedAppointment);
+
+          const result = await service.declineAppointment(1, 1);
+
+          expect(
+            mockAppointmentsRepository.declineByDoctor,
+          ).toHaveBeenCalledWith(1);
+          expect(result.error).toBeNull();
+          expect(result.data).toEqual(declinedAppointment);
+        });
+
+        it('should decline by patient if user is patient', async () => {
+          mockAppointmentsRepository.findById.mockResolvedValueOnce({
+            ...createMockAppointment(),
+            declined_by_doctor: false,
+            declined_by_patient: false,
+          });
+          mockPatientsService.findByUserId.mockResolvedValueOnce({
+            data: testPatient,
+            error: null,
+          });
+          mockDoctorsService.findByUserId.mockResolvedValueOnce({
+            data: null,
+            error: { message: 'Not found' },
+          });
+          const declinedAppointment = {
+            ...createMockAppointment(),
+            declined_by_patient: true,
+          };
+          mockAppointmentsRepository.declineByPatient = jest
+            .fn()
+            .mockResolvedValueOnce(declinedAppointment);
+
+          const result = await service.declineAppointment(1, 1);
+
+          expect(
+            mockAppointmentsRepository.declineByPatient,
+          ).toHaveBeenCalledWith(1);
+          expect(result.error).toBeNull();
+          expect(result.data).toEqual(declinedAppointment);
+        });
+
+        it('should return forbidden if user role is unknown', async () => {
+          mockAppointmentsRepository.findById.mockResolvedValueOnce({
+            ...createMockAppointment(),
+            declined_by_doctor: false,
+            declined_by_patient: false,
+          });
+          mockPatientsService.findByUserId.mockResolvedValueOnce({
+            data: null,
+            error: null,
+          });
+          mockDoctorsService.findByUserId.mockResolvedValueOnce({
+            data: null,
+            error: null,
+          });
+
+          const result = await service.declineAppointment(1, 1);
+
+          expect(result.data).toBeNull();
+          expect(result.error?.status).toBe(ResponseStatus.Forbidden);
+          expect(result.error?.message).toBe('Unknown user role');
+        });
+
+        it('should return error if exception is thrown', async () => {
+          mockAppointmentsRepository.findById.mockRejectedValueOnce(
+            new Error('DB error'),
+          );
+
+          const result = await service.declineAppointment(1, 1);
+
+          expect(result.data).toBeNull();
+          expect(result.error?.message).toBe('Error declining appointment');
+        });
       });
     });
   });

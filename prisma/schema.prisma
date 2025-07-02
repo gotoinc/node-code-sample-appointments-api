@@ -84,6 +84,8 @@ model Appointment {
   timeslot                 Timeslot           @relation(fields: [timeslot_id], references: [id])
   doctor                   Doctor             @relation(fields: [doctor_id], references: [id])
   appointment_result       AppointmentResult?
+  declined_by_patient      Boolean?
+  declined_by_doctor       Boolean?
 
   @@map("appointments")
 }

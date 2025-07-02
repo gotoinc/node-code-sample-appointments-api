@@ -896,6 +896,43 @@
           "Appointments"
         ]
       }
+    },
+    "/appointments/decline": {
+      "post": {
+        "operationId": "AppointmentsController_declineAppointment",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeclineAppointmentDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AppointmentDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Appointment not found"
+          },
+          "503": {
+            "description": "Error declining appointment"
+          }
+        },
+        "tags": [
+          "Appointments"
+        ]
+      }
     }
   },
   "info": {
@@ -1325,6 +1362,18 @@
           "recommendations",
           "appointment_id",
           "appointment"
+        ]
+      },
+      "DeclineAppointmentDto": {
+        "type": "object",
+        "properties": {
+          "appointmentId": {
+            "type": "number",
+            "minimum": 1
+          }
+        },
+        "required": [
+          "appointmentId"
         ]
       },
       "ValidationError": {

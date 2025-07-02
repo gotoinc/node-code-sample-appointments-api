@@ -135,6 +135,7 @@ export class AppointmentsRepository
       },
     });
   }
+
   async addResult(
     appointmentResult: AppointmentResultEntity,
     tx?: unknown,
@@ -154,6 +155,48 @@ export class AppointmentsRepository
             timeslot: true,
           },
         },
+      },
+    });
+  }
+
+  async declineByDoctor(
+    appointmentId: number,
+    tx?: unknown,
+  ): Promise<AppointmentReturnType> {
+    const prisma = this.getClient(tx);
+
+    return prisma.appointment.update({
+      where: {
+        id: appointmentId,
+      },
+      data: {
+        declined_by_doctor: true,
+      },
+      include: {
+        doctor: true,
+        patient: true,
+        timeslot: true,
+      },
+    });
+  }
+
+  async declineByPatient(
+    appointmentId: number,
+    tx?: unknown,
+  ): Promise<AppointmentReturnType> {
+    const prisma = this.getClient(tx);
+
+    return prisma.appointment.update({
+      where: {
+        id: appointmentId,
+      },
+      data: {
+        declined_by_patient: true,
+      },
+      include: {
+        doctor: true,
+        patient: true,
+        timeslot: true,
       },
     });
   }

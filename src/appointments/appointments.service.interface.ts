@@ -19,4 +19,8 @@ export interface IAppointmentsService {
   addResult(
     appointmentResult: AddAppointmentResultDto,
   ): Promise<IServiceResponse<AppointmentResultDto>>;
+  declineAppointment(
+    appointmentId: number,
+    userId: number,
+  ): Promise<IServiceResponse<AppointmentDto>>;
 }
