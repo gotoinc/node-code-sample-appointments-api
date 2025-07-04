@@ -862,7 +862,7 @@
     },
     "/appointments/result": {
       "post": {
-        "operationId": "AppointmentsController_addResult",
+        "operationId": "AppointmentsController_createResult",
         "parameters": [],
         "requestBody": {
           "required": true,

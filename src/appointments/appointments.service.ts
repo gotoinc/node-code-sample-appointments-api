@@ -9,9 +9,6 @@ import { ITransactionManager } from 'src/common/interfaces/transaction-manager.i
 import { ITimeslotsRepository } from 'src/timeslots/timeslots.repository.interface';
 import { ILogger } from 'src/common/interfaces/logger.interface';
 import { AppointmentDto } from './dto/appointment.dto';
-import { AddAppointmentResultDto } from './dto/add-appointment-result.dto';
-import { AppointmentResultEntity } from './entities/appointmentResult.entity';
-import { AppointmentResultDto } from './dto/appointment-result.dto';
 
 export class AppointmentsService implements IAppointmentsService {
   constructor(
@@ -119,39 +116,6 @@ export class AppointmentsService implements IAppointmentsService {
     } catch (error) {
       this.logger.error(error);
       return { error: { message: 'Error creating appointment' }, data: null };
-    }
-  }
-
-  async addResult(
-    appointmentResult: AddAppointmentResultDto,
-  ): Promise<IServiceResponse<AppointmentResultDto>> {
-    try {
-      const appointment = await this.appointmentsRepository.findById(
-        appointmentResult.appointmentId,
-      );
-      if (!appointment) {
-        return ServiceResponse.notFound('Appointment not found');
-      }
-
-      const appointmentResultEntity: AppointmentResultEntity = {
-        appointmentId: appointmentResult.appointmentId,
-        diagnosis: appointmentResult.diagnosis,
-        recommendations: appointmentResult.recommendations,
-      };
-
-      const appointmentWithResult = await this.appointmentsRepository.addResult(
-        appointmentResultEntity,
-      );
-
-      return ServiceResponse.success<AppointmentResultDto>(
-        appointmentWithResult,
-      );
-    } catch (error) {
-      this.logger.error(error);
-      return {
-        error: { message: 'Error creating appointment result' },
-        data: null,
-      };
     }
   }
 

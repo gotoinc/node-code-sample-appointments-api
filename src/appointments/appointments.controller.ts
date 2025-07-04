@@ -28,12 +28,18 @@ import {
 import { AppointmentResultDto } from './dto/appointment-result.dto';
 import { AddAppointmentResultDto } from './dto/add-appointment-result.dto';
 import { DeclineAppointmentDto } from './dto/decline-appointment.dto';
+import {
+  AppointmentsResultServiceSymbol,
+  IAppointmentsResultService,
+} from './appointments_result/appointments_result.service.interface';
 
 @Controller('appointments')
 export class AppointmentsController {
   constructor(
     @Inject(AppointmentsServiceSymbol)
     private readonly appointmentsService: IAppointmentsService,
+    @Inject(AppointmentsResultServiceSymbol)
+    private readonly appointmentsResultService: IAppointmentsResultService,
   ) {}
 
   @ApiServiceUnavailableResponse({ description: 'Error finding appointment' })
@@ -115,10 +121,17 @@ export class AppointmentsController {
   @ApiNotFoundResponse({ description: 'Appointment not found' })
   @Roles('doctor')
   @Post('result')
-  async addResult(
+  async createResult(
     @Body() body: AddAppointmentResultDto,
   ): Promise<AppointmentResultDto> {
-    const { error, data } = await this.appointmentsService.addResult(body);
+    const { error: appointmentError } = await this.appointmentsService.findById(
+      body.appointmentId,
+    );
+
+    const appointmentsException = handleServiceError(appointmentError);
+    if (appointmentsException) throw appointmentsException;
+
+    const { error, data } = await this.appointmentsResultService.create(body);
 
     const exception = handleServiceError(error);
     if (exception) throw exception;
