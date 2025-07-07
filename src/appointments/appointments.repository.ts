@@ -6,7 +6,7 @@ import {
 import { AppointmentEntity } from './entities/appointment.entity';
 import { PrismaService } from 'src/database/prisma.service';
 import { Injectable } from '@nestjs/common';
-import { AppointmentResult } from '@prisma/client';
+import { AppointmentResult, Prisma } from '@prisma/client';
 import { AppointmentResultEntity } from './entities/appointmentResult.entity';
 
 @Injectable()
@@ -159,9 +159,9 @@ export class AppointmentsRepository
     });
   }
 
-  async decline(
+  async update(
     appointmentId: number,
-    declinedBy: 'declined_by_doctor' | 'declined_by_patient',
+    updatedData: Prisma.AppointmentUpdateInput,
     tx?: unknown,
   ): Promise<AppointmentReturnType> {
     const prisma = this.getClient(tx);
@@ -170,9 +170,7 @@ export class AppointmentsRepository
       where: {
         id: appointmentId,
       },
-      data: {
-        [declinedBy]: true,
-      },
+      data: updatedData,
       include: {
         doctor: true,
         patient: true,

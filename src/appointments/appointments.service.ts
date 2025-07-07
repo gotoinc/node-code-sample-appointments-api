@@ -160,9 +160,9 @@ export class AppointmentsService implements IAppointmentsService {
         return ServiceResponse.invalidData();
       }
 
-      const updatedAppointment = await this.appointmentsRepository.decline(
+      const updatedAppointment = await this.appointmentsRepository.update(
         appointmentId,
-        declinedBy,
+        { [declinedBy]: true },
       );
 
       return ServiceResponse.success<AppointmentDto>(updatedAppointment);

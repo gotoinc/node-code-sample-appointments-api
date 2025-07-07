@@ -1,4 +1,4 @@
-import { Appointment, Doctor, Patient, Timeslot } from '@prisma/client';
+import { Appointment, Doctor, Patient, Prisma, Timeslot } from '@prisma/client';
 import { AppointmentEntity } from './entities/appointment.entity';
 
 export type AppointmentReturnType = Appointment & {
@@ -21,9 +21,9 @@ export interface IAppointmentsRepository {
     appointment: AppointmentEntity,
     tx?: unknown,
   ): Promise<AppointmentReturnType>;
-  decline(
+  update(
     appointmentId: number,
-    declinedBy: 'declined_by_doctor' | 'declined_by_patient',
+    updatedData: Prisma.AppointmentUpdateInput,
     tx?: unknown,
   ): Promise<AppointmentReturnType>;
 }
