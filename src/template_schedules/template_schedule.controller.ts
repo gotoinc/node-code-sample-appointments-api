@@ -7,6 +7,7 @@ import {
   Post,
   Req,
   ServiceUnavailableException,
+  UsePipes,
 } from '@nestjs/common';
 import {
   ITemplateScheduleService,
@@ -19,9 +20,13 @@ import {
 import { DoctorIdParamDto } from 'src/timeslots/dto/doctor-id-param.dto';
 import { TemplateSchedule } from '@prisma/client';
 import { handleServiceError } from 'src/common/handle-service-error';
-import { CreateTemplateScheduleDto } from './dto/createTemplateSchedule.dto';
+import {
+  CreateTemplateScheduleDto,
+  CreateTemplateScheduleSchema,
+} from './dto/createTemplateSchedule.dto';
 import { Roles } from 'src/iam/authorization/decorators/roles.decorator';
 import { Request } from 'express';
+import { ZodValidationPipe } from 'nestjs-zod';
 
 @Controller('templates')
 export class TemplateScheduleController {
@@ -49,11 +54,24 @@ export class TemplateScheduleController {
   @ApiNotFoundResponse({ description: 'Doctor not found' })
   @Roles('doctor')
   @Post()
+  @UsePipes(ZodValidationPipe)
   async createDoctorTimeslots(
     @Body() body: CreateTemplateScheduleDto,
     @Req() req: Request,
   ): Promise<TemplateSchedule> {
     const user = req.user!;
+    console.log(
+      CreateTemplateScheduleSchema.safeParse({
+        name: 'test-template22',
+        slotDuration: 60,
+        schedule: {
+          monday: {
+            start_time: '25:00',
+            end_time: '17:00',
+          },
+        },
+      }),
+    );
 
     const { error, data } = await this.templateScheduleService.create(
       body,

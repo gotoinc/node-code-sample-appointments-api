@@ -1,22 +1,10 @@
-export type DayOfWeek =
-  | 'monday'
-  | 'tuesday'
-  | 'wednesday'
-  | 'thursday'
-  | 'friday'
-  | 'saturday'
-  | 'sunday';
+import { CreateTemplateScheduleSchema } from '../dto/createTemplateSchedule.dto';
+import z from 'zod';
 
-export type ISchedule = {
-  [day in DayOfWeek]?: {
-    start_time: string;
-    end_time: string;
-  };
-};
-
+export type Schedule = z.infer<typeof CreateTemplateScheduleSchema>['schedule'];
 export class TemplateScheduleEntity {
   name: string;
   slotDuration: number;
-  schedule: ISchedule;
+  schedule: Schedule;
   doctor_id: number;
 }

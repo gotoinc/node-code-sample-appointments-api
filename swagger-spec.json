@@ -1350,22 +1350,7 @@
       },
       "CreateTemplateScheduleDto": {
         "type": "object",
-        "properties": {
-          "name": {
-            "type": "string"
-          },
-          "slotDuration": {
-            "type": "number"
-          },
-          "schedule": {
-            "type": "object"
-          }
-        },
-        "required": [
-          "name",
-          "slotDuration",
-          "schedule"
-        ]
+        "properties": {}
       },
       "ValidationError": {
         "type": "object",
