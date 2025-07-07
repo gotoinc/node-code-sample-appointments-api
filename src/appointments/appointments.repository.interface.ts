@@ -21,12 +21,9 @@ export interface IAppointmentsRepository {
     appointment: AppointmentEntity,
     tx?: unknown,
   ): Promise<AppointmentReturnType>;
-  declineByPatient(
+  decline(
     appointmentId: number,
-    tx?: unknown,
-  ): Promise<AppointmentReturnType>;
-  declineByDoctor(
-    appointmentId: number,
+    declinedBy: 'declined_by_doctor' | 'declined_by_patient',
     tx?: unknown,
   ): Promise<AppointmentReturnType>;
 }

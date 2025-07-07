@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  ForbiddenException,
   Get,
   Inject,
   Param,
@@ -123,10 +124,22 @@ export class AppointmentsController {
   @Post('result')
   async createResult(
     @Body() body: AddAppointmentResultDto,
+    @Req() req: Request,
   ): Promise<AppointmentResultDto> {
+    const user = req.user!;
     const { error: appointmentError } = await this.appointmentsService.findById(
       body.appointmentId,
     );
+
+    const { data: isUserInAppointment } =
+      await this.appointmentsService.isUserInAppointment(
+        body.appointmentId,
+        user.userId,
+      );
+
+    if (!isUserInAppointment?.included) {
+      throw new ForbiddenException('User is not in appointment');
+    }
 
     const appointmentsException = handleServiceError(appointmentError);
     if (appointmentsException) throw appointmentsException;

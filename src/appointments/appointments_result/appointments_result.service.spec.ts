@@ -60,13 +60,13 @@ const mockAppointmentsRepository: jest.Mocked<IAppointmentsRepository> = {
   findByDoctorId: jest.fn(),
   findByPatientId: jest.fn(),
   create: jest.fn(),
-  declineByDoctor: jest.fn(),
-  declineByPatient: jest.fn(),
+  decline: jest.fn(),
 };
 
 const mockAppointmentsResultRepository: jest.Mocked<IAppointmentsResultRepository> =
   {
     create: jest.fn(),
+    findByAppointmentId: jest.fn(),
   };
 
 describe('AppointmentsResultService', () => {

@@ -159,8 +159,9 @@ export class AppointmentsRepository
     });
   }
 
-  async declineByDoctor(
+  async decline(
     appointmentId: number,
+    declinedBy: 'declined_by_doctor' | 'declined_by_patient',
     tx?: unknown,
   ): Promise<AppointmentReturnType> {
     const prisma = this.getClient(tx);
@@ -170,28 +171,7 @@ export class AppointmentsRepository
         id: appointmentId,
       },
       data: {
-        declined_by_doctor: true,
-      },
-      include: {
-        doctor: true,
-        patient: true,
-        timeslot: true,
-      },
-    });
-  }
-
-  async declineByPatient(
-    appointmentId: number,
-    tx?: unknown,
-  ): Promise<AppointmentReturnType> {
-    const prisma = this.getClient(tx);
-
-    return prisma.appointment.update({
-      where: {
-        id: appointmentId,
-      },
-      data: {
-        declined_by_patient: true,
+        [declinedBy]: true,
       },
       include: {
         doctor: true,
