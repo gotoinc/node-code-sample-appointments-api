@@ -5,6 +5,7 @@ import { CreateTemplateScheduleDto } from './dto/createTemplateSchedule.dto';
 import { ILogger } from 'src/common/interfaces/logger.interface';
 import { IDoctorsService } from 'src/doctors/doctors.service.interface';
 import { DoctorReturnType } from 'src/doctors/doctors.repository.interface';
+import { ITemplateScheduleRepository } from './template_schedules.repository.interface';
 
 function createMockDoctor(overrides = {}): DoctorReturnType {
   return {
@@ -36,10 +37,11 @@ const mockLogger: ILogger = {
   warn: jest.fn(),
 };
 
-const mockTemplateRepository = {
+const mockTemplateRepository: jest.Mocked<ITemplateScheduleRepository> = {
   create: jest.fn(),
   findAllByDoctorId: jest.fn(),
   findById: jest.fn(),
+  findByName: jest.fn(),
 };
 
 const mockDoctorsService: jest.Mocked<IDoctorsService> = {

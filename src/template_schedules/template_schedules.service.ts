@@ -27,6 +27,16 @@ export class TemplateScheduleService implements ITemplateScheduleService {
 
       const doctorId = doctor.id;
 
+      const existedTemplate = await this.templateRepository.findByName(
+        templateDto.name,
+        doctorId,
+      );
+
+      if (existedTemplate)
+        return ServiceResponse.conflict(
+          'A template with this name already exists',
+        );
+
       const templateScheduleEntity: TemplateScheduleEntity = {
         doctor_id: doctorId,
         name: templateDto.name,

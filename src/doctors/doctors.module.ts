@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { DoctorsController } from './doctors.controller';
 import { DoctorsService } from './doctors.service';
 import { DoctorsServiceSymbol } from './doctors.service.interface';
@@ -12,9 +12,10 @@ import { SpecializationsModule } from 'src/specializations/specializations.modul
 import { PrismaService } from 'src/database/prisma.service';
 import { ILogger } from 'src/common/interfaces/logger.interface';
 import { Logger } from 'nestjs-pino';
+import { TemplateScheduleModule } from 'src/template_schedules/template_schedules.module';
 
 @Module({
-  imports: [SpecializationsModule],
+  imports: [SpecializationsModule, forwardRef(() => TemplateScheduleModule)],
   controllers: [DoctorsController],
   providers: [
     PrismaService,

@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { PrismaService } from 'src/database/prisma.service';
 
 import { Logger } from 'nestjs-pino';
@@ -12,10 +12,9 @@ import {
 import { TemplateScheduleRepository } from './template_schedules.repository';
 import { TemplateScheduleService } from './template_schedules.service';
 import { DoctorsModule } from 'src/doctors/doctors.module';
-import { TemplateScheduleController } from './template_schedule.controller';
 
 @Module({
-  imports: [DoctorsModule],
+  imports: [forwardRef(() => DoctorsModule)],
   providers: [
     PrismaService,
     TemplateScheduleRepository,
@@ -36,7 +35,7 @@ import { TemplateScheduleController } from './template_schedule.controller';
       inject: [Logger, TemplateScheduleRepository, DoctorsServiceSymbol],
     },
   ],
-  controllers: [TemplateScheduleController],
+  controllers: [],
   exports: [TemplateScheduleServiceSymbol],
 })
 export class TemplateScheduleModule {}

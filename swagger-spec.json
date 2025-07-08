@@ -397,6 +397,63 @@
         ]
       }
     },
+    "/doctors/{doctorId}/templates": {
+      "get": {
+        "operationId": "DoctorsController_getDoctorTemplates",
+        "parameters": [
+          {
+            "name": "doctorId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "minimum": 1,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "503": {
+            "description": "Error finding template"
+          }
+        },
+        "tags": [
+          "Doctors"
+        ]
+      }
+    },
+    "/doctors/templates": {
+      "post": {
+        "operationId": "DoctorsController_createTemplateSchedule",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateTemplateScheduleDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          },
+          "404": {
+            "description": "Doctor not found"
+          },
+          "503": {
+            "description": "Error creating template"
+          }
+        },
+        "tags": [
+          "Doctors"
+        ]
+      }
+    },
     "/specializations": {
       "get": {
         "operationId": "SpecializationsController_findAll",
@@ -892,63 +949,6 @@
           "Appointments"
         ]
       }
-    },
-    "/templates/doctors/{doctorId}": {
-      "get": {
-        "operationId": "TemplateScheduleController_getDoctorTemplates",
-        "parameters": [
-          {
-            "name": "doctorId",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "minimum": 1,
-              "type": "number"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": ""
-          },
-          "503": {
-            "description": "Error finding template"
-          }
-        },
-        "tags": [
-          "TemplateSchedule"
-        ]
-      }
-    },
-    "/templates": {
-      "post": {
-        "operationId": "TemplateScheduleController_createDoctorTimeslots",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateTemplateScheduleDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": ""
-          },
-          "404": {
-            "description": "Doctor not found"
-          },
-          "503": {
-            "description": "Error creating template"
-          }
-        },
-        "tags": [
-          "TemplateSchedule"
-        ]
-      }
     }
   },
   "info": {
@@ -1125,6 +1125,10 @@
           "licence_number",
           "specializationId"
         ]
+      },
+      "CreateTemplateScheduleDto": {
+        "type": "object",
+        "properties": {}
       },
       "CreatePatientDto": {
         "type": "object",
@@ -1347,10 +1351,6 @@
           "timeslot_id",
           "doctor_id"
         ]
-      },
-      "CreateTemplateScheduleDto": {
-        "type": "object",
-        "properties": {}
       },
       "ValidationError": {
         "type": "object",

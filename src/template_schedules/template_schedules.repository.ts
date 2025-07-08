@@ -52,4 +52,18 @@ export class TemplateScheduleRepository
       },
     });
   }
+  async findByName(
+    name: string,
+    doctorId: number,
+    tx?: unknown,
+  ): Promise<TemplateSchedule | null> {
+    const prisma = this.getClient(tx);
+
+    return prisma.templateSchedule.findFirst({
+      where: {
+        name: name,
+        doctor_id: doctorId,
+      },
+    });
+  }
 }

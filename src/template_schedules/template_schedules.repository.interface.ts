@@ -11,4 +11,9 @@ export interface ITemplateScheduleRepository {
     tx?: unknown,
   ): Promise<TemplateSchedule[]>;
   findById(id: number, tx?: unknown): Promise<TemplateSchedule | null>;
+  findByName(
+    name: string,
+    doctorId: number,
+    tx?: unknown,
+  ): Promise<TemplateSchedule | null>;
 }
