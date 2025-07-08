@@ -285,6 +285,19 @@ describe('TimeslotsService', () => {
       ],
     };
 
+    const timeslotsWithColission = {
+      timeslots: [
+        {
+          start_time: '2024-06-01T10:00:00.000Z',
+          end_time: '2024-06-01T10:30:00.000Z',
+        },
+        {
+          start_time: '2024-06-01T10:00:00.000Z',
+          end_time: '2024-06-01T11:30:00.000Z',
+        },
+      ],
+    };
+
     it('should return error if doctor service returns error', async () => {
       mockDoctorsService.findByUserId.mockResolvedValueOnce({
         data: null,
@@ -342,6 +355,23 @@ describe('TimeslotsService', () => {
       expect(result.error).not.toBeNull();
       expect(mockLogger.error).toHaveBeenCalled();
     });
+    it('should return error if timeslots has collision', async () => {
+      mockDoctorsService.findByUserId.mockResolvedValueOnce({
+        data: doctor,
+        error: null,
+      });
+      mockTimeslotsRepository.findCollisions.mockResolvedValue([]);
+      mockTimeslotsRepository.createMany.mockResolvedValueOnce({ count: 2 });
+
+      const result = await service.createSchedule(
+        timeslotsWithColission,
+        userId,
+      );
+
+      expect(result.data).toBeNull();
+      expect(result.error?.status).toBe(ResponseStatus.Conflict);
+      expect(result.error?.message).toContain('Timeslot collision');
+    });
 
     it('should return success if all timeslots created', async () => {
       mockDoctorsService.findByUserId.mockResolvedValueOnce({
@@ -354,7 +384,7 @@ describe('TimeslotsService', () => {
       const result = await service.createSchedule(timeslotsDto, userId);
 
       expect(result.error).toBeNull();
-      expect(result.data).toEqual({ count: 2 });
+      expect(result.data).toEqual({ status: 'ok' });
     });
   });
 });

@@ -83,7 +83,7 @@ export class TimeslotsController {
   async createSchedule(
     @Body() body: CreateScheduleDto,
     @Req() req: Request,
-  ): Promise<{ count: number }> {
+  ): Promise<{ status: string }> {
     const user = req.user!;
 
     const { error, data } = await this.timeslotsService.createSchedule(

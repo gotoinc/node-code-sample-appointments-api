@@ -19,5 +19,5 @@ export interface ITimeslotsService {
   createSchedule(
     createScheduleDto: CreateScheduleDto,
     doctorId: number,
-  ): Promise<IServiceResponse<{ count: number }>>;
+  ): Promise<IServiceResponse<{ status: string }>>;
 }

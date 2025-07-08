@@ -16,6 +16,26 @@ export class TimeslotsService implements ITimeslotsService {
     private readonly doctorsService: IDoctorsService,
   ) {}
 
+  private hasLocalCollisions(timeslots: CreateTimeslotDto[]): boolean {
+    const sorted = timeslots
+      .slice()
+      .sort(
+        (a, b) =>
+          new Date(a.start_time).getTime() - new Date(b.start_time).getTime(),
+      );
+
+    for (let i = 1; i < sorted.length; i++) {
+      const currentStart = new Date(sorted[i].start_time).getTime();
+      const previousEnd = new Date(sorted[i - 1].end_time).getTime();
+
+      if (currentStart < previousEnd) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
   async create(
     timeslotDto: CreateTimeslotDto,
     userId: number,
@@ -99,8 +119,7 @@ export class TimeslotsService implements ITimeslotsService {
   async createSchedule(
     timeslotsDto: CreateScheduleDto,
     userId: number,
-  ): Promise<IServiceResponse<{ count: number }>> {
-    console.log(timeslotsDto);
+  ): Promise<IServiceResponse<{ status: string }>> {
     try {
       const { error: errorDoctor, data: doctor } =
         await this.doctorsService.findByUserId(userId);
@@ -108,6 +127,12 @@ export class TimeslotsService implements ITimeslotsService {
       if (!doctor) return ServiceResponse.notFound('Doctor not found');
 
       const doctorId = doctor.id;
+
+      const hasCollisions = this.hasLocalCollisions(timeslotsDto.timeslots);
+
+      if (hasCollisions) {
+        return ServiceResponse.conflict(`Timeslot collisions`);
+      }
 
       const timeslotEntities: TimeslotEntity[] = timeslotsDto.timeslots.map(
         (dto) => ({
@@ -129,10 +154,9 @@ export class TimeslotsService implements ITimeslotsService {
         }
       }
 
-      const result =
-        await this.timeslotsRepository.createMany(timeslotEntities);
+      await this.timeslotsRepository.createMany(timeslotEntities);
 
-      return ServiceResponse.success<{ count: number }>(result);
+      return ServiceResponse.success<{ status: string }>({ status: 'ok' });
     } catch (error) {
       this.logger.error(error);
       return {
