@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { AppointmentsController } from './appointments.controller';
 import { IAppointmentsRepository } from './appointments.repository.interface';
 import {
@@ -27,9 +27,9 @@ import { AppointmentsResultModule } from './appointments_result/appointments_res
 @Module({
   imports: [
     PatientsModule,
-    TimeslotsModule,
-    DoctorsModule,
     AppointmentsResultModule,
+    forwardRef(() => TimeslotsModule),
+    forwardRef(() => DoctorsModule),
   ],
   providers: [
     PrismaService,
@@ -64,6 +64,7 @@ import { AppointmentsResultModule } from './appointments_result/appointments_res
       ],
     },
   ],
+  exports: [AppointmentsServiceSymbol, AppointmentsRepository],
   controllers: [AppointmentsController],
 })
 export class AppointmentsModule {}

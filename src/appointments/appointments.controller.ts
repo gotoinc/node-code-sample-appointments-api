@@ -33,6 +33,10 @@ import {
   AppointmentsResultServiceSymbol,
   IAppointmentsResultService,
 } from './appointments_result/appointments_result.service.interface';
+import {
+  IPatientsService,
+  PatientsServiceSymbol,
+} from 'src/patients/patients.service.interface';
 
 @Controller('appointments')
 export class AppointmentsController {
@@ -41,6 +45,8 @@ export class AppointmentsController {
     private readonly appointmentsService: IAppointmentsService,
     @Inject(AppointmentsResultServiceSymbol)
     private readonly appointmentsResultService: IAppointmentsResultService,
+    @Inject(PatientsServiceSymbol)
+    private readonly patientsService: IPatientsService,
   ) {}
 
   @ApiServiceUnavailableResponse({ description: 'Error finding appointment' })
@@ -74,11 +80,25 @@ export class AppointmentsController {
   }
 
   @ApiServiceUnavailableResponse({ description: 'Error finding appointments' })
-  @Roles('doctor')
+  @Roles('doctor', 'patient')
   @Get('patients/:patientId')
   async findByPatientId(
     @Param() { patientId }: PatientIdParamDto,
+    @Req() req: Request,
   ): Promise<AppointmentDto[]> {
+    const user = req.user!;
+
+    const { data: patient, error: patientError } =
+      await this.patientsService.findByUserId(user.userId);
+
+    if (patientError) {
+      throw new ServiceUnavailableException('Error finding patient');
+    }
+
+    if (patient?.id !== patientId) {
+      throw new ForbiddenException('Patient mismatch');
+    }
+
     const { error, data } =
       await this.appointmentsService.findByPatientId(patientId);
 

@@ -14,4 +14,8 @@ export interface IEmailCredentialsService {
     hashedPassword: string,
   ): Promise<IServiceResponse<User>>;
   findOne(email: string): Promise<IServiceResponse<EmailCredentials>>;
+  updatePassword(
+    email: string,
+    hashedPassword: string,
+  ): Promise<IServiceResponse<EmailCredentials>>;
 }

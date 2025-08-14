@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { TimeslotsController } from './timeslots.controller';
 import { PrismaService } from 'src/database/prisma.service';
 import { TimeslotsRepository } from './timeslots.repository';
@@ -14,7 +14,7 @@ import { Logger } from 'nestjs-pino';
 import { ILogger } from 'src/common/interfaces/logger.interface';
 
 @Module({
-  imports: [DoctorsModule],
+  imports: [forwardRef(() => DoctorsModule)],
   providers: [
     PrismaService,
     TimeslotsRepository,

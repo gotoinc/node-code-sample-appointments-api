@@ -26,4 +26,12 @@ export interface IAppointmentsRepository {
     updatedData: Prisma.AppointmentUpdateInput,
     tx?: unknown,
   ): Promise<AppointmentReturnType>;
+  countPatientsByDoctorId(
+    doctorId: number,
+    tx?: unknown,
+  ): Promise<{ count: number }>;
+  countAppointmentsByDoctorId(
+    doctorId: number,
+    tx?: unknown,
+  ): Promise<{ count: number }>;
 }

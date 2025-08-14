@@ -47,15 +47,18 @@ model Patient {
 }
 
 model Doctor {
-  id                Int            @id @default(autoincrement())
-  phone_number      String
-  licence_number    String
-  user_id           Int            @unique @map("fk_user_id")
-  specialization_id Int            @map("fk_specialization_id")
-  user              User           @relation(fields: [user_id], references: [id], onDelete: Cascade)
-  specialization    Specialization @relation(fields: [specialization_id], references: [id])
-  timeslots         Timeslot[]
-  appointments      Appointment[]
+  id                 Int            @id @default(autoincrement())
+  phone_number       String
+  licence_number     String
+  user_id            Int            @unique @map("fk_user_id")
+  specialization_id  Int            @map("fk_specialization_id")
+  user               User           @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  specialization     Specialization @relation(fields: [specialization_id], references: [id])
+  timeslots          Timeslot[]
+  appointments       Appointment[]
+  hospital_address   String
+  hospital_name      String
+  professional_since DateTime
 
   @@map("doctors")
 }
