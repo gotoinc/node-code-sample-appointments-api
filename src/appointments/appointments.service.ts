@@ -1,5 +1,8 @@
 import { IServiceResponse, ServiceResponse } from 'src/common/service-response';
-import { IAppointmentsService } from './appointments.service.interface';
+import {
+  IAppointmentsService,
+  IUserInAppointment,
+} from './appointments.service.interface';
 import { CreateAppointmentDto } from './dto/create-appointment.dto';
 import { IAppointmentsRepository } from './appointments.repository.interface';
 import { IPatientsService } from 'src/patients/patients.service.interface';
@@ -10,6 +13,10 @@ import { ITimeslotsRepository } from 'src/timeslots/timeslots.repository.interfa
 import { ILogger } from 'src/common/interfaces/logger.interface';
 import { AppointmentDto } from './dto/appointment.dto';
 
+type AppointmentDeclinedFields = {
+  doctor: 'declined_by_doctor';
+  patient: 'declined_by_patient';
+};
 export class AppointmentsService implements IAppointmentsService {
   constructor(
     private readonly logger: ILogger,
@@ -19,6 +26,11 @@ export class AppointmentsService implements IAppointmentsService {
     private readonly doctorsService: IDoctorsService,
     private readonly transactionManager: ITransactionManager,
   ) {}
+
+  private declinedFieldByRole: AppointmentDeclinedFields = {
+    doctor: 'declined_by_doctor',
+    patient: 'declined_by_patient',
+  };
 
   async findById(id: number): Promise<IServiceResponse<AppointmentDto>> {
     try {
@@ -117,5 +129,84 @@ export class AppointmentsService implements IAppointmentsService {
       this.logger.error(error);
       return { error: { message: 'Error creating appointment' }, data: null };
     }
+  }
+
+  async declineAppointment(
+    appointmentId: number,
+    userId: number,
+  ): Promise<IServiceResponse<AppointmentDto>> {
+    try {
+      const appointment =
+        await this.appointmentsRepository.findById(appointmentId);
+
+      if (!appointment) {
+        return ServiceResponse.notFound('Appointment not found');
+      }
+
+      if (appointment.declined_by_doctor || appointment.declined_by_patient) {
+        return ServiceResponse.conflict('Appointment already declined');
+      }
+
+      const { data: isUserInAppointment } = await this.isUserInAppointment(
+        appointmentId,
+        userId,
+      );
+
+      const declinedBy =
+        isUserInAppointment?.included &&
+        this.declinedFieldByRole[isUserInAppointment.role!];
+
+      if (!declinedBy) {
+        return ServiceResponse.invalidData();
+      }
+
+      const updatedAppointment = await this.appointmentsRepository.update(
+        appointmentId,
+        { [declinedBy]: true },
+      );
+
+      return ServiceResponse.success<AppointmentDto>(updatedAppointment);
+    } catch (error) {
+      this.logger.error(error);
+      return { error: { message: 'Error declining appointment' }, data: null };
+    }
+  }
+  async isUserInAppointment(
+    appointmentId: number,
+    userId: number,
+  ): Promise<IServiceResponse<IUserInAppointment>> {
+    const appointment =
+      await this.appointmentsRepository.findById(appointmentId);
+
+    const { data: patient } = await this.patientsService.findByUserId(userId);
+
+    const { data: doctor } = await this.doctorsService.findByUserId(userId);
+
+    if (doctor && appointment?.doctor_id === doctor.id) {
+      return {
+        data: {
+          included: true,
+          role: 'doctor',
+        },
+        error: null,
+      };
+    }
+
+    if (patient && appointment?.patient_id === patient.id) {
+      return {
+        data: {
+          included: true,
+          role: 'patient',
+        },
+        error: null,
+      };
+    }
+
+    return {
+      data: {
+        included: false,
+      },
+      error: null,
+    };
   }
 }

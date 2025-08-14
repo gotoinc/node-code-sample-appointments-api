@@ -1,4 +1,4 @@
-import { Appointment, Doctor, Patient, Timeslot } from '@prisma/client';
+import { Appointment, Doctor, Patient, Prisma, Timeslot } from '@prisma/client';
 import { AppointmentEntity } from './entities/appointment.entity';
 
 export type AppointmentReturnType = Appointment & {
@@ -21,11 +21,15 @@ export interface IAppointmentsRepository {
     appointment: AppointmentEntity,
     tx?: unknown,
   ): Promise<AppointmentReturnType>;
+  update(
+    appointmentId: number,
+    updatedData: Prisma.AppointmentUpdateInput,
+    tx?: unknown,
+  ): Promise<AppointmentReturnType>;
   countPatientsByDoctorId(
     doctorId: number,
     tx?: unknown,
   ): Promise<{ count: number }>;
-
   countAppointmentsByDoctorId(
     doctorId: number,
     tx?: unknown,

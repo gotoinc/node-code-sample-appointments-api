@@ -10,9 +10,13 @@ import { IDoctorsService } from 'src/doctors/doctors.service.interface';
 import { ITransactionManager } from 'src/common/interfaces/transaction-manager.interface';
 import { IPatientsService } from 'src/patients/patients.service.interface';
 import { ResponseStatus } from 'src/common/service-response';
+import { DoctorReturnType } from 'src/doctors/doctors.repository.interface';
+import { PatientReturnType } from 'src/patients/patients.repository.interface';
 
 function createMockAppointment(overrides = {}): AppointmentReturnType {
   return {
+    declined_by_doctor: null,
+    declined_by_patient: null,
     doctor: {
       id: 1,
       phone_number: '1234567890',
@@ -53,6 +57,50 @@ function createMockAppointment(overrides = {}): AppointmentReturnType {
     ...overrides,
   };
 }
+function createMockDoctor(overrides = {}): DoctorReturnType {
+  return {
+    id: 1,
+    phone_number: '1234567890',
+    licence_number: 'XYZ123',
+    specialization_id: 1,
+    user_id: 1,
+    specialization: {
+      id: 1,
+      name: 'Doctor',
+    },
+    user: {
+      id: 1,
+      email: 'doctor@example.com',
+      first_name: 'John',
+      last_name: 'Doe',
+      created_at: new Date(),
+      updated_at: new Date(),
+      user_role_id: 2,
+    },
+    ...overrides,
+  };
+}
+function createMockPatient(overrides = {}): PatientReturnType {
+  return {
+    id: 1,
+    user_id: 1,
+    address: 'address',
+    date_of_birth: new Date(),
+    gender: 'male',
+    user: {
+      user_role_id: 1,
+      id: 1,
+      first_name: 'John',
+      last_name: 'Doe',
+      email: 'patient@test.com',
+      created_at: new Date(),
+      updated_at: new Date(),
+    },
+    created_at: new Date(),
+    updated_at: new Date(),
+    ...overrides,
+  };
+}
 
 const mockLogger: jest.Mocked<ILogger> = {
   log: jest.fn(),
@@ -65,6 +113,7 @@ const mockAppointmentsRepository: jest.Mocked<IAppointmentsRepository> = {
   findByDoctorId: jest.fn(),
   findByPatientId: jest.fn(),
   create: jest.fn(),
+  update: jest.fn(),
   countAppointmentsByDoctorId: jest.fn(),
   countPatientsByDoctorId: jest.fn(),
 };
@@ -561,6 +610,98 @@ describe('AppointmentsService', () => {
 
       expect(appointment.error).toBeNull();
       expect(appointment.data?.email).toBe('john@doe.com');
+    });
+
+    describe('isUserInAppointment', () => {
+      const appointment = createMockAppointment({
+        doctor_id: 10,
+        patient_id: 20,
+      });
+
+      it('should return included: true and role: doctor if user is the doctor', async () => {
+        mockAppointmentsRepository.findById.mockResolvedValueOnce(appointment);
+        mockPatientsService.findByUserId.mockResolvedValueOnce({
+          data: null,
+          error: null,
+        });
+        mockDoctorsService.findByUserId.mockResolvedValueOnce({
+          data: createMockDoctor({ id: 10 }),
+          error: null,
+        });
+
+        const result = await service.isUserInAppointment(1, 100);
+
+        expect(result.error).toBeNull();
+        expect(result.data).toEqual({ included: true, role: 'doctor' });
+      });
+
+      it('should return included: true and role: patient if user is the patient', async () => {
+        mockAppointmentsRepository.findById.mockResolvedValueOnce(appointment);
+        mockPatientsService.findByUserId.mockResolvedValueOnce({
+          data: createMockPatient({ id: 20 }),
+          error: null,
+        });
+        mockDoctorsService.findByUserId.mockResolvedValueOnce({
+          data: null,
+          error: null,
+        });
+
+        const result = await service.isUserInAppointment(1, 200);
+
+        expect(result.error).toBeNull();
+        expect(result.data).toEqual({ included: true, role: 'patient' });
+      });
+
+      it('should return included: false if user is neither doctor nor patient', async () => {
+        mockAppointmentsRepository.findById.mockResolvedValueOnce(appointment);
+        mockPatientsService.findByUserId.mockResolvedValueOnce({
+          data: null,
+          error: null,
+        });
+        mockDoctorsService.findByUserId.mockResolvedValueOnce({
+          data: null,
+          error: null,
+        });
+
+        const result = await service.isUserInAppointment(1, 999);
+
+        expect(result.error).toBeNull();
+        expect(result.data).toEqual({ included: false });
+      });
+
+      it('should return included: false if appointment is not found', async () => {
+        mockAppointmentsRepository.findById.mockResolvedValueOnce(null);
+        mockPatientsService.findByUserId.mockResolvedValueOnce({
+          data: null,
+          error: null,
+        });
+        mockDoctorsService.findByUserId.mockResolvedValueOnce({
+          data: null,
+          error: null,
+        });
+
+        const result = await service.isUserInAppointment(1, 999);
+
+        expect(result.error).toBeNull();
+        expect(result.data).toEqual({ included: false });
+      });
+
+      it('should return included: false if doctor and patient do not match appointment', async () => {
+        mockAppointmentsRepository.findById.mockResolvedValueOnce(appointment);
+        mockPatientsService.findByUserId.mockResolvedValueOnce({
+          data: createMockPatient({ id: 30 }),
+          error: null,
+        });
+        mockDoctorsService.findByUserId.mockResolvedValueOnce({
+          data: createMockDoctor({ id: 40 }),
+          error: null,
+        });
+
+        const result = await service.isUserInAppointment(1, 300);
+
+        expect(result.error).toBeNull();
+        expect(result.data).toEqual({ included: false });
+      });
     });
   });
 });

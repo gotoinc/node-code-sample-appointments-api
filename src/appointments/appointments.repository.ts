@@ -6,6 +6,8 @@ import {
 import { AppointmentEntity } from './entities/appointment.entity';
 import { PrismaService } from 'src/database/prisma.service';
 import { Injectable } from '@nestjs/common';
+import { AppointmentResult, Prisma } from '@prisma/client';
+import { AppointmentResultEntity } from './entities/appointmentResult.entity';
 
 @Injectable()
 export class AppointmentsRepository
@@ -27,6 +29,7 @@ export class AppointmentsRepository
         id,
       },
       include: {
+        appointment_result: true,
         doctor: {
           include: {
             specialization: true,
@@ -54,6 +57,7 @@ export class AppointmentsRepository
         doctor_id: doctorId,
       },
       include: {
+        appointment_result: true,
         doctor: {
           include: {
             specialization: true,
@@ -81,6 +85,7 @@ export class AppointmentsRepository
         patient_id: patientId,
       },
       include: {
+        appointment_result: true,
         doctor: {
           include: {
             specialization: true,
@@ -130,6 +135,50 @@ export class AppointmentsRepository
       },
     });
   }
+
+  async addResult(
+    appointmentResult: AppointmentResultEntity,
+    tx?: unknown,
+  ): Promise<AppointmentResult & { appointment: AppointmentReturnType }> {
+    const prisma = this.getClient(tx);
+    return await prisma.appointmentResult.create({
+      data: {
+        diagnosis: appointmentResult.diagnosis,
+        recommendations: appointmentResult.recommendations,
+        appointment_id: appointmentResult.appointmentId,
+      },
+      include: {
+        appointment: {
+          include: {
+            doctor: true,
+            patient: true,
+            timeslot: true,
+          },
+        },
+      },
+    });
+  }
+
+  async update(
+    appointmentId: number,
+    updatedData: Prisma.AppointmentUpdateInput,
+    tx?: unknown,
+  ): Promise<AppointmentReturnType> {
+    const prisma = this.getClient(tx);
+
+    return prisma.appointment.update({
+      where: {
+        id: appointmentId,
+      },
+      data: updatedData,
+      include: {
+        doctor: true,
+        patient: true,
+        timeslot: true,
+      },
+    });
+  }
+
   async countAppointmentsByDoctorId(
     doctorId: number,
     tx?: unknown,
