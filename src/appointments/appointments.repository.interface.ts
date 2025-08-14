@@ -21,4 +21,13 @@ export interface IAppointmentsRepository {
     appointment: AppointmentEntity,
     tx?: unknown,
   ): Promise<AppointmentReturnType>;
+  countPatientsByDoctorId(
+    doctorId: number,
+    tx?: unknown,
+  ): Promise<{ count: number }>;
+
+  countAppointmentsByDoctorId(
+    doctorId: number,
+    tx?: unknown,
+  ): Promise<{ count: number }>;
 }

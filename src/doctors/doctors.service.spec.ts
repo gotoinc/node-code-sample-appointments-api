@@ -7,12 +7,16 @@ import { ILogger } from 'src/common/interfaces/logger.interface';
 import { IDoctorsService } from './doctors.service.interface';
 import { ISpecializationsService } from 'src/specializations/specializations.service.interface';
 import { ResponseStatus } from 'src/common/service-response';
+import { IAppointmentsRepository } from 'src/appointments/appointments.repository.interface';
 
 function createMockDoctor(overrides = {}): DoctorReturnType {
   return {
     id: 1,
     phone_number: '1234567890',
     licence_number: 'XYZ123',
+    hospital_address: 'hospital adress test',
+    hospital_name: 'hospital name test',
+    professional_since: new Date('2016-10-30T00:00:00.000Z'),
     specialization_id: 1,
     user_id: 1,
     specialization: {
@@ -53,6 +57,15 @@ const mockSpecializationsService: jest.Mocked<ISpecializationsService> = {
   findOne: jest.fn(),
 };
 
+const mockAppointmentsRepository: jest.Mocked<IAppointmentsRepository> = {
+  countAppointmentsByDoctorId: jest.fn(),
+  countPatientsByDoctorId: jest.fn(),
+  create: jest.fn(),
+  findByDoctorId: jest.fn(),
+  findById: jest.fn(),
+  findByPatientId: jest.fn(),
+};
+
 describe('DoctorsService', () => {
   let service: IDoctorsService;
 
@@ -61,6 +74,7 @@ describe('DoctorsService', () => {
       mockLogger,
       mockDoctorsRepository,
       mockSpecializationsService,
+      mockAppointmentsRepository,
     );
   });
 
@@ -76,6 +90,9 @@ describe('DoctorsService', () => {
           phone_number: '+1234567890',
           licence_number: '1234567890',
           specializationId: 1,
+          hospital_address: 'hospital adress test',
+          hospital_name: 'hospital name test',
+          professional_since: new Date('2016-10-30T00:00:00.000Z'),
         },
         1,
       );
@@ -94,6 +111,10 @@ describe('DoctorsService', () => {
           phone_number: '+1234567890',
           licence_number: '1234567890',
           specializationId: 1,
+
+          hospital_address: 'hospital adress test',
+          hospital_name: 'hospital name test',
+          professional_since: new Date('2016-10-30T00:00:00.000Z'),
         },
         1,
       );
@@ -120,6 +141,9 @@ describe('DoctorsService', () => {
           phone_number: '+1234567890',
           licence_number: '1234567890',
           specializationId: 1,
+          hospital_address: 'hospital adress test',
+          hospital_name: 'hospital name test',
+          professional_since: new Date('2016-10-30T00:00:00.000Z'),
         },
         1,
       );
@@ -145,6 +169,9 @@ describe('DoctorsService', () => {
           phone_number: '+1234567890',
           licence_number: '1234567890',
           specializationId: 1,
+          hospital_address: 'hospital adress test',
+          hospital_name: 'hospital name test',
+          professional_since: new Date('2016-10-30T00:00:00.000Z'),
         },
         1,
       );
@@ -177,6 +204,9 @@ describe('DoctorsService', () => {
           phone_number: '+1234567890',
           licence_number: '1234567890',
           specializationId: 1,
+          hospital_address: 'hospital adress test',
+          hospital_name: 'hospital name test',
+          professional_since: new Date('2016-10-30T00:00:00.000Z'),
         },
         1,
       );
@@ -219,6 +249,15 @@ describe('DoctorsService', () => {
           phone_number: '+1234567890',
         }),
       );
+      mockAppointmentsRepository.countAppointmentsByDoctorId.mockResolvedValueOnce(
+        {
+          count: 1,
+        },
+      );
+
+      mockAppointmentsRepository.countPatientsByDoctorId.mockResolvedValueOnce({
+        count: 1,
+      });
 
       const doctor = await service.findOne(1);
 
@@ -292,6 +331,9 @@ describe('DoctorsService', () => {
           phone_number: '+4444444444',
           licence_number: '1234567890',
           specializationId: 1,
+          hospital_address: 'hospital adress test',
+          hospital_name: 'hospital name test',
+          professional_since: new Date('2016-10-30T00:00:00.000Z'),
         },
         1,
       );
@@ -316,6 +358,9 @@ describe('DoctorsService', () => {
           phone_number: '+1234567890',
           licence_number: '1234567890',
           specializationId: 1,
+          hospital_address: 'hospital adress test',
+          hospital_name: 'hospital name test',
+          professional_since: new Date('2016-10-30T00:00:00.000Z'),
         },
         1,
       );
@@ -337,6 +382,10 @@ describe('DoctorsService', () => {
           phone_number: '+1234567890',
           licence_number: '1234567890',
           specializationId: 1,
+
+          hospital_address: 'hospital adress test',
+          hospital_name: 'hospital name test',
+          professional_since: new Date('2016-10-30T00:00:00.000Z'),
         },
         1,
       );
@@ -353,6 +402,9 @@ describe('DoctorsService', () => {
           phone_number: '+1234567890',
           licence_number: '1234567890',
           specializationId: 1,
+          hospital_address: 'hospital adress test',
+          hospital_name: 'hospital name test',
+          professional_since: new Date('2016-10-30T00:00:00.000Z'),
         },
         1,
       );
@@ -376,6 +428,9 @@ describe('DoctorsService', () => {
           phone_number: '+1234567890',
           licence_number: '1234567890',
           specializationId: 1,
+          hospital_address: 'hospital adress test',
+          hospital_name: 'hospital name test',
+          professional_since: new Date('2016-10-30T00:00:00.000Z'),
         },
         1,
       );
@@ -399,6 +454,9 @@ describe('DoctorsService', () => {
           phone_number: '+1234567890',
           licence_number: '1234567890',
           specializationId: 1,
+          hospital_address: 'hospital adress test',
+          hospital_name: 'hospital name test',
+          professional_since: new Date('2016-10-30T00:00:00.000Z'),
         },
         1,
       );

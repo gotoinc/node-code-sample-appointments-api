@@ -8,12 +8,14 @@ import { DoctorEntity } from './entities/doctor.entity';
 import { ISpecializationsService } from 'src/specializations/specializations.service.interface';
 import { ILogger } from 'src/common/interfaces/logger.interface';
 import { DoctorDto } from './dto/doctor.dto';
+import { IAppointmentsRepository } from 'src/appointments/appointments.repository.interface';
 
 export class DoctorsService implements IDoctorsService {
   constructor(
     private readonly logger: ILogger,
     private readonly doctorsRepository: IDoctorsRepository,
     private readonly specializationsService: ISpecializationsService,
+    private readonly appointmentsRepository: IAppointmentsRepository,
   ) {}
 
   async create(
@@ -41,6 +43,9 @@ export class DoctorsService implements IDoctorsService {
         phoneNumber: doctor.phone_number,
         licenceNumber: doctor.licence_number,
         specializationId: specialization.id,
+        hospital_address: doctor.hospital_address,
+        hospital_name: doctor.hospital_name,
+        professional_since: doctor.professional_since,
       };
 
       const createdDoctor = await this.doctorsRepository.create(
@@ -69,8 +74,24 @@ export class DoctorsService implements IDoctorsService {
   async findOne(id: number): Promise<IServiceResponse<DoctorDto | null>> {
     try {
       const doctor = await this.doctorsRepository.findOne(id);
+      console.log(doctor);
+      const appointmentsCount =
+        await this.appointmentsRepository.countAppointmentsByDoctorId(id);
 
-      return ServiceResponse.success<Doctor | null>(doctor);
+      const patientsCount =
+        await this.appointmentsRepository.countPatientsByDoctorId(id);
+
+      if (!doctor) return ServiceResponse.notFound('Doctor not found');
+
+      const result = {
+        ...doctor,
+        stats: {
+          patientsCount: patientsCount.count,
+          appointmentsCount: appointmentsCount.count,
+        },
+      };
+
+      return ServiceResponse.success<DoctorDto | null>(result);
     } catch (error) {
       this.logger.error(error);
       return { error: { message: 'Error finding doctor' }, data: null };
@@ -116,6 +137,9 @@ export class DoctorsService implements IDoctorsService {
         phoneNumber: doctorToUpdate.phone_number,
         licenceNumber: doctorToUpdate.licence_number,
         specializationId: specialization.id,
+        hospital_address: doctorToUpdate.hospital_address,
+        hospital_name: doctorToUpdate.hospital_name,
+        professional_since: doctorToUpdate.professional_since,
       };
 
       const updatedDoctor = await this.doctorsRepository.update(

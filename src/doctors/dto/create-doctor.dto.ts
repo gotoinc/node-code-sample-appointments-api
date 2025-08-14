@@ -1,4 +1,5 @@
 import {
+  IsDateString,
   IsNotEmpty,
   IsNumber,
   IsPhoneNumber,
@@ -17,4 +18,13 @@ export class CreateDoctorDto {
   @IsNumber()
   @Min(1, { message: 'Specialization ID must be a positive integer' })
   specializationId: number;
+
+  @IsString()
+  hospital_address;
+
+  @IsString()
+  hospital_name;
+
+  @IsDateString()
+  professional_since;
 }

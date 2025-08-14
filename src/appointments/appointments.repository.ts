@@ -130,4 +130,31 @@ export class AppointmentsRepository
       },
     });
   }
+  async countAppointmentsByDoctorId(
+    doctorId: number,
+    tx?: unknown,
+  ): Promise<{ count: number }> {
+    const prisma = this.getClient(tx);
+    const totalAppointments = await prisma.appointment.count({
+      where: {
+        doctor_id: doctorId,
+      },
+    });
+
+    return { count: totalAppointments };
+  }
+  async countPatientsByDoctorId(
+    doctorId: number,
+    tx?: unknown,
+  ): Promise<{ count: number }> {
+    const prisma = this.getClient(tx);
+    const uniquePatients = await prisma.appointment.findMany({
+      where: {
+        doctor_id: doctorId,
+      },
+      select: { patient_id: true },
+      distinct: ['patient_id'],
+    });
+    return { count: uniquePatients.length };
+  }
 }
