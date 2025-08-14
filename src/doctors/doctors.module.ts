@@ -12,12 +12,17 @@ import { SpecializationsModule } from 'src/specializations/specializations.modul
 import { PrismaService } from 'src/database/prisma.service';
 import { ILogger } from 'src/common/interfaces/logger.interface';
 import { Logger } from 'nestjs-pino';
+import { TemplateScheduleModule } from 'src/template_schedules/template_schedules.module';
 import { AppointmentsModule } from 'src/appointments/appointments.module';
 import { AppointmentsRepository } from 'src/appointments/appointments.repository';
 import { IAppointmentsRepository } from 'src/appointments/appointments.repository.interface';
 
 @Module({
-  imports: [SpecializationsModule, forwardRef(() => AppointmentsModule)],
+  imports: [
+    SpecializationsModule,
+    forwardRef(() => TemplateScheduleModule),
+    forwardRef(() => AppointmentsModule),
+  ],
   controllers: [DoctorsController],
   providers: [
     PrismaService,

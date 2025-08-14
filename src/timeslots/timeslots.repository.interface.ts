@@ -16,4 +16,8 @@ export interface ITimeslotsRepository {
   ): Promise<Timeslot[]>;
   findById(id: number, tx?: unknown): Promise<Timeslot | null>;
   setUnavailable(id: number, tx?: unknown): Promise<Timeslot>;
+  createMany(
+    timeslots: TimeslotEntity[],
+    tx?: unknown,
+  ): Promise<{ count: number }>;
 }

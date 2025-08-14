@@ -10,6 +10,7 @@ import {
   Put,
   Req,
   ServiceUnavailableException,
+  UsePipes,
 } from '@nestjs/common';
 import { Auth } from 'src/iam/authentication/decorators/auth.decorator';
 import { CreateDoctorDto } from './dto/create-doctor.dto';
@@ -29,6 +30,14 @@ import {
   ApiNotFoundResponse,
   ApiServiceUnavailableResponse,
 } from '@nestjs/swagger';
+import {
+  ITemplateScheduleService,
+  TemplateScheduleServiceSymbol,
+} from 'src/template_schedules/template_schedules.service.interface';
+import { DoctorIdParamDto } from 'src/timeslots/dto/doctor-id-param.dto';
+import { TemplateSchedule } from '@prisma/client';
+import { ZodValidationPipe } from 'nestjs-zod';
+import { CreateTemplateScheduleDto } from 'src/template_schedules/dto/createTemplateSchedule.dto';
 
 @Auth('Jwt')
 @Controller('doctors')
@@ -36,6 +45,8 @@ export class DoctorsController {
   constructor(
     @Inject(DoctorsServiceSymbol)
     private readonly doctorsService: IDoctorsService,
+    @Inject(TemplateScheduleServiceSymbol)
+    private readonly templateScheduleService: ITemplateScheduleService,
   ) {}
 
   @ApiBadRequestResponse({ description: 'Bad Request' })
@@ -109,6 +120,44 @@ export class DoctorsController {
     if (exception) throw exception;
 
     if (!data) throw new ServiceUnavailableException('Error updating doctor');
+
+    return data;
+  }
+
+  @ApiServiceUnavailableResponse({ description: 'Error finding template' })
+  @Get(':doctorId/templates')
+  async getDoctorTemplates(
+    @Param() { doctorId }: DoctorIdParamDto,
+  ): Promise<TemplateSchedule[]> {
+    const { error, data } =
+      await this.templateScheduleService.findByDoctorId(doctorId);
+
+    const exception = handleServiceError(error);
+    if (exception) throw exception;
+    if (!data) throw new ServiceUnavailableException('Error finding templates');
+
+    return data;
+  }
+
+  @ApiServiceUnavailableResponse({ description: 'Error creating template' })
+  @ApiNotFoundResponse({ description: 'Doctor not found' })
+  @Roles('doctor')
+  @Post('templates')
+  @UsePipes(ZodValidationPipe)
+  async createTemplateSchedule(
+    @Body() body: CreateTemplateScheduleDto,
+    @Req() req: Request,
+  ): Promise<TemplateSchedule> {
+    const user = req.user!;
+
+    const { error, data } = await this.templateScheduleService.create(
+      body,
+      user.userId,
+    );
+
+    const exception = handleServiceError(error);
+    if (exception) throw exception;
+    if (!data) throw new ServiceUnavailableException('Error creating template');
 
     return data;
   }

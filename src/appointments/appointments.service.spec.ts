@@ -102,6 +102,46 @@ function createMockPatient(overrides = {}): PatientReturnType {
   };
 }
 
+function createMockAppointment(overrides = {}): AppointmentReturnType {
+  return {
+    doctor: {
+      id: 1,
+      phone_number: '1234567890',
+      licence_number: 'XYZ123',
+      specialization_id: 1,
+      user_id: 1,
+    },
+    patient: {
+      id: 1,
+      user_id: 1,
+      address: 'address',
+      date_of_birth: new Date(),
+      gender: 'male',
+      created_at: new Date(),
+      updated_at: new Date(),
+    },
+    timeslot: {
+      doctor_id: 1,
+      end_time: new Date(),
+      start_time: new Date(),
+      id: 1,
+      is_available: false,
+    },
+    doctor_id: 1,
+    email: 'email@email.com',
+    full_name: 'John Doe',
+    id: 1,
+    patient_id: 1,
+    patient_insurance_number: '123123',
+    phone_number: '123123213',
+    reason: 'Reason',
+    timeslot_id: 1,
+    created_at: new Date(),
+    updated_at: new Date(),
+    ...overrides,
+  };
+}
+
 const mockLogger: jest.Mocked<ILogger> = {
   log: jest.fn(),
   error: jest.fn(),
@@ -132,6 +172,7 @@ const mockTimeslotsRepository: jest.Mocked<ITimeslotsRepository> = {
   create: jest.fn(),
   findManyByDoctorId: jest.fn(),
   findCollisions: jest.fn(),
+  createMany: jest.fn(),
 };
 
 const mockDoctorsService: jest.Mocked<IDoctorsService> = {
