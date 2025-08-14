@@ -1,12 +1,55 @@
 import { AppointmentsService } from './appointments.service';
 import { IAppointmentsService } from './appointments.service.interface';
 import { ILogger } from 'src/common/interfaces/logger.interface';
-import { IAppointmentsRepository } from './appointments.repository.interface';
+import {
+  AppointmentReturnType,
+  IAppointmentsRepository,
+} from './appointments.repository.interface';
 import { ITimeslotsRepository } from 'src/timeslots/timeslots.repository.interface';
 import { IDoctorsService } from 'src/doctors/doctors.service.interface';
 import { ITransactionManager } from 'src/common/interfaces/transaction-manager.interface';
 import { IPatientsService } from 'src/patients/patients.service.interface';
 import { ResponseStatus } from 'src/common/service-response';
+
+function createMockAppointment(overrides = {}): AppointmentReturnType {
+  return {
+    doctor: {
+      id: 1,
+      phone_number: '1234567890',
+      licence_number: 'XYZ123',
+      specialization_id: 1,
+      user_id: 1,
+    },
+    patient: {
+      id: 1,
+      user_id: 1,
+      address: 'address',
+      date_of_birth: new Date(),
+      gender: 'male',
+      created_at: new Date(),
+      updated_at: new Date(),
+    },
+    timeslot: {
+      doctor_id: 1,
+      end_time: new Date(),
+      start_time: new Date(),
+      id: 1,
+      is_available: false,
+    },
+    doctor_id: 1,
+    email: 'email@email.com',
+    full_name: 'John Doe',
+    id: 1,
+    patient_id: 1,
+    patient_insurance_number: '123123',
+    phone_number: '123123213',
+    reason: 'Reason',
+    timeslot_id: 1,
+    created_at: new Date(),
+    updated_at: new Date(),
+    ...overrides,
+  };
+}
 
 const mockLogger: jest.Mocked<ILogger> = {
   log: jest.fn(),
@@ -69,19 +112,9 @@ describe('AppointmentsService', () => {
 
   describe('findById', () => {
     it('should return appointment by id', async () => {
-      mockAppointmentsRepository.findById.mockResolvedValueOnce({
-        id: 1,
-        full_name: 'John Doe',
-        email: 'john@doe.com',
-        phone_number: '+1234567890',
-        patient_insurance_number: '1234567890',
-        reason: 'Test reason',
-        timeslot_id: 1,
-        doctor_id: 1,
-        patient_id: 1,
-        created_at: new Date(),
-        updated_at: new Date(),
-      });
+      mockAppointmentsRepository.findById.mockResolvedValueOnce(
+        createMockAppointment(),
+      );
 
       const appointment = await service.findById(1);
 
@@ -114,19 +147,7 @@ describe('AppointmentsService', () => {
   describe('findByDoctorId', () => {
     it('should find by doctor id', async () => {
       mockAppointmentsRepository.findByDoctorId.mockResolvedValueOnce([
-        {
-          id: 1,
-          full_name: 'John Doe',
-          email: 'john@doe.com',
-          phone_number: '+1234567890',
-          patient_insurance_number: '1234567890',
-          reason: 'Test reason',
-          timeslot_id: 1,
-          doctor_id: 1,
-          patient_id: 1,
-          created_at: new Date(),
-          updated_at: new Date(),
-        },
+        createMockAppointment(),
       ]);
 
       const appointments = await service.findByDoctorId(1);
@@ -160,19 +181,7 @@ describe('AppointmentsService', () => {
   describe('findByPatientId', () => {
     it('should find by patient id', async () => {
       mockAppointmentsRepository.findByPatientId.mockResolvedValueOnce([
-        {
-          id: 1,
-          full_name: 'John Doe',
-          email: 'john@doe.com',
-          phone_number: '+1234567890',
-          patient_insurance_number: '1234567890',
-          reason: 'Test reason',
-          timeslot_id: 1,
-          doctor_id: 1,
-          patient_id: 1,
-          created_at: new Date(),
-          updated_at: new Date(),
-        },
+        createMockAppointment(),
       ]);
 
       const appointments = await service.findByPatientId(1);
@@ -520,19 +529,9 @@ describe('AppointmentsService', () => {
         },
       );
 
-      mockAppointmentsRepository.create.mockResolvedValueOnce({
-        id: 1,
-        full_name: 'John Doe',
-        email: 'john@doe.com',
-        phone_number: '+1234567890',
-        patient_insurance_number: '1234567890',
-        reason: 'Test reason',
-        timeslot_id: 1,
-        doctor_id: 1,
-        patient_id: 1,
-        created_at: new Date(),
-        updated_at: new Date(),
-      });
+      mockAppointmentsRepository.create.mockResolvedValueOnce(
+        createMockAppointment({ email: 'john@doe.com' }),
+      );
 
       mockTimeslotsRepository.setUnavailable.mockResolvedValueOnce({
         id: 1,
