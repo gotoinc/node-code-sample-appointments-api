@@ -29,6 +29,9 @@ export class DoctorsRepository
         licence_number: doctor.licenceNumber,
         specialization_id: doctor.specializationId,
         user_id: userId,
+        hospital_address: doctor.hospital_address,
+        hospital_name: doctor.hospital_name,
+        professional_since: doctor.professional_since,
       },
       include: { user: true, specialization: true },
     });
@@ -80,6 +83,9 @@ export class DoctorsRepository
         phone_number: doctor.phoneNumber,
         licence_number: doctor.licenceNumber,
         specialization_id: doctor.specializationId,
+        hospital_address: doctor.hospital_address,
+        hospital_name: doctor.hospital_name,
+        professional_since: doctor.professional_since,
       },
       include: { user: true, specialization: true },
     });

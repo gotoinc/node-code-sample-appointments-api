@@ -38,4 +38,20 @@ export class EmailCredentialsRepository
       },
     });
   }
+  async updatePassword(
+    email: string,
+    hashedPassword: string,
+    tx?: unknown,
+  ): Promise<EmailCredentials | null> {
+    const prisma = this.getClient(tx);
+
+    return await prisma.emailCredentials.update({
+      where: {
+        email: email,
+      },
+      data: {
+        password_hash: hashedPassword,
+      },
+    });
+  }
 }

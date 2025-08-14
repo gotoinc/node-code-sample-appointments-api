@@ -8,4 +8,10 @@ export interface IEmailCredentialsRepository {
   ): Promise<EmailCredentials>;
 
   findOne(email: string): Promise<EmailCredentials | null>;
+
+  updatePassword(
+    email: string,
+    hashedPassword: string,
+    tx?: unknown,
+  ): Promise<EmailCredentials | null>;
 }

@@ -75,4 +75,29 @@ export class EmailCredentialsService implements IEmailCredentialsService {
       };
     }
   }
+
+  async updatePassword(
+    email: string,
+    hashedPassword: string,
+  ): Promise<IServiceResponse<EmailCredentials>> {
+    try {
+      const emailCredentials =
+        await this.emailCredentialsRepository.findOne(email);
+
+      if (!emailCredentials) return ServiceResponse.notFound('Email not found');
+
+      await this.emailCredentialsRepository.updatePassword(
+        email,
+        hashedPassword,
+      );
+
+      return ServiceResponse.success<EmailCredentials>(emailCredentials);
+    } catch (error) {
+      this.logger.error(error);
+      return {
+        error: { message: 'Error updating password' },
+        data: null,
+      };
+    }
+  }
 }

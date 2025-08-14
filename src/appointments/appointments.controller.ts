@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  ForbiddenException,
   Get,
   Inject,
   Param,
@@ -25,12 +26,27 @@ import {
   ApiNotFoundResponse,
   ApiServiceUnavailableResponse,
 } from '@nestjs/swagger';
+import { AppointmentResultDto } from './dto/appointment-result.dto';
+import { AddAppointmentResultDto } from './dto/add-appointment-result.dto';
+import { DeclineAppointmentDto } from './dto/decline-appointment.dto';
+import {
+  AppointmentsResultServiceSymbol,
+  IAppointmentsResultService,
+} from './appointments_result/appointments_result.service.interface';
+import {
+  IPatientsService,
+  PatientsServiceSymbol,
+} from 'src/patients/patients.service.interface';
 
 @Controller('appointments')
 export class AppointmentsController {
   constructor(
     @Inject(AppointmentsServiceSymbol)
     private readonly appointmentsService: IAppointmentsService,
+    @Inject(AppointmentsResultServiceSymbol)
+    private readonly appointmentsResultService: IAppointmentsResultService,
+    @Inject(PatientsServiceSymbol)
+    private readonly patientsService: IPatientsService,
   ) {}
 
   @ApiServiceUnavailableResponse({ description: 'Error finding appointment' })
@@ -64,11 +80,25 @@ export class AppointmentsController {
   }
 
   @ApiServiceUnavailableResponse({ description: 'Error finding appointments' })
-  @Roles('doctor')
+  @Roles('doctor', 'patient')
   @Get('patients/:patientId')
   async findByPatientId(
     @Param() { patientId }: PatientIdParamDto,
+    @Req() req: Request,
   ): Promise<AppointmentDto[]> {
+    const user = req.user!;
+
+    const { data: patient, error: patientError } =
+      await this.patientsService.findByUserId(user.userId);
+
+    if (patientError) {
+      throw new ServiceUnavailableException('Error finding patient');
+    }
+
+    if (patient?.id !== patientId) {
+      throw new ForbiddenException('Patient mismatch');
+    }
+
     const { error, data } =
       await this.appointmentsService.findByPatientId(patientId);
 
@@ -102,6 +132,67 @@ export class AppointmentsController {
     if (exception) throw exception;
     if (!data)
       throw new ServiceUnavailableException('Error creating appointment');
+
+    return data;
+  }
+
+  @ApiServiceUnavailableResponse({
+    description: 'Error creating appointment result',
+  })
+  @ApiNotFoundResponse({ description: 'Appointment not found' })
+  @Roles('doctor')
+  @Post('result')
+  async createResult(
+    @Body() body: AddAppointmentResultDto,
+    @Req() req: Request,
+  ): Promise<AppointmentResultDto> {
+    const user = req.user!;
+    const { error: appointmentError } = await this.appointmentsService.findById(
+      body.appointmentId,
+    );
+
+    const { data: isUserInAppointment } =
+      await this.appointmentsService.isUserInAppointment(
+        body.appointmentId,
+        user.userId,
+      );
+
+    if (!isUserInAppointment?.included) {
+      throw new ForbiddenException('User is not in appointment');
+    }
+
+    const appointmentsException = handleServiceError(appointmentError);
+    if (appointmentsException) throw appointmentsException;
+
+    const { error, data } = await this.appointmentsResultService.create(body);
+
+    const exception = handleServiceError(error);
+    if (exception) throw exception;
+    if (!data)
+      throw new ServiceUnavailableException(
+        'Error creating appointment result',
+      );
+
+    return data;
+  }
+  @ApiServiceUnavailableResponse({ description: 'Error declining appointment' })
+  @ApiNotFoundResponse({ description: 'Appointment not found' })
+  @Post('decline')
+  @Roles('doctor', 'patient')
+  async declineAppointment(
+    @Body() { appointmentId }: DeclineAppointmentDto,
+    @Req() req: Request,
+  ) {
+    const user = req.user!;
+
+    const { error, data } = await this.appointmentsService.declineAppointment(
+      appointmentId,
+      user.userId,
+    );
+
+    const exception = handleServiceError(error);
+    if (exception) throw exception;
+    if (!data) throw new ServiceUnavailableException();
 
     return data;
   }
