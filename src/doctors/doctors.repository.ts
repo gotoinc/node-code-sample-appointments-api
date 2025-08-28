@@ -70,7 +70,7 @@ export class DoctorsRepository
 
   async update(
     id: number,
-    doctor: DoctorEntity,
+    doctor: Partial<DoctorEntity>,
     tx?: unknown,
   ): Promise<DoctorReturnType> {
     const prisma = this.getClient(tx);
@@ -80,12 +80,18 @@ export class DoctorsRepository
         id,
       },
       data: {
-        phone_number: doctor.phoneNumber,
-        licence_number: doctor.licenceNumber,
-        specialization_id: doctor.specializationId,
-        hospital_address: doctor.hospital_address,
-        hospital_name: doctor.hospital_name,
-        professional_since: doctor.professional_since,
+        ...(doctor.phoneNumber && { phone_number: doctor.phoneNumber }),
+        ...(doctor.licenceNumber && { licence_number: doctor.licenceNumber }),
+        ...(doctor.specializationId && {
+          specialization_id: doctor.specializationId,
+        }),
+        ...(doctor.hospital_address && {
+          hospital_address: doctor.hospital_address,
+        }),
+        ...(doctor.hospital_name && { hospital_name: doctor.hospital_name }),
+        ...(doctor.professional_since && {
+          professional_since: doctor.professional_since,
+        }),
       },
       include: { user: true, specialization: true },
     });

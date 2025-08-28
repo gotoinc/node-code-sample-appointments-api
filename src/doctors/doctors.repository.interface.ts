@@ -17,7 +17,7 @@ export interface IDoctorsRepository {
   findByUserId(userId: number, tx?: unknown): Promise<DoctorReturnType | null>;
   update(
     id: number,
-    doctor: DoctorEntity,
+    doctor: Partial<DoctorEntity>,
     tx?: unknown,
   ): Promise<DoctorReturnType>;
 }

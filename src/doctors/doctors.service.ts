@@ -116,34 +116,48 @@ export class DoctorsService implements IDoctorsService {
     userId: number,
   ): Promise<IServiceResponse<DoctorDto>> {
     try {
-      const exisingDoctor = await this.doctorsRepository.findByUserId(userId);
+      const existingDoctor = await this.doctorsRepository.findByUserId(userId);
 
-      if (!exisingDoctor)
+      if (!existingDoctor)
         return ServiceResponse.notFound('Doctor profile not found');
 
-      if (userId !== exisingDoctor.user_id) return ServiceResponse.forbidden();
+      if (userId !== existingDoctor.user_id) return ServiceResponse.forbidden();
 
-      const { error: errorSpecialization, data: specialization } =
-        await this.specializationsService.findOne(
-          doctorToUpdate.specializationId,
-        );
+      if (doctorToUpdate.specializationId) {
+        const { error: errorSpecialization, data: specialization } =
+          await this.specializationsService.findOne(
+            doctorToUpdate.specializationId,
+          );
 
-      if (errorSpecialization)
-        return { error: errorSpecialization, data: null };
-      if (!specialization)
-        return ServiceResponse.invalidData('Specialization not found');
+        if (errorSpecialization)
+          return { error: errorSpecialization, data: null };
+        if (!specialization)
+          return ServiceResponse.invalidData('Specialization not found');
+      }
 
-      const doctorEntity: DoctorEntity = {
-        phoneNumber: doctorToUpdate.phone_number,
-        licenceNumber: doctorToUpdate.licence_number,
-        specializationId: specialization.id,
-        hospital_address: doctorToUpdate.hospital_address,
-        hospital_name: doctorToUpdate.hospital_name,
-        professional_since: doctorToUpdate.professional_since,
+      const doctorEntity: Partial<DoctorEntity> = {
+        ...(doctorToUpdate.phone_number && {
+          phoneNumber: doctorToUpdate.phone_number,
+        }),
+        ...(doctorToUpdate.licence_number && {
+          licenceNumber: doctorToUpdate.licence_number,
+        }),
+        ...(doctorToUpdate.specializationId && {
+          specializationId: doctorToUpdate.specializationId,
+        }),
+        ...(doctorToUpdate.hospital_address && {
+          hospital_address: doctorToUpdate.hospital_address,
+        }),
+        ...(doctorToUpdate.hospital_name && {
+          hospital_name: doctorToUpdate.hospital_name,
+        }),
+        ...(doctorToUpdate.professional_since && {
+          professional_since: doctorToUpdate.professional_since,
+        }),
       };
 
       const updatedDoctor = await this.doctorsRepository.update(
-        exisingDoctor.id,
+        existingDoctor.id,
         doctorEntity,
       );
 
