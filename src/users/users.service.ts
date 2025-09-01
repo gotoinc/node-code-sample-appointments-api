@@ -6,6 +6,7 @@ import { IUsersRepository } from './users.repository.interface';
 import { IRolesService } from 'src/roles/roles.service.interface';
 import { CreateUserDto } from './dto/create-user.dto';
 import { ILogger } from 'src/common/interfaces/logger.interface';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 export class UsersService implements IUsersService {
   constructor(
@@ -58,6 +59,29 @@ export class UsersService implements IUsersService {
       const users: User[] = await this.usersRepository.findAll();
 
       return ServiceResponse.success<User[]>(users);
+    } catch (error) {
+      this.logger.error(error);
+      return { error: { message: error.message }, data: null };
+    }
+  }
+
+  async update(
+    id: number,
+    updateUserDto: UpdateUserDto,
+  ): Promise<IServiceResponse<User>> {
+    try {
+      if (updateUserDto.email) {
+        const existingUser = await this.usersRepository.findOne(
+          updateUserDto.email,
+        );
+
+        if (existingUser && existingUser.id !== id) {
+          return { error: { message: 'Email already in use' }, data: null };
+        }
+      }
+
+      const updatedUser = await this.usersRepository.update(id, updateUserDto);
+      return ServiceResponse.success<User>(updatedUser);
     } catch (error) {
       this.logger.error(error);
       return { error: { message: error.message }, data: null };

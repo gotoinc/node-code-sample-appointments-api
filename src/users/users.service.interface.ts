@@ -12,4 +12,9 @@ export interface IUsersService {
   ): Promise<IServiceResponse<User & { user_role: UserRole }>>;
 
   findAll(): Promise<IServiceResponse<User[]>>;
+
+  update(
+    id: number,
+    updateUserDto: Partial<CreateUserDto>,
+  ): Promise<IServiceResponse<User>>;
 }
