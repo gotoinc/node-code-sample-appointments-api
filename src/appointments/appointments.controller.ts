@@ -6,6 +6,7 @@ import {
   Inject,
   Param,
   Post,
+  Put,
   Req,
   ServiceUnavailableException,
 } from '@nestjs/common';
@@ -22,8 +23,10 @@ import { Request } from 'express';
 import { Roles } from 'src/iam/authorization/decorators/roles.decorator';
 import { AppointmentDto } from './dto/appointment.dto';
 import {
+  ApiBody,
   ApiForbiddenResponse,
   ApiNotFoundResponse,
+  ApiResponse,
   ApiServiceUnavailableResponse,
 } from '@nestjs/swagger';
 import { AppointmentResultDto } from './dto/appointment-result.dto';
@@ -37,6 +40,7 @@ import {
   IPatientsService,
   PatientsServiceSymbol,
 } from 'src/patients/patients.service.interface';
+import { UpdateAppointmentResultDto } from './dto/update-appointment-result.dto';
 
 @Controller('appointments')
 export class AppointmentsController {
@@ -141,6 +145,8 @@ export class AppointmentsController {
   })
   @ApiNotFoundResponse({ description: 'Appointment not found' })
   @Roles('doctor')
+  @ApiBody({ type: AddAppointmentResultDto })
+  @ApiResponse({ type: AppointmentResultDto })
   @Post('result')
   async createResult(
     @Body() body: AddAppointmentResultDto,
@@ -175,6 +181,50 @@ export class AppointmentsController {
 
     return data;
   }
+
+  @ApiServiceUnavailableResponse({
+    description: 'Error updating appointment result',
+  })
+  @ApiNotFoundResponse({ description: 'Appointment not found' })
+  @ApiBody({ type: UpdateAppointmentResultDto })
+  @ApiResponse({ type: AppointmentResultDto })
+  @ApiForbiddenResponse({ description: 'User is not in appointment ' })
+  @Roles('doctor')
+  @Put('result')
+  async updateResult(
+    @Body() body: UpdateAppointmentResultDto,
+    @Req() req: Request,
+  ): Promise<AppointmentResultDto> {
+    const user = req.user!;
+    const { error: appointmentError } = await this.appointmentsService.findById(
+      body.appointmentId,
+    );
+    if (appointmentError) {
+      throw new ServiceUnavailableException('Error finding appointment');
+    }
+
+    const { data: isUserInAppointment } =
+      await this.appointmentsService.isUserInAppointment(
+        body.appointmentId,
+        user.userId,
+      );
+
+    if (!isUserInAppointment?.included) {
+      throw new ForbiddenException('User is not in appointment');
+    }
+
+    const { error, data } = await this.appointmentsResultService.update(body);
+
+    const exception = handleServiceError(error);
+    if (exception) throw exception;
+    if (!data)
+      throw new ServiceUnavailableException(
+        'Error updating appointment result',
+      );
+
+    return data;
+  }
+
   @ApiServiceUnavailableResponse({ description: 'Error declining appointment' })
   @ApiNotFoundResponse({ description: 'Appointment not found' })
   @Post('decline')

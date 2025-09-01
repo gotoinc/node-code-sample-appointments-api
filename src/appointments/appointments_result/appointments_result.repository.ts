@@ -60,4 +60,33 @@ export class AppointmentsResultRepository
       },
     });
   }
+  update(
+    appointmentResult: Partial<AppointmentResultEntity>,
+    tx?: unknown,
+  ): Promise<AppointmentResult & { appointment: AppointmentReturnType }> {
+    const prisma = this.getClient(tx);
+
+    return prisma.appointmentResult.update({
+      where: {
+        appointment_id: appointmentResult.appointmentId!,
+      },
+      data: {
+        ...(appointmentResult.diagnosis && {
+          diagnosis: appointmentResult.diagnosis,
+        }),
+        ...(appointmentResult.recommendations && {
+          recommendations: appointmentResult.recommendations,
+        }),
+      },
+      include: {
+        appointment: {
+          include: {
+            doctor: true,
+            patient: true,
+            timeslot: true,
+          },
+        },
+      },
+    });
+  }
 }

@@ -5,6 +5,7 @@ import { AppointmentResultDto } from '../dto/appointment-result.dto';
 import { AppointmentResultEntity } from '../entities/appointmentResult.entity';
 import { AddAppointmentResultDto } from '../dto/add-appointment-result.dto';
 import { IAppointmentsResultRepository } from './appointments_result.repository.interface';
+import { UpdateAppointmentResultDto } from '../dto/update-appointment-result.dto';
 
 export class AppointmentsResultService implements IAppointmentsResultService {
   constructor(
@@ -41,6 +42,32 @@ export class AppointmentsResultService implements IAppointmentsResultService {
       this.logger.error(error);
       return {
         error: { message: 'Error creating appointment result' },
+        data: null,
+      };
+    }
+  }
+
+  async update(
+    updatedResults: UpdateAppointmentResultDto,
+  ): Promise<IServiceResponse<AppointmentResultDto>> {
+    try {
+      const appointmentResultEntity: Partial<AppointmentResultEntity> = {
+        appointmentId: updatedResults.appointmentId,
+        diagnosis: updatedResults.diagnosis && updatedResults.diagnosis,
+        recommendations:
+          updatedResults.recommendations && updatedResults.recommendations,
+      };
+
+      const appointmentWithResult =
+        await this.appointmentsResultRepository.update(appointmentResultEntity);
+
+      return ServiceResponse.success<AppointmentResultDto>(
+        appointmentWithResult,
+      );
+    } catch (error) {
+      this.logger.error(error);
+      return {
+        error: { message: 'Error updating appointment result' },
         data: null,
       };
     }
