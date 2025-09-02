@@ -7,7 +7,7 @@ import { IDoctorsRepository } from './doctors.repository.interface';
 import { DoctorEntity } from './entities/doctor.entity';
 import { ISpecializationsService } from 'src/specializations/specializations.service.interface';
 import { ILogger } from 'src/common/interfaces/logger.interface';
-import { DoctorDto } from './dto/doctor.dto';
+import { DoctorDto, GetDoctorQuery } from './dto/doctor.dto';
 import { IAppointmentsRepository } from 'src/appointments/appointments.repository.interface';
 
 export class DoctorsService implements IDoctorsService {
@@ -60,9 +60,9 @@ export class DoctorsService implements IDoctorsService {
     }
   }
 
-  async findAll(): Promise<IServiceResponse<DoctorDto[]>> {
+  async findAll(query: GetDoctorQuery): Promise<IServiceResponse<DoctorDto[]>> {
     try {
-      const doctors = await this.doctorsRepository.findAll();
+      const doctors = await this.doctorsRepository.findAll(query);
 
       return ServiceResponse.success<Doctor[]>(doctors);
     } catch (error) {

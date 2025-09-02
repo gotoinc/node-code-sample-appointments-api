@@ -8,6 +8,7 @@ import { IDoctorsService } from './doctors.service.interface';
 import { ISpecializationsService } from 'src/specializations/specializations.service.interface';
 import { ResponseStatus } from 'src/common/service-response';
 import { IAppointmentsRepository } from 'src/appointments/appointments.repository.interface';
+import { GetDoctorQuery } from './dto/doctor.dto';
 
 function createMockDoctor(overrides = {}): DoctorReturnType {
   return {
@@ -224,7 +225,8 @@ describe('DoctorsService', () => {
         createMockDoctor({ id: 2 }),
       ]);
 
-      const doctors = await service.findAll();
+      const query: GetDoctorQuery = {};
+      const doctors = await service.findAll(query);
 
       expect(doctors.error).toBeNull();
       expect(doctors.data?.length).toBe(2);
@@ -235,7 +237,8 @@ describe('DoctorsService', () => {
         'Error finding doctors',
       );
 
-      const doctors = await service.findAll();
+      const query: GetDoctorQuery = {};
+      const doctors = await service.findAll(query);
 
       expect(doctors.data).toBeNull();
       expect(doctors.error).not.toBeNull();

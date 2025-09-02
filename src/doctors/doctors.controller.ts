@@ -8,6 +8,7 @@ import {
   Param,
   Post,
   Put,
+  Query,
   Req,
   ServiceUnavailableException,
   UsePipes,
@@ -23,7 +24,7 @@ import { UpdateDoctorDto } from './dto/update-doctor.dto';
 import { IdParamDto } from 'src/common/dto/id-param.dto';
 import { Request } from 'express';
 import { handleServiceError } from 'src/common/handle-service-error';
-import { DoctorDto } from './dto/doctor.dto';
+import { DoctorDto, GetDoctorQuery } from './dto/doctor.dto';
 import {
   ApiBadRequestResponse,
   ApiForbiddenResponse,
@@ -67,8 +68,8 @@ export class DoctorsController {
 
   @ApiServiceUnavailableResponse({ description: 'Error finding all doctors' })
   @Get()
-  async findAll(): Promise<DoctorDto[]> {
-    const { error, data } = await this.doctorsService.findAll();
+  async findAll(@Query() query: GetDoctorQuery): Promise<DoctorDto[]> {
+    const { error, data } = await this.doctorsService.findAll(query);
     if (error) throw new ServiceUnavailableException(error.message);
     if (!data)
       throw new ServiceUnavailableException('Error finding all doctors');

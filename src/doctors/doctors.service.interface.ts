@@ -1,7 +1,7 @@
 import { IServiceResponse } from 'src/common/service-response';
 import { CreateDoctorDto } from './dto/create-doctor.dto';
 import { UpdateDoctorDto } from './dto/update-doctor.dto';
-import { DoctorDto } from './dto/doctor.dto';
+import { DoctorDto, GetDoctorQuery } from './dto/doctor.dto';
 
 export const DoctorsServiceSymbol = Symbol('DOCTORS_SERVICE');
 
@@ -10,7 +10,7 @@ export interface IDoctorsService {
     doctor: CreateDoctorDto,
     userId: number,
   ): Promise<IServiceResponse<DoctorDto>>;
-  findAll(): Promise<IServiceResponse<DoctorDto[]>>;
+  findAll(query: GetDoctorQuery): Promise<IServiceResponse<DoctorDto[]>>;
   findOne(id: number): Promise<IServiceResponse<DoctorDto | null>>;
   findByUserId(userId: number): Promise<IServiceResponse<DoctorDto | null>>;
   update(
