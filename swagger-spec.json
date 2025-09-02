@@ -1143,6 +1143,48 @@
         ]
       }
     },
+    "/timeslots/{id}": {
+      "delete": {
+        "operationId": "TimeslotsController_deleteDoctorTimeslot",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeleteTimeslotDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "404": {
+            "description": "Doctor not found"
+          },
+          "409": {
+            "description": "Timeslots collision"
+          },
+          "503": {
+            "description": "Error creating schedule"
+          }
+        },
+        "tags": [
+          "Timeslots"
+        ]
+      }
+    },
     "/timeslots/schedule": {
       "post": {
         "operationId": "TimeslotsController_createSchedule",
@@ -1663,6 +1705,17 @@
         "required": [
           "start_time",
           "end_time"
+        ]
+      },
+      "DeleteTimeslotDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "id"
         ]
       },
       "CreateScheduleDto": {

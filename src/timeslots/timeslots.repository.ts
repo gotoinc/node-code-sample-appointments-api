@@ -105,4 +105,14 @@ export class TimeslotsRepository
       skipDuplicates: true,
     });
   }
+
+  async delete(id: number, tx?: unknown): Promise<Timeslot> {
+    const prisma = this.getClient(tx);
+
+    return await prisma.timeslot.delete({
+      where: {
+        id,
+      },
+    });
+  }
 }

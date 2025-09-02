@@ -20,4 +20,8 @@ export interface ITimeslotsService {
     createScheduleDto: CreateScheduleDto,
     doctorId: number,
   ): Promise<IServiceResponse<{ status: string }>>;
+  delete(
+    id: number,
+    userId: number,
+  ): Promise<IServiceResponse<{ message: string }>>;
 }
