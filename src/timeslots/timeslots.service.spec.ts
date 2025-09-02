@@ -388,113 +388,113 @@ describe('TimeslotsService', () => {
       expect(result.error).toBeNull();
       expect(result.data).toEqual({ status: 'ok' });
     });
+  });
 
-    describe('delete', () => {
-      const userId = 1;
-      const doctor: Doctor = {
-        hospital_address: 'Some address',
-        hospital_name: 'Some hospital',
-        id: 1,
-        phone_number: '+1234567890',
-        licence_number: '1234567890',
-        specialization_id: 1,
-        user_id: 1,
-        professional_since: new Date(),
-      };
-      const timeslot = {
-        id: 1,
-        doctor_id: 1,
-        start_time: new Date(),
-        end_time: new Date(),
-        is_available: true,
-      };
+  describe('delete', () => {
+    const userId = 1;
+    const doctor: Doctor = {
+      hospital_address: 'Some address',
+      hospital_name: 'Some hospital',
+      id: 1,
+      phone_number: '+1234567890',
+      licence_number: '1234567890',
+      specialization_id: 1,
+      user_id: 1,
+      professional_since: new Date(),
+    };
+    const timeslot = {
+      id: 1,
+      doctor_id: 1,
+      start_time: new Date(),
+      end_time: new Date(),
+      is_available: true,
+    };
 
-      it('should return error if doctor service returns error', async () => {
-        mockDoctorsService.findByUserId.mockResolvedValueOnce({
-          data: null,
-          error: { message: 'Doctor service error' },
-        });
-
-        const result = await service.delete(1, userId);
-
-        expect(result.data).toBeNull();
-        expect(result.error).toEqual({ message: 'Doctor service error' });
+    it('should return error if doctor service returns error', async () => {
+      mockDoctorsService.findByUserId.mockResolvedValueOnce({
+        data: null,
+        error: { message: 'Doctor service error' },
       });
 
-      it('should return not found if doctor not found', async () => {
-        mockDoctorsService.findByUserId.mockResolvedValueOnce({
-          data: null,
-          error: null,
-        });
+      const result = await service.delete(1, userId);
 
-        const result = await service.delete(1, userId);
+      expect(result.data).toBeNull();
+      expect(result.error).toEqual({ message: 'Doctor service error' });
+    });
 
-        expect(result.data).toBeNull();
-        expect(result.error?.status).toBe(ResponseStatus.NotFound);
-        expect(result.error?.message).toContain('Doctor not found');
+    it('should return not found if doctor not found', async () => {
+      mockDoctorsService.findByUserId.mockResolvedValueOnce({
+        data: null,
+        error: null,
       });
 
-      it('should return not found if timeslot not found', async () => {
-        mockDoctorsService.findByUserId.mockResolvedValueOnce({
-          data: doctor,
-          error: null,
-        });
-        mockTimeslotsRepository.findById.mockResolvedValueOnce(null);
+      const result = await service.delete(1, userId);
 
-        const result = await service.delete(1, userId);
+      expect(result.data).toBeNull();
+      expect(result.error?.status).toBe(ResponseStatus.NotFound);
+      expect(result.error?.message).toContain('Doctor not found');
+    });
 
-        expect(result.data).toBeNull();
-        expect(result.error?.status).toBe(ResponseStatus.NotFound);
-        expect(result.error?.message).toContain('Timeslot not found');
+    it('should return not found if timeslot not found', async () => {
+      mockDoctorsService.findByUserId.mockResolvedValueOnce({
+        data: doctor,
+        error: null,
+      });
+      mockTimeslotsRepository.findById.mockResolvedValueOnce(null);
+
+      const result = await service.delete(1, userId);
+
+      expect(result.data).toBeNull();
+      expect(result.error?.status).toBe(ResponseStatus.NotFound);
+      expect(result.error?.message).toContain('Timeslot not found');
+    });
+
+    it('should return forbidden if doctor does not own timeslot', async () => {
+      mockDoctorsService.findByUserId.mockResolvedValueOnce({
+        data: doctor,
+        error: null,
+      });
+      mockTimeslotsRepository.findById.mockResolvedValueOnce({
+        ...timeslot,
+        doctor_id: 2,
       });
 
-      it('should return forbidden if doctor does not own timeslot', async () => {
-        mockDoctorsService.findByUserId.mockResolvedValueOnce({
-          data: doctor,
-          error: null,
-        });
-        mockTimeslotsRepository.findById.mockResolvedValueOnce({
-          ...timeslot,
-          doctor_id: 2,
-        });
+      const result = await service.delete(1, userId);
 
-        const result = await service.delete(1, userId);
+      expect(result.data).toBeNull();
+      expect(result.error?.status).toBe(ResponseStatus.Forbidden);
+      expect(result.error?.message).toContain('permission');
+    });
 
-        expect(result.data).toBeNull();
-        expect(result.error?.status).toBe(ResponseStatus.Forbidden);
-        expect(result.error?.message).toContain('permission');
+    it('should return error if repository throws error', async () => {
+      mockDoctorsService.findByUserId.mockResolvedValueOnce({
+        data: doctor,
+        error: null,
       });
+      mockTimeslotsRepository.findById.mockResolvedValueOnce(timeslot);
+      mockTimeslotsRepository.delete.mockRejectedValueOnce(
+        new Error('Delete error'),
+      );
 
-      it('should return error if repository throws error', async () => {
-        mockDoctorsService.findByUserId.mockResolvedValueOnce({
-          data: doctor,
-          error: null,
-        });
-        mockTimeslotsRepository.findById.mockResolvedValueOnce(timeslot);
-        mockTimeslotsRepository.delete.mockRejectedValueOnce(
-          new Error('Delete error'),
-        );
+      const result = await service.delete(1, userId);
 
-        const result = await service.delete(1, userId);
+      expect(result.data).toBeNull();
+      expect(result.error).not.toBeNull();
+      expect(mockLogger.error).toHaveBeenCalled();
+    });
 
-        expect(result.data).toBeNull();
-        expect(result.error).not.toBeNull();
-        expect(mockLogger.error).toHaveBeenCalled();
+    it('should return success if timeslot deleted', async () => {
+      mockDoctorsService.findByUserId.mockResolvedValueOnce({
+        data: doctor,
+        error: null,
       });
+      mockTimeslotsRepository.findById.mockResolvedValueOnce(timeslot);
+      mockTimeslotsRepository.delete.mockResolvedValueOnce(timeslot);
 
-      it('should return success if timeslot deleted', async () => {
-        mockDoctorsService.findByUserId.mockResolvedValueOnce({
-          data: doctor,
-          error: null,
-        });
-        mockTimeslotsRepository.findById.mockResolvedValueOnce(timeslot);
-        mockTimeslotsRepository.delete.mockResolvedValueOnce(timeslot);
+      const result = await service.delete(1, userId);
 
-        const result = await service.delete(1, userId);
-
-        expect(result.error).toBeNull();
-        expect(result.data?.message).toBe('Timeslot deleted successfully');
-      });
+      expect(result.error).toBeNull();
+      expect(result.data?.message).toBe('Timeslot deleted successfully');
     });
   });
 });
