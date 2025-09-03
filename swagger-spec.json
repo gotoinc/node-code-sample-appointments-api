@@ -201,6 +201,18 @@
         "tags": [
           "Users"
         ]
+      },
+      "delete": {
+        "operationId": "UsersController_remove",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Users"
+        ]
       }
     },
     "/roles": {

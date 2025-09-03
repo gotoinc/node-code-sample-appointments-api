@@ -87,4 +87,17 @@ export class UsersService implements IUsersService {
       return { error: { message: error.message }, data: null };
     }
   }
+
+  async remove(id: number, email: string): Promise<IServiceResponse<User>> {
+    try {
+      const user = await this.usersRepository.findOne(email);
+      if (!user) return ServiceResponse.notFound('User not found');
+
+      await this.usersRepository.remove(id);
+      return ServiceResponse.success<User>(user);
+    } catch (error) {
+      this.logger.error(error);
+      return { error: { message: error.message }, data: null };
+    }
+  }
 }

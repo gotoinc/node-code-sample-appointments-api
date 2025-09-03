@@ -15,6 +15,8 @@ const mockUsersRepository: jest.Mocked<IUsersRepository> = {
   findAll: jest.fn(),
   findOne: jest.fn(),
   create: jest.fn(),
+  remove: jest.fn(),
+  update: jest.fn(),
 };
 
 const mockRolesService: jest.Mocked<IRolesService> = {
@@ -22,7 +24,7 @@ const mockRolesService: jest.Mocked<IRolesService> = {
   findAll: jest.fn(),
 };
 
-describe('RolesService', () => {
+describe('UsersService', () => {
   let service: IUsersService;
 
   beforeEach(async () => {
@@ -197,6 +199,63 @@ describe('RolesService', () => {
 
       expect(users.error?.message).not.toBeNull();
       expect(users.data).toBeNull();
+    });
+  });
+  describe('remove', () => {
+    it('should return not found if user does not exist', async () => {
+      mockUsersRepository.findOne.mockResolvedValueOnce(null);
+
+      const result = await service.remove(1, 'notfound@test.com');
+
+      expect(result.data).toBeNull();
+      expect(result.error?.status).toBe(ResponseStatus.NotFound);
+      expect(result.error?.message).toBe('User not found');
+    });
+
+    it('should remove user and return success', async () => {
+      const user = {
+        id: 1,
+        email: 'test@test.com',
+        first_name: 'John',
+        last_name: 'Doe',
+        user_role_id: 1,
+        created_at: new Date(),
+        updated_at: new Date(),
+        user_role: { id: 1, role_name: 'doctor' },
+      };
+      mockUsersRepository.findOne.mockResolvedValueOnce(user);
+      mockUsersRepository.remove.mockResolvedValueOnce(undefined as any);
+
+      const result = await service.remove(1, 'test@test.com');
+
+      expect(result.error).toBeNull();
+      expect(result.data).toEqual(user);
+      expect(mockUsersRepository.remove).toHaveBeenCalledWith(1);
+    });
+
+    it('should return error if repository throws error', async () => {
+      mockUsersRepository.findOne.mockResolvedValueOnce({
+        id: 1,
+        email: 'test@test.com',
+        first_name: 'John',
+        last_name: 'Doe',
+        user_role_id: 1,
+        user_role: {
+          id: 1,
+          role_name: 'doctor',
+        },
+        created_at: new Date(),
+        updated_at: new Date(),
+      });
+      mockUsersRepository.remove.mockRejectedValueOnce(
+        new Error('Remove failed'),
+      );
+
+      const result = await service.remove(1, 'test@test.com');
+
+      expect(result.data).toBeNull();
+      expect(result.error?.message).toBe('Remove failed');
+      expect(mockLogger.error).toHaveBeenCalled();
     });
   });
 });

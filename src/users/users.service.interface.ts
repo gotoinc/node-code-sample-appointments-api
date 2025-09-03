@@ -17,4 +17,6 @@ export interface IUsersService {
     id: number,
     updateUserDto: Partial<CreateUserDto>,
   ): Promise<IServiceResponse<User>>;
+
+  remove(id: number, email: string): Promise<IServiceResponse<User>>;
 }

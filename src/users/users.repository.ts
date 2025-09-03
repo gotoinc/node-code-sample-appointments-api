@@ -68,4 +68,12 @@ export class UsersRepository
       },
     });
   }
+
+  async remove(id: number, tx?: unknown): Promise<User> {
+    const prisma = this.getClient(tx);
+
+    return await prisma.user.delete({
+      where: { id },
+    });
+  }
 }
