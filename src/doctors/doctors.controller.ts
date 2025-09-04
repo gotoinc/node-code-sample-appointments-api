@@ -68,8 +68,11 @@ export class DoctorsController {
 
   @ApiServiceUnavailableResponse({ description: 'Error finding all doctors' })
   @Get()
-  async findAll(@Query() query: GetDoctorQuery): Promise<DoctorDto[]> {
+  async findAll(
+    @Query() query: GetDoctorQuery,
+  ): Promise<{ data: DoctorDto[]; total: number }> {
     const { error, data } = await this.doctorsService.findAll(query);
+
     if (error) throw new ServiceUnavailableException(error.message);
     if (!data)
       throw new ServiceUnavailableException('Error finding all doctors');

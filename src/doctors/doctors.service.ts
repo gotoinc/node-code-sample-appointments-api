@@ -60,11 +60,13 @@ export class DoctorsService implements IDoctorsService {
     }
   }
 
-  async findAll(query: GetDoctorQuery): Promise<IServiceResponse<DoctorDto[]>> {
+  async findAll(
+    query: GetDoctorQuery,
+  ): Promise<IServiceResponse<{ data: DoctorDto[]; total: number }>> {
     try {
       const doctors = await this.doctorsRepository.findAll(query);
 
-      return ServiceResponse.success<Doctor[]>(doctors);
+      return ServiceResponse.success(doctors);
     } catch (error) {
       this.logger.error(error);
       return { error: { message: 'Error finding all doctors' }, data: null };

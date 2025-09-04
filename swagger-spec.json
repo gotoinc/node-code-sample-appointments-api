@@ -377,17 +377,7 @@
         ],
         "responses": {
           "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/DoctorDto"
-                  }
-                }
-              }
-            }
+            "description": ""
           },
           "503": {
             "description": "Error finding all doctors"

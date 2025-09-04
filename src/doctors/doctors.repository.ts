@@ -70,17 +70,24 @@ export class DoctorsRepository
   async findAll(
     query: GetDoctorQuery,
     tx?: unknown,
-  ): Promise<DoctorReturnType[]> {
+  ): Promise<{ data: DoctorReturnType[]; total: number }> {
     const prisma = this.getClient(tx);
 
     const where = this.buildWhereClause(query);
 
-    return await prisma.doctor.findMany({
-      where,
-      include: { user: true, specialization: true },
-      skip: query.offset ? Number(query.offset) : undefined,
-      take: query.limit ? Number(query.limit) : undefined,
-    });
+    const [data, total] = await Promise.all([
+      prisma.doctor.findMany({
+        where,
+        include: { user: true, specialization: true },
+        skip: query.offset ? Number(query.offset) : undefined,
+        take: query.limit ? Number(query.limit) : undefined,
+      }),
+      prisma.doctor.count({
+        where,
+      }),
+    ]);
+
+    return { data, total };
   }
 
   async findOne(id: number, tx?: unknown): Promise<DoctorReturnType | null> {

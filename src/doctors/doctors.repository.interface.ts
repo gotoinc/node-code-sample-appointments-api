@@ -13,7 +13,10 @@ export interface IDoctorsRepository {
     userId: number,
     tx?: unknown,
   ): Promise<DoctorReturnType>;
-  findAll(query: GetDoctorQuery, tx?: unknown): Promise<DoctorReturnType[]>;
+  findAll(
+    query: GetDoctorQuery,
+    tx?: unknown,
+  ): Promise<{ data: DoctorReturnType[]; total: number }>;
   findOne(id: number, tx?: unknown): Promise<DoctorReturnType | null>;
   findByUserId(userId: number, tx?: unknown): Promise<DoctorReturnType | null>;
   update(

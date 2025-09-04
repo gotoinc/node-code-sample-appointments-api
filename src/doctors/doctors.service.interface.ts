@@ -10,7 +10,9 @@ export interface IDoctorsService {
     doctor: CreateDoctorDto,
     userId: number,
   ): Promise<IServiceResponse<DoctorDto>>;
-  findAll(query: GetDoctorQuery): Promise<IServiceResponse<DoctorDto[]>>;
+  findAll(
+    query: GetDoctorQuery,
+  ): Promise<IServiceResponse<{ data: DoctorDto[]; total: number }>>;
   findOne(id: number): Promise<IServiceResponse<DoctorDto | null>>;
   findByUserId(userId: number): Promise<IServiceResponse<DoctorDto | null>>;
   update(
