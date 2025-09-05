@@ -25,8 +25,11 @@ export class DoctorsRepository
       where.specialization_id = query.specialization_id;
     }
 
-    if (query.professional_since) {
-      where.professional_since = { lte: query.professional_since };
+    if (query.professional_since_from && query.professional_since_to) {
+      where.professional_since = {
+        gte: query.professional_since_from,
+        lte: query.professional_since_to,
+      };
     }
 
     if (query.search) {

@@ -367,7 +367,15 @@
             }
           },
           {
-            "name": "professional_since",
+            "name": "professional_since_from",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "professional_since_to",
             "required": false,
             "in": "query",
             "schema": {

@@ -23,7 +23,11 @@ export class GetDoctorQuery {
 
   @IsOptional()
   @IsDateString()
-  professional_since?: string;
+  professional_since_from?: string;
+
+  @IsOptional()
+  @IsDateString()
+  professional_since_to?: string;
 }
 
 export class DoctorDto {

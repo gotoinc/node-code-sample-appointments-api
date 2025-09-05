@@ -220,16 +220,16 @@ describe('DoctorsService', () => {
 
   describe('findAll', () => {
     it('should return all doctors', async () => {
-      mockDoctorsRepository.findAll.mockResolvedValueOnce([
-        createMockDoctor({ id: 1 }),
-        createMockDoctor({ id: 2 }),
-      ]);
+      mockDoctorsRepository.findAll.mockResolvedValueOnce({
+        data: [createMockDoctor({ id: 1 }), createMockDoctor({ id: 2 })],
+        total: 2,
+      });
 
       const query: GetDoctorQuery = {};
       const doctors = await service.findAll(query);
 
       expect(doctors.error).toBeNull();
-      expect(doctors.data?.length).toBe(2);
+      expect(doctors.data?.data.length).toBe(2);
     });
 
     it('should return error if repository throws error', async () => {
