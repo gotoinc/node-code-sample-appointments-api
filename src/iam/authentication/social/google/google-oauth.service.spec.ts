@@ -24,6 +24,9 @@ describe('GoogleOauthService', () => {
       findOne: jest.fn(),
       findAll: jest.fn(),
       create: jest.fn(),
+      remove: jest.fn(),
+      update: jest.fn(),
+      uploadAvatar: jest.fn(),
     } as jest.Mocked<IUsersService>;
 
     tokenGenerationService = {
@@ -55,6 +58,7 @@ describe('GoogleOauthService', () => {
           last_name: 'Doe',
           created_at: new Date(),
           updated_at: new Date(),
+          avatar: null,
           user_role_id: 1,
           user_role: { role_name: 'doctor', id: 1 },
         }),

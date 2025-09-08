@@ -57,6 +57,7 @@ describe('EmailCredentialsService', () => {
         user_role_id: role.id,
         created_at: new Date(),
         updated_at: new Date(),
+        avatar: null,
       };
 
       rolesService.findByName.mockResolvedValue(ServiceResponse.success(role));
