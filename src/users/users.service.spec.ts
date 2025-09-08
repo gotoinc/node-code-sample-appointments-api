@@ -4,6 +4,7 @@ import { IUsersService } from './users.service.interface';
 import { IUsersRepository } from './users.repository.interface';
 import { IRolesService } from 'src/roles/roles.service.interface';
 import { ResponseStatus } from 'src/common/service-response';
+import { IMinioService } from 'src/minio-module/minio.service.interface';
 
 const mockLogger: jest.Mocked<ILogger> = {
   log: jest.fn(),
@@ -17,11 +18,18 @@ const mockUsersRepository: jest.Mocked<IUsersRepository> = {
   create: jest.fn(),
   remove: jest.fn(),
   update: jest.fn(),
+  findById: jest.fn(),
 };
 
 const mockRolesService: jest.Mocked<IRolesService> = {
   findByName: jest.fn(),
   findAll: jest.fn(),
+};
+
+const mockMinioService: jest.Mocked<IMinioService> = {
+  uploadFile: jest.fn(),
+  getFile: jest.fn(),
+  deleteFile: jest.fn(),
 };
 
 describe('UsersService', () => {
@@ -32,6 +40,7 @@ describe('UsersService', () => {
       mockLogger,
       mockUsersRepository,
       mockRolesService,
+      mockMinioService,
     );
   });
 
@@ -105,6 +114,7 @@ describe('UsersService', () => {
         user_role_id: 1,
         created_at: new Date(),
         updated_at: new Date(),
+        avatar: null,
       });
 
       const user = await service.create({
@@ -133,6 +143,7 @@ describe('UsersService', () => {
           id: 1,
           role_name: 'doctor',
         },
+        avatar: null,
       });
 
       const user = await service.findOne('test@test.com');
@@ -173,6 +184,7 @@ describe('UsersService', () => {
           user_role_id: 1,
           created_at: new Date(),
           updated_at: new Date(),
+          avatar: null,
         },
         {
           id: 2,
@@ -182,6 +194,7 @@ describe('UsersService', () => {
           user_role_id: 2,
           created_at: new Date(),
           updated_at: new Date(),
+          avatar: null,
         },
       ]);
 
@@ -222,6 +235,7 @@ describe('UsersService', () => {
         created_at: new Date(),
         updated_at: new Date(),
         user_role: { id: 1, role_name: 'doctor' },
+        avatar: null,
       };
       mockUsersRepository.findOne.mockResolvedValueOnce(user);
       mockUsersRepository.remove.mockResolvedValueOnce(undefined as any);
@@ -236,6 +250,7 @@ describe('UsersService', () => {
     it('should return error if repository throws error', async () => {
       mockUsersRepository.findOne.mockResolvedValueOnce({
         id: 1,
+        avatar: null,
         email: 'test@test.com',
         first_name: 'John',
         last_name: 'Doe',

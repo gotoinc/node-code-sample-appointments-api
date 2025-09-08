@@ -215,6 +215,20 @@
         ]
       }
     },
+    "/users/me/avatar": {
+      "post": {
+        "operationId": "UsersController_uploadAvatar",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Users"
+        ]
+      }
+    },
     "/roles": {
       "get": {
         "operationId": "RolesController_findAll",
@@ -1350,7 +1364,11 @@
       },
       "UpdateUserDto": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "avatar": {
+            "type": "string"
+          }
+        }
       },
       "RoleDto": {
         "type": "object",

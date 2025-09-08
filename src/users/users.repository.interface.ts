@@ -12,6 +12,8 @@ export interface IUsersRepository {
 
   findAll(tx?: unknown): Promise<User[]>;
 
+  findById(id: number, tx?: unknown): Promise<User | null>;
+
   update(id: number, user: UpdateUserDto, tx?: unknown): Promise<User>;
   remove(id: number, tx?: unknown): Promise<User>;
 }

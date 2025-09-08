@@ -65,7 +65,16 @@ export class UsersRepository
         ...(user.first_name && { first_name: user.first_name }),
         ...(user.last_name && { last_name: user.last_name }),
         ...(user.email && { email: user.email }),
+        ...(user.avatar && { avatar: user.avatar }),
       },
+    });
+  }
+
+  async findById(id: number, tx?: unknown): Promise<User | null> {
+    const prisma = this.getClient(tx);
+
+    return await prisma.user.findUnique({
+      where: { id },
     });
   }
 

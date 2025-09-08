@@ -1,6 +1,7 @@
 import { User, UserRole } from '@prisma/client';
 import { IServiceResponse } from 'src/common/service-response';
 import { CreateUserDto } from './dto/create-user.dto';
+import Multer from 'multer';
 
 export const UsersServiceSymbol = Symbol('USERS_SERVICE');
 
@@ -19,4 +20,8 @@ export interface IUsersService {
   ): Promise<IServiceResponse<User>>;
 
   remove(id: number, email: string): Promise<IServiceResponse<User>>;
+  uploadAvatar(
+    userId: number,
+    file: Multer.File,
+  ): Promise<IServiceResponse<string>>;
 }

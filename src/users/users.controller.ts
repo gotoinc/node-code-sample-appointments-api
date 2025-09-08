@@ -4,13 +4,18 @@ import {
   Delete,
   Get,
   Inject,
+  Post,
   Put,
   Req,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
 import { IUsersService, UsersServiceSymbol } from './users.service.interface';
 import { Auth } from 'src/iam/authentication/decorators/auth.decorator';
 import { Request } from 'express';
 import { UpdateUserDto } from './dto/update-user.dto';
+import Multer from 'multer';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Auth('Jwt')
 @Controller('users')
@@ -50,5 +55,20 @@ export class UsersController {
     if (!data) throw new Error('User not found');
 
     return data;
+  }
+
+  @Post('me/avatar')
+  @UseInterceptors(FileInterceptor('file'))
+  async uploadAvatar(@Req() req: Request, @UploadedFile() file: Multer.File) {
+    const user = req.user!;
+    console.log('file', file);
+    const { error, data } = await this.usersService.uploadAvatar(
+      user.userId,
+      file,
+    );
+    if (error) throw error;
+    if (!data) throw new Error('User not found');
+
+    return { avatarUrl: data };
   }
 }

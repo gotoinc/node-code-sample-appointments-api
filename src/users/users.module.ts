@@ -13,9 +13,14 @@ import {
 } from 'src/roles/roles.service.interface';
 import { Logger } from 'nestjs-pino';
 import { ILogger } from 'src/common/interfaces/logger.interface';
+import { MinioModule } from 'src/minio-module/minio.module';
+import {
+  IMinioService,
+  MinioServiceSymbol,
+} from 'src/minio-module/minio.service.interface';
 
 @Module({
-  imports: [RolesModule],
+  imports: [RolesModule, MinioModule],
   controllers: [UsersController],
   providers: [
     PrismaService,
@@ -26,10 +31,16 @@ import { ILogger } from 'src/common/interfaces/logger.interface';
         logger: ILogger,
         usersRepository: IUsersRepository,
         rolesService: IRolesService,
+        minioService: IMinioService,
       ) => {
-        return new UsersService(logger, usersRepository, rolesService);
+        return new UsersService(
+          logger,
+          usersRepository,
+          rolesService,
+          minioService,
+        );
       },
-      inject: [Logger, UsersRepository, RolesServiceSymbol],
+      inject: [Logger, UsersRepository, RolesServiceSymbol, MinioServiceSymbol],
     },
     JwtAuthGuard,
   ],

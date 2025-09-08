@@ -7,12 +7,15 @@ import { IRolesService } from 'src/roles/roles.service.interface';
 import { CreateUserDto } from './dto/create-user.dto';
 import { ILogger } from 'src/common/interfaces/logger.interface';
 import { UpdateUserDto } from './dto/update-user.dto';
+import Multer from 'multer';
+import { IMinioService } from 'src/minio-module/minio.service.interface';
 
 export class UsersService implements IUsersService {
   constructor(
     private readonly logger: ILogger,
     private readonly usersRepository: IUsersRepository,
     private readonly rolesService: IRolesService,
+    private readonly minioService: IMinioService,
   ) {}
 
   async create(user: CreateUserDto): Promise<IServiceResponse<User>> {
@@ -95,6 +98,44 @@ export class UsersService implements IUsersService {
 
       await this.usersRepository.remove(id);
       return ServiceResponse.success<User>(user);
+    } catch (error) {
+      this.logger.error(error);
+      return { error: { message: error.message }, data: null };
+    }
+  }
+
+  async uploadAvatar(
+    userId: number,
+    file: Multer.File,
+  ): Promise<IServiceResponse<string>> {
+    try {
+      const user = await this.usersRepository.findById(userId);
+      const oldAvatar = user?.avatar?.split('/').pop();
+
+      const bucketName = process.env.MINIO_BUCKET!;
+      const objectName = `avatar-${userId}-${Date.now()}`;
+      const uploadResult = await this.minioService.uploadFile(
+        bucketName,
+        objectName,
+        file.buffer,
+        file.mimetype,
+      );
+
+      if (uploadResult.error) {
+        return { error: uploadResult.error, data: null };
+      }
+
+      const avatarUrl = `/${bucketName}/${objectName}`;
+
+      await this.usersRepository.update(userId, {
+        avatar: avatarUrl,
+      });
+
+      if (oldAvatar) {
+        await this.minioService.deleteFile(bucketName, oldAvatar);
+      }
+
+      return ServiceResponse.success<string>('Avatar uploaded successfully');
     } catch (error) {
       this.logger.error(error);
       return { error: { message: error.message }, data: null };
