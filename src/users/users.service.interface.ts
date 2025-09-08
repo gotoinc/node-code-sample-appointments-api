@@ -24,4 +24,6 @@ export interface IUsersService {
     userId: number,
     file: Multer.File,
   ): Promise<IServiceResponse<string>>;
+
+  removeAvatar(userId: number): Promise<IServiceResponse<boolean>>;
 }

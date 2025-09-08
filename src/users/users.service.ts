@@ -141,4 +141,22 @@ export class UsersService implements IUsersService {
       return { error: { message: error.message }, data: null };
     }
   }
+
+  async removeAvatar(userId: number): Promise<IServiceResponse<boolean>> {
+    try {
+      const user = await this.usersRepository.findById(userId);
+      const oldAvatar = user?.avatar?.split('/').pop();
+      const bucketName = process.env.MINIO_BUCKET!;
+
+      if (oldAvatar) {
+        await this.minioService.deleteFile(bucketName, oldAvatar);
+      }
+
+      await this.usersRepository.update(userId, { avatar: null });
+      return ServiceResponse.success<boolean>(true);
+    } catch (error) {
+      this.logger.error(error);
+      return { error: { message: error.message }, data: null };
+    }
+  }
 }

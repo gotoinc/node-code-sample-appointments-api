@@ -227,6 +227,18 @@
         "tags": [
           "Users"
         ]
+      },
+      "delete": {
+        "operationId": "UsersController_removeAvatar",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Users"
+        ]
       }
     },
     "/roles": {
@@ -1366,7 +1378,8 @@
         "type": "object",
         "properties": {
           "avatar": {
-            "type": "string"
+            "type": "string",
+            "nullable": true
           }
         }
       },

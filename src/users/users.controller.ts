@@ -71,4 +71,14 @@ export class UsersController {
 
     return { avatarUrl: data };
   }
+
+  @Delete('me/avatar')
+  async removeAvatar(@Req() req: Request) {
+    const user = req.user!;
+    const { error, data } = await this.usersService.removeAvatar(user.userId);
+    if (error) throw error;
+    if (!data) throw new Error('User not found');
+
+    return { success: 'Avatar removed successfully' };
+  }
 }
