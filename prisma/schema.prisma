@@ -10,6 +10,7 @@ datasource db {
 model User {
   id               Int               @id @default(autoincrement())
   email            String            @unique
+  avatar           String?
   first_name       String
   last_name        String
   created_at       DateTime          @default(now())
@@ -47,19 +48,19 @@ model Patient {
 }
 
 model Doctor {
-  id                Int                @id @default(autoincrement())
-  phone_number      String
-  licence_number    String
-  user_id           Int                @unique @map("fk_user_id")
-  specialization_id Int                @map("fk_specialization_id")
+  id                 Int                @id @default(autoincrement())
+  phone_number       String
+  licence_number     String
+  user_id            Int                @unique @map("fk_user_id")
+  specialization_id  Int                @map("fk_specialization_id")
   hospital_address   String
   hospital_name      String
   professional_since DateTime
-  user              User               @relation(fields: [user_id], references: [id], onDelete: Cascade)
-  specialization    Specialization     @relation(fields: [specialization_id], references: [id])
-  timeslots         Timeslot[]
-  appointments      Appointment[]
-  TemplateSchedule  TemplateSchedule[]
+  user               User               @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  specialization     Specialization     @relation(fields: [specialization_id], references: [id])
+  timeslots          Timeslot[]
+  appointments       Appointment[]
+  TemplateSchedule   TemplateSchedule[]
 
   @@map("doctors")
 }
@@ -134,6 +135,7 @@ model UserAuthMethod {
 
   @@map("user_auth_methods")
 }
+
 model TemplateSchedule {
   id           Int    @id @default(autoincrement())
   name         String
@@ -144,6 +146,7 @@ model TemplateSchedule {
 
   @@map("template_schedule")
 }
+
 model AppointmentResult {
   id              Int         @id @default(autoincrement())
   appointment_id  Int         @unique
