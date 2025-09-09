@@ -135,7 +135,7 @@ export class UsersService implements IUsersService {
         await this.minioService.deleteFile(bucketName, oldAvatar);
       }
 
-      return ServiceResponse.success<string>('Avatar uploaded successfully');
+      return ServiceResponse.success<string>(avatarUrl);
     } catch (error) {
       this.logger.error(error);
       return { error: { message: error.message }, data: null };

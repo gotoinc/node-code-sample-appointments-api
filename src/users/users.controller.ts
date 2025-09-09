@@ -16,6 +16,7 @@ import { Request } from 'express';
 import { UpdateUserDto } from './dto/update-user.dto';
 import Multer from 'multer';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { handleServiceError } from 'src/common/handle-service-error';
 
 @Auth('Jwt')
 @Controller('users')
@@ -61,13 +62,12 @@ export class UsersController {
   @UseInterceptors(FileInterceptor('file'))
   async uploadAvatar(@Req() req: Request, @UploadedFile() file: Multer.File) {
     const user = req.user!;
-    console.log('file', file);
     const { error, data } = await this.usersService.uploadAvatar(
       user.userId,
       file,
     );
-    if (error) throw error;
-    if (!data) throw new Error('User not found');
+
+    handleServiceError(error);
 
     return { avatarUrl: data };
   }
@@ -75,9 +75,8 @@ export class UsersController {
   @Delete('me/avatar')
   async removeAvatar(@Req() req: Request) {
     const user = req.user!;
-    const { error, data } = await this.usersService.removeAvatar(user.userId);
-    if (error) throw error;
-    if (!data) throw new Error('User not found');
+    const { error } = await this.usersService.removeAvatar(user.userId);
+    handleServiceError(error);
 
     return { success: 'Avatar removed successfully' };
   }

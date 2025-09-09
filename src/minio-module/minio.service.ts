@@ -19,6 +19,7 @@ export class MinioService implements OnModuleInit, IMinioService {
   onModuleInit() {
     const accessKeyId = process.env.MINIO_ACCESS_KEY ?? '';
     const secretAccessKey = process.env.MINIO_SECRET_KEY ?? '';
+
     this.s3 = new S3Client({
       endpoint: `http://${process.env.MINIO_ENDPOINT}:${process.env.MINIO_PORT}`,
       credentials: {
