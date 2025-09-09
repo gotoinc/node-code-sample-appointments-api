@@ -1695,12 +1695,7 @@
           "address": {
             "type": "string"
           }
-        },
-        "required": [
-          "date_of_birth",
-          "gender",
-          "address"
-        ]
+        }
       },
       "CreateTimeslotDto": {
         "type": "object",
