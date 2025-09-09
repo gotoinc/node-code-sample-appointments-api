@@ -14,11 +14,15 @@ function createMockDoctor(overrides = {}): DoctorReturnType {
     licence_number: 'XYZ123',
     specialization_id: 1,
     user_id: 1,
+    hospital_address: '123 Main St',
+    hospital_name: 'General Hospital',
+    professional_since: new Date('2010-01-01'),
     specialization: {
       id: 1,
       name: 'Doctor',
     },
     user: {
+      avatar: 'http://example.com/avatar.jpg',
       id: 1,
       email: 'doctor@example.com',
       first_name: 'John',
