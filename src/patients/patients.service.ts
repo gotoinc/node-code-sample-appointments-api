@@ -94,10 +94,12 @@ export class PatientsService implements IPatientsService {
       if (userId !== existingPatient.user_id)
         return ServiceResponse.forbidden();
 
-      const patientEntity: PatientEntity = {
-        dateOfBirth: new Date(patientToUpdate.date_of_birth),
-        gender: patientToUpdate.gender,
-        address: patientToUpdate.address,
+      const patientEntity: Partial<PatientEntity> = {
+        dateOfBirth: patientToUpdate?.date_of_birth
+          ? new Date(patientToUpdate.date_of_birth)
+          : undefined,
+        gender: patientToUpdate?.gender,
+        address: patientToUpdate?.address,
       };
 
       const updatedPatient = await this.patientsRepository.update(
