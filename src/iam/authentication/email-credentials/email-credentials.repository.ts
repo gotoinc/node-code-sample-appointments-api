@@ -54,4 +54,14 @@ export class EmailCredentialsRepository
       },
     });
   }
+
+  async updateEmail(
+    email: string,
+    newEmail: string,
+  ): Promise<EmailCredentials | null> {
+    return await this.prismaClient.emailCredentials.update({
+      where: { email },
+      data: { email: newEmail },
+    });
+  }
 }

@@ -7,12 +7,16 @@ import { IRolesService } from 'src/roles/roles.service.interface';
 import { CreateUserDto } from './dto/create-user.dto';
 import { ILogger } from 'src/common/interfaces/logger.interface';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { ITransactionManager } from 'src/common/interfaces/transaction-manager.interface';
+import { IEmailCredentialsRepository } from 'src/iam/authentication/email-credentials/email-credentials.repository.interface';
 
 export class UsersService implements IUsersService {
   constructor(
     private readonly logger: ILogger,
     private readonly usersRepository: IUsersRepository,
     private readonly rolesService: IRolesService,
+    private readonly emailCredentialRepository: IEmailCredentialsRepository,
+    private readonly transactionManager: ITransactionManager,
   ) {}
 
   async create(user: CreateUserDto): Promise<IServiceResponse<User>> {
@@ -71,17 +75,55 @@ export class UsersService implements IUsersService {
   ): Promise<IServiceResponse<User>> {
     try {
       if (updateUserDto.email) {
+        const currentUser = await this.usersRepository.findById(id);
+        const curentUserCredentials =
+          await this.emailCredentialRepository.findOne(
+            currentUser?.email || '',
+          );
+
+        if (!currentUser || !curentUserCredentials) {
+          return ServiceResponse.notFound('User not found');
+        }
+
         const existingUser = await this.usersRepository.findOne(
           updateUserDto.email,
         );
 
-        if (existingUser && existingUser.id !== id) {
-          return { error: { message: 'Email already in use' }, data: null };
-        }
-      }
+        const existedUserCredentials =
+          await this.emailCredentialRepository.findOne(updateUserDto.email);
 
-      const updatedUser = await this.usersRepository.update(id, updateUserDto);
-      return ServiceResponse.success<User>(updatedUser);
+        if (
+          (existingUser && existingUser.id !== id) ||
+          (existedUserCredentials && existedUserCredentials.user_id !== id)
+        ) {
+          return ServiceResponse.conflict('Email already in use');
+        }
+
+        const updatedEmail = await this.transactionManager.transaction(
+          async (tx) => {
+            await this.emailCredentialRepository.updateEmail(
+              currentUser.email,
+              updateUserDto.email!,
+            );
+
+            const upd = await this.usersRepository.update(
+              id,
+              updateUserDto,
+              tx,
+            );
+
+            return upd;
+          },
+        );
+
+        return ServiceResponse.success<User>(updatedEmail);
+      } else {
+        const updatedUser = await this.usersRepository.update(
+          id,
+          updateUserDto,
+        );
+        return ServiceResponse.success<User>(updatedUser);
+      }
     } catch (error) {
       this.logger.error(error);
       return { error: { message: error.message }, data: null };

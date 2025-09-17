@@ -14,4 +14,9 @@ export interface IEmailCredentialsRepository {
     hashedPassword: string,
     tx?: unknown,
   ): Promise<EmailCredentials | null>;
+
+  updateEmail(
+    email: string,
+    newEmail: string,
+  ): Promise<EmailCredentials | null>;
 }

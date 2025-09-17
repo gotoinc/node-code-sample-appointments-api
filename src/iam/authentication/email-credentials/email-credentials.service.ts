@@ -76,6 +76,34 @@ export class EmailCredentialsService implements IEmailCredentialsService {
     }
   }
 
+  // async updateEmail(
+  //   email: string,
+  //   newEmail: string,
+  // ): Promise<IServiceResponse<string>> {
+  //   try {
+  //     const emailCredentials =
+  //       await this.emailCredentialsRepository.findOne(email);
+
+  //     if (!emailCredentials) return ServiceResponse.notFound('Email not found');
+
+  //     const existingEmailCredentials =
+  //       await this.emailCredentialsRepository.findOne(newEmail);
+
+  //     if (!existingEmailCredentials)
+  //       return ServiceResponse.conflict('Email already in use');
+
+  //     await this.emailCredentialsRepository.updateEmail(email, newEmail);
+
+  //     return ServiceResponse.success<string>(newEmail);
+  //   } catch (error) {
+  //     this.logger.error(error);
+  //     return {
+  //       error: { message: 'Error updating email' },
+  //       data: null,
+  //     };
+  //   }
+  // }
+
   async updatePassword(
     email: string,
     hashedPassword: string,

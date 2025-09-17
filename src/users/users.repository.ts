@@ -69,6 +69,14 @@ export class UsersRepository
     });
   }
 
+  async findById(id: number, tx?: unknown): Promise<User | null> {
+    const prisma = this.getClient(tx);
+
+    return await prisma.user.findUnique({
+      where: { id },
+    });
+  }
+
   async remove(id: number, tx?: unknown): Promise<User> {
     const prisma = this.getClient(tx);
 

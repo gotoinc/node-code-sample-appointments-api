@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { EmailCredentialsService } from './email-credentials.service';
 import { EmailCredentialsServiceSymbol } from './email-credentials.service.interface';
 import { PrismaTransactionManager } from 'src/database/prisma-transaction.service';
@@ -18,7 +18,7 @@ import { ILogger } from 'src/common/interfaces/logger.interface';
 import { Logger } from 'nestjs-pino';
 
 @Module({
-  imports: [UsersModule, RolesModule],
+  imports: [forwardRef(() => UsersModule), RolesModule],
   providers: [
     PrismaService,
     PrismaTransactionManager,
@@ -49,6 +49,6 @@ import { Logger } from 'nestjs-pino';
       ],
     },
   ],
-  exports: [EmailCredentialsServiceSymbol],
+  exports: [EmailCredentialsServiceSymbol, EmailCredentialsRepository],
 })
 export class EmailCredentialsModule {}

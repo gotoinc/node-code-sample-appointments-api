@@ -50,6 +50,7 @@ describe('EmailCredentialsService', () => {
     it('should create a new user successfully', async () => {
       const role = { id: 1, name: 'patient' };
       const user: User = {
+        avatar: null,
         id: 1,
         email: 'test@example.com',
         first_name: 'John',
