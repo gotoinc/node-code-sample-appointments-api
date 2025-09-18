@@ -27,8 +27,10 @@ import { handleServiceError } from 'src/common/handle-service-error';
 import { DoctorDto, GetDoctorQuery } from './dto/doctor.dto';
 import {
   ApiBadRequestResponse,
+  ApiBody,
   ApiForbiddenResponse,
   ApiNotFoundResponse,
+  ApiResponse,
   ApiServiceUnavailableResponse,
 } from '@nestjs/swagger';
 import {
@@ -39,6 +41,8 @@ import { DoctorIdParamDto } from 'src/timeslots/dto/doctor-id-param.dto';
 import { TemplateSchedule } from '@prisma/client';
 import { ZodValidationPipe } from 'nestjs-zod';
 import { CreateTemplateScheduleDto } from 'src/template_schedules/dto/createTemplateSchedule.dto';
+import { CreateDoctorsRatingDto } from './dto/create-doctor-rating.dto';
+import { DoctorsRatingDto } from './dto/doctor-rating.dto';
 
 @Auth('Jwt')
 @Controller('doctors')
@@ -163,6 +167,33 @@ export class DoctorsController {
     if (exception) throw exception;
     if (!data) throw new ServiceUnavailableException('Error creating template');
 
+    return data;
+  }
+
+  @ApiServiceUnavailableResponse({
+    description: 'Error creating doctors rating',
+  })
+  @ApiNotFoundResponse({ description: 'Doctor not found' })
+  @Roles('patient')
+  @Post('ratings')
+  @ApiBody({ type: CreateDoctorsRatingDto })
+  @ApiResponse({
+    status: 201,
+    description: 'Rating created',
+    type: DoctorsRatingDto,
+  })
+  async createDoctorRating(
+    @Body() body: CreateDoctorsRatingDto,
+    @Req() req: Request,
+  ): Promise<DoctorsRatingDto> {
+    const user = req.user!;
+    const { error, data } = await this.doctorsService.addDoctorRating(
+      body,
+      user.userId,
+    );
+    const exception = handleServiceError(error);
+    if (exception) throw exception;
+    if (!data) throw new ServiceUnavailableException('Error creating rating');
     return data;
   }
 }

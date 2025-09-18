@@ -81,7 +81,7 @@ export class DoctorsRepository
     const [data, total] = await Promise.all([
       prisma.doctor.findMany({
         where,
-        include: { user: true, specialization: true },
+        include: { user: true, specialization: true, doctorsRating: true },
         skip: query.offset ? Number(query.offset) : undefined,
         take: query.limit ? Number(query.limit) : undefined,
       }),
@@ -98,7 +98,11 @@ export class DoctorsRepository
 
     return await prisma.doctor.findUnique({
       where: { id },
-      include: { user: true, specialization: true },
+      include: {
+        user: true,
+        specialization: true,
+        doctorsRating: { include: { patient: { include: { user: true } } } },
+      },
     });
   }
 

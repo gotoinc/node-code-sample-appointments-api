@@ -16,12 +16,18 @@ import { TemplateScheduleModule } from 'src/template_schedules/template_schedule
 import { AppointmentsModule } from 'src/appointments/appointments.module';
 import { AppointmentsRepository } from 'src/appointments/appointments.repository';
 import { IAppointmentsRepository } from 'src/appointments/appointments.repository.interface';
+import { DoctorsRatingModule } from './doctors_rating/doctors_rating.module';
+import {
+  DoctorsRatingServiceSymbol,
+  IDoctorsRatingService,
+} from './doctors_rating/doctors_rating.service.interface';
 
 @Module({
   imports: [
     SpecializationsModule,
     forwardRef(() => TemplateScheduleModule),
     forwardRef(() => AppointmentsModule),
+    DoctorsRatingModule,
   ],
   controllers: [DoctorsController],
   providers: [
@@ -34,12 +40,14 @@ import { IAppointmentsRepository } from 'src/appointments/appointments.repositor
         doctorsRepository: IDoctorsRepository,
         specializationService: ISpecializationsService,
         appointmentsRepository: IAppointmentsRepository,
+        doctorsRatingService: IDoctorsRatingService,
       ) => {
         return new DoctorsService(
           logger,
           doctorsRepository,
           specializationService,
           appointmentsRepository,
+          doctorsRatingService,
         );
       },
       inject: [
@@ -47,6 +55,7 @@ import { IAppointmentsRepository } from 'src/appointments/appointments.repositor
         DoctorsRepository,
         SpecializationsServiceSymbol,
         AppointmentsRepository,
+        DoctorsRatingServiceSymbol,
       ],
     },
   ],

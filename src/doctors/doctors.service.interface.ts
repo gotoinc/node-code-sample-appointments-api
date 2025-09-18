@@ -2,6 +2,8 @@ import { IServiceResponse } from 'src/common/service-response';
 import { CreateDoctorDto } from './dto/create-doctor.dto';
 import { UpdateDoctorDto } from './dto/update-doctor.dto';
 import { DoctorDto, GetDoctorQuery } from './dto/doctor.dto';
+import { CreateDoctorsRatingDto } from './dto/create-doctor-rating.dto';
+import { DoctorsRatingDto } from './dto/doctor-rating.dto';
 
 export const DoctorsServiceSymbol = Symbol('DOCTORS_SERVICE');
 
@@ -19,4 +21,8 @@ export interface IDoctorsService {
     doctor: UpdateDoctorDto,
     userId: number,
   ): Promise<IServiceResponse<DoctorDto>>;
+  addDoctorRating(
+    doctorsRating: CreateDoctorsRatingDto,
+    patient_id: number,
+  ): Promise<IServiceResponse<DoctorsRatingDto | null>>;
 }
