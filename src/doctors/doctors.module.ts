@@ -21,6 +21,11 @@ import {
   DoctorsRatingServiceSymbol,
   IDoctorsRatingService,
 } from './doctors_rating/doctors_rating.service.interface';
+import { PatientsModule } from 'src/patients/patients.module';
+import {
+  IPatientsService,
+  PatientsServiceSymbol,
+} from 'src/patients/patients.service.interface';
 
 @Module({
   imports: [
@@ -28,6 +33,7 @@ import {
     forwardRef(() => TemplateScheduleModule),
     forwardRef(() => AppointmentsModule),
     DoctorsRatingModule,
+    PatientsModule,
   ],
   controllers: [DoctorsController],
   providers: [
@@ -41,6 +47,7 @@ import {
         specializationService: ISpecializationsService,
         appointmentsRepository: IAppointmentsRepository,
         doctorsRatingService: IDoctorsRatingService,
+        patientsService: IPatientsService,
       ) => {
         return new DoctorsService(
           logger,
@@ -48,6 +55,7 @@ import {
           specializationService,
           appointmentsRepository,
           doctorsRatingService,
+          patientsService,
         );
       },
       inject: [
@@ -56,6 +64,7 @@ import {
         SpecializationsServiceSymbol,
         AppointmentsRepository,
         DoctorsRatingServiceSymbol,
+        PatientsServiceSymbol,
       ],
     },
   ],

@@ -12,6 +12,7 @@ import { IAppointmentsRepository } from 'src/appointments/appointments.repositor
 import { CreateDoctorsRatingDto } from './dto/create-doctor-rating.dto';
 import { DoctorsRatingDto } from './dto/doctor-rating.dto';
 import { IDoctorsRatingService } from './doctors_rating/doctors_rating.service.interface';
+import { IPatientsService } from 'src/patients/patients.service.interface';
 
 export class DoctorsService implements IDoctorsService {
   constructor(
@@ -20,6 +21,7 @@ export class DoctorsService implements IDoctorsService {
     private readonly specializationsService: ISpecializationsService,
     private readonly appointmentsRepository: IAppointmentsRepository,
     private readonly doctorsRatingService: IDoctorsRatingService,
+    private readonly patientsService: IPatientsService,
   ) {}
 
   async create(
@@ -176,9 +178,15 @@ export class DoctorsService implements IDoctorsService {
 
   async addDoctorRating(
     doctorsRating: CreateDoctorsRatingDto,
-    patient_id: number,
+    user_id: number,
   ): Promise<IServiceResponse<DoctorsRatingDto | null>> {
     try {
+      const { data: patient, error: patientError } =
+        await this.patientsService.findByUserId(user_id);
+      if (!patient || patientError) {
+        return ServiceResponse.notFound('Patient not found');
+      }
+
       const existingDoctor = this.doctorsRepository.findOne(
         doctorsRating.doctor_id,
       );
@@ -187,7 +195,7 @@ export class DoctorsService implements IDoctorsService {
       }
       const { error, data } = await this.doctorsRatingService.create(
         doctorsRating,
-        patient_id,
+        patient.id,
       );
 
       if (error) {

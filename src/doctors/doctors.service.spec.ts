@@ -9,6 +9,8 @@ import { ISpecializationsService } from 'src/specializations/specializations.ser
 import { ResponseStatus } from 'src/common/service-response';
 import { IAppointmentsRepository } from 'src/appointments/appointments.repository.interface';
 import { GetDoctorQuery } from './dto/doctor.dto';
+import { IPatientsService } from 'src/patients/patients.service.interface';
+import { IDoctorsRatingService } from './doctors_rating/doctors_rating.service.interface';
 
 function createMockDoctor(overrides = {}): DoctorReturnType {
   return {
@@ -68,6 +70,17 @@ const mockAppointmentsRepository: jest.Mocked<IAppointmentsRepository> = {
   update: jest.fn(),
 };
 
+const mockPatientsService: jest.Mocked<IPatientsService> = {
+  findAll: jest.fn(),
+  findByUserId: jest.fn(),
+  create: jest.fn(),
+  findById: jest.fn(),
+  update: jest.fn(),
+};
+const mockDoctorsRatingService: jest.Mocked<IDoctorsRatingService> = {
+  create: jest.fn(),
+};
+
 describe('DoctorsService', () => {
   let service: IDoctorsService;
 
@@ -77,6 +90,8 @@ describe('DoctorsService', () => {
       mockDoctorsRepository,
       mockSpecializationsService,
       mockAppointmentsRepository,
+      mockDoctorsRatingService,
+      mockPatientsService,
     );
   });
 
