@@ -147,6 +147,7 @@ const mockDoctorsService: jest.Mocked<IDoctorsService> = {
   findAll: jest.fn(),
   create: jest.fn(),
   update: jest.fn(),
+  addDoctorRating: jest.fn(),
 };
 
 const mockTransactionManager: jest.Mocked<ITransactionManager> = {

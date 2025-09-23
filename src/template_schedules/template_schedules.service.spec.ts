@@ -50,6 +50,7 @@ const mockTemplateRepository: jest.Mocked<ITemplateScheduleRepository> = {
 
 const mockDoctorsService: jest.Mocked<IDoctorsService> = {
   findOne: jest.fn(),
+  addDoctorRating: jest.fn(),
   findByUserId: jest.fn(),
   findAll: jest.fn(),
   create: jest.fn(),

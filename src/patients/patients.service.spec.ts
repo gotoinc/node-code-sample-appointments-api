@@ -15,6 +15,7 @@ function createMockPatient(overrides = {}): PatientReturnType {
     date_of_birth: new Date(),
     gender: 'male',
     user: {
+      avatar: null,
       user_role_id: 1,
       id: 1,
       first_name: 'John',
