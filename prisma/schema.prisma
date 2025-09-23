@@ -34,15 +34,16 @@ model UserRole {
 }
 
 model Patient {
-  id            Int           @id @default(autoincrement())
-  date_of_birth DateTime      @db.Date
+  id            Int             @id @default(autoincrement())
+  date_of_birth DateTime        @db.Date
   gender        String
   address       String?
-  created_at    DateTime      @default(now())
-  updated_at    DateTime      @default(now())
-  user_id       Int           @unique @map("fk_user_id")
-  user          User          @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  created_at    DateTime        @default(now())
+  updated_at    DateTime        @default(now())
+  user_id       Int             @unique @map("fk_user_id")
+  user          User            @relation(fields: [user_id], references: [id], onDelete: Cascade)
   appointments  Appointment[]
+  DoctorsRating DoctorsRating[]
 
   @@map("patients")
 }
@@ -60,7 +61,8 @@ model Doctor {
   specialization     Specialization     @relation(fields: [specialization_id], references: [id])
   timeslots          Timeslot[]
   appointments       Appointment[]
-  TemplateSchedule   TemplateSchedule[]
+  templateSchedule   TemplateSchedule[]
+  doctorsRating      DoctorsRating[]
 
   @@map("doctors")
 }
@@ -155,4 +157,18 @@ model AppointmentResult {
   recommendations String
 
   @@map("appointment_result")
+}
+
+model DoctorsRating {
+  id         Int      @id @default(autoincrement())
+  doctor_id  Int      @map("fk_doctor_id")
+  patient_id Int      @map("fk_patient_id")
+  rating     Int
+  review     String?
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now())
+  doctor     Doctor   @relation(fields: [doctor_id], references: [id], onDelete: Cascade)
+  patient    Patient  @relation(fields: [patient_id], references: [id], onDelete: Cascade)
+
+  @@map("doctors_rating")
 }

@@ -9,6 +9,10 @@ import { ISpecializationsService } from 'src/specializations/specializations.ser
 import { ILogger } from 'src/common/interfaces/logger.interface';
 import { DoctorDto, GetDoctorQuery } from './dto/doctor.dto';
 import { IAppointmentsRepository } from 'src/appointments/appointments.repository.interface';
+import { CreateDoctorsRatingDto } from './dto/create-doctor-rating.dto';
+import { DoctorsRatingDto } from './dto/doctor-rating.dto';
+import { IDoctorsRatingService } from './doctors_rating/doctors_rating.service.interface';
+import { IPatientsService } from 'src/patients/patients.service.interface';
 
 export class DoctorsService implements IDoctorsService {
   constructor(
@@ -16,6 +20,8 @@ export class DoctorsService implements IDoctorsService {
     private readonly doctorsRepository: IDoctorsRepository,
     private readonly specializationsService: ISpecializationsService,
     private readonly appointmentsRepository: IAppointmentsRepository,
+    private readonly doctorsRatingService: IDoctorsRatingService,
+    private readonly patientsService: IPatientsService,
   ) {}
 
   async create(
@@ -167,6 +173,39 @@ export class DoctorsService implements IDoctorsService {
     } catch (error) {
       this.logger.error(error);
       return { error: { message: 'Error updating doctor' }, data: null };
+    }
+  }
+
+  async addDoctorRating(
+    doctorsRating: CreateDoctorsRatingDto,
+    user_id: number,
+  ): Promise<IServiceResponse<DoctorsRatingDto | null>> {
+    try {
+      const { data: patient, error: patientError } =
+        await this.patientsService.findByUserId(user_id);
+      if (!patient || patientError) {
+        return ServiceResponse.notFound('Patient not found');
+      }
+
+      const existingDoctor = this.doctorsRepository.findOne(
+        doctorsRating.doctor_id,
+      );
+      if (!existingDoctor) {
+        return ServiceResponse.notFound('Doctor not found');
+      }
+      const { error, data } = await this.doctorsRatingService.create(
+        doctorsRating,
+        patient.id,
+      );
+
+      if (error) {
+        return { data: null, error };
+      }
+
+      return ServiceResponse.success(data);
+    } catch (error) {
+      this.logger.error(error);
+      return ServiceResponse.invalidData('Error adding doctor rating');
     }
   }
 }
