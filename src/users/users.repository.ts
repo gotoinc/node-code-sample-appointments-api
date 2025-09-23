@@ -65,6 +65,7 @@ export class UsersRepository
         ...(user.first_name && { first_name: user.first_name }),
         ...(user.last_name && { last_name: user.last_name }),
         ...(user.email && { email: user.email }),
+        ...(user.avatar !== undefined && { avatar: user.avatar }),
       },
     });
   }

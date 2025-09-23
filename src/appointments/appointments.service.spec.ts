@@ -76,6 +76,7 @@ function createMockDoctor(overrides = {}): DoctorReturnType {
       email: 'doctor@example.com',
       first_name: 'John',
       last_name: 'Doe',
+      avatar: null, // Added avatar field
       created_at: new Date(),
       updated_at: new Date(),
       user_role_id: 2,
@@ -91,6 +92,7 @@ function createMockPatient(overrides = {}): PatientReturnType {
     date_of_birth: new Date(),
     gender: 'male',
     user: {
+      avatar: null,
       user_role_id: 1,
       id: 1,
       first_name: 'John',
@@ -136,6 +138,7 @@ const mockTimeslotsRepository: jest.Mocked<ITimeslotsRepository> = {
   findManyByDoctorId: jest.fn(),
   findCollisions: jest.fn(),
   createMany: jest.fn(),
+  delete: jest.fn(),
 };
 
 const mockDoctorsService: jest.Mocked<IDoctorsService> = {

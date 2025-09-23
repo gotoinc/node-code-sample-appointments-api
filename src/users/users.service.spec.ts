@@ -7,6 +7,7 @@ import { ResponseStatus } from 'src/common/service-response';
 import { ITransactionManager } from 'src/common/interfaces/transaction-manager.interface';
 import { IEmailCredentialsRepository } from 'src/iam/authentication/email-credentials/email-credentials.repository.interface';
 import { EmailCredentials, User } from '@prisma/client';
+import { IMinioService } from 'src/minio-module/minio.service.interface';
 
 const getMockUser = (overrides: Partial<User>): User => {
   return {
@@ -66,6 +67,12 @@ const mockEmailCredentialsRepository: jest.Mocked<IEmailCredentialsRepository> =
     updatePassword: jest.fn(),
   };
 
+const mockMinioService: jest.Mocked<IMinioService> = {
+  uploadFile: jest.fn(),
+  getFile: jest.fn(),
+  deleteFile: jest.fn(),
+};
+
 describe('UsersService', () => {
   let service: IUsersService;
 
@@ -76,6 +83,7 @@ describe('UsersService', () => {
       mockRolesService,
       mockEmailCredentialsRepository,
       mockTransactionManager,
+      mockMinioService,
     );
   });
 

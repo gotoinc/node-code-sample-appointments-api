@@ -9,6 +9,8 @@ import { ILogger } from 'src/common/interfaces/logger.interface';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ITransactionManager } from 'src/common/interfaces/transaction-manager.interface';
 import { IEmailCredentialsRepository } from 'src/iam/authentication/email-credentials/email-credentials.repository.interface';
+import Multer from 'multer';
+import { IMinioService } from 'src/minio-module/minio.service.interface';
 
 export class UsersService implements IUsersService {
   constructor(
@@ -17,6 +19,7 @@ export class UsersService implements IUsersService {
     private readonly rolesService: IRolesService,
     private readonly emailCredentialRepository: IEmailCredentialsRepository,
     private readonly transactionManager: ITransactionManager,
+    private readonly minioService: IMinioService,
   ) {}
 
   async create(user: CreateUserDto): Promise<IServiceResponse<User>> {
@@ -137,6 +140,62 @@ export class UsersService implements IUsersService {
 
       await this.usersRepository.remove(id);
       return ServiceResponse.success<User>(user);
+    } catch (error) {
+      this.logger.error(error);
+      return { error: { message: error.message }, data: null };
+    }
+  }
+
+  async uploadAvatar(
+    userId: number,
+    file: Multer.File,
+  ): Promise<IServiceResponse<string>> {
+    try {
+      const user = await this.usersRepository.findById(userId);
+      const oldAvatar = user?.avatar?.split('/').pop();
+
+      const bucketName = process.env.MINIO_BUCKET!;
+      const objectName = `avatar-${userId}-${Date.now()}`;
+      const uploadResult = await this.minioService.uploadFile(
+        bucketName,
+        objectName,
+        file.buffer,
+        file.mimetype,
+      );
+
+      if (uploadResult.error) {
+        return { error: uploadResult.error, data: null };
+      }
+
+      const avatarUrl = `/${bucketName}/${objectName}`;
+
+      await this.usersRepository.update(userId, {
+        avatar: avatarUrl,
+      });
+
+      if (oldAvatar) {
+        await this.minioService.deleteFile(bucketName, oldAvatar);
+      }
+
+      return ServiceResponse.success<string>(avatarUrl);
+    } catch (error) {
+      this.logger.error(error);
+      return { error: { message: error.message }, data: null };
+    }
+  }
+
+  async removeAvatar(userId: number): Promise<IServiceResponse<boolean>> {
+    try {
+      const user = await this.usersRepository.findById(userId);
+      const oldAvatar = user?.avatar?.split('/').pop();
+      const bucketName = process.env.MINIO_BUCKET!;
+
+      if (oldAvatar) {
+        await this.minioService.deleteFile(bucketName, oldAvatar);
+      }
+
+      await this.usersRepository.update(userId, { avatar: null });
+      return ServiceResponse.success<boolean>(true);
     } catch (error) {
       this.logger.error(error);
       return { error: { message: error.message }, data: null };

@@ -25,6 +25,7 @@ function createMockDoctor(overrides = {}): DoctorReturnType {
       name: 'Doctor',
     },
     user: {
+      avatar: null,
       id: 1,
       email: 'doctor@example.com',
       first_name: 'John',

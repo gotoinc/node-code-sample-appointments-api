@@ -13,6 +13,11 @@ import {
 } from 'src/roles/roles.service.interface';
 import { Logger } from 'nestjs-pino';
 import { ILogger } from 'src/common/interfaces/logger.interface';
+import { MinioModule } from 'src/minio-module/minio.module';
+import {
+  IMinioService,
+  MinioServiceSymbol,
+} from 'src/minio-module/minio.service.interface';
 import { EmailCredentialsModule } from 'src/iam/authentication/email-credentials/email-credentials.module';
 import { ITransactionManager } from 'src/common/interfaces/transaction-manager.interface';
 import { PrismaTransactionManager } from 'src/database/prisma-transaction.service';
@@ -20,7 +25,7 @@ import { IEmailCredentialsRepository } from 'src/iam/authentication/email-creden
 import { EmailCredentialsRepository } from 'src/iam/authentication/email-credentials/email-credentials.repository';
 
 @Module({
-  imports: [RolesModule, forwardRef(() => EmailCredentialsModule)],
+  imports: [RolesModule, forwardRef(() => EmailCredentialsModule), MinioModule],
   controllers: [UsersController],
   providers: [
     PrismaService,
@@ -34,6 +39,7 @@ import { EmailCredentialsRepository } from 'src/iam/authentication/email-credent
         rolesService: IRolesService,
         emailCredentialService: IEmailCredentialsRepository,
         transactionManager: ITransactionManager,
+        minioService: IMinioService,
       ) => {
         return new UsersService(
           logger,
@@ -41,6 +47,7 @@ import { EmailCredentialsRepository } from 'src/iam/authentication/email-credent
           rolesService,
           emailCredentialService,
           transactionManager,
+          minioService,
         );
       },
       inject: [
@@ -49,6 +56,7 @@ import { EmailCredentialsRepository } from 'src/iam/authentication/email-credent
         RolesServiceSymbol,
         EmailCredentialsRepository,
         PrismaTransactionManager,
+        MinioServiceSymbol,
       ],
     },
     JwtAuthGuard,
