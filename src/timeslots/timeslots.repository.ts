@@ -90,6 +90,7 @@ export class TimeslotsRepository
       },
     });
   }
+
   async createMany(
     timeslots: TimeslotEntity[],
     tx?: unknown,

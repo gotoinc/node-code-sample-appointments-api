@@ -176,6 +176,7 @@ export class AppointmentsService implements IAppointmentsService {
       return { error: { message: 'Error declining appointment' }, data: null };
     }
   }
+
   async isUserInAppointment(
     appointmentId: number,
     userId: number,

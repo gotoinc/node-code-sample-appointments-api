@@ -38,6 +38,7 @@ export class EmailCredentialsRepository
       },
     });
   }
+
   async updatePassword(
     email: string,
     hashedPassword: string,

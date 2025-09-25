@@ -18,6 +18,7 @@ export interface IServiceResponse<T> {
 
 export class ServiceResponse<T> implements IServiceResponse<T> {
   data: IServiceResponse<T>['data'];
+
   error: IServiceResponse<T>['error'];
 
   constructor(

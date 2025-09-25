@@ -4,6 +4,7 @@ import { PatientDto } from 'src/patients/dto/patient.dto';
 
 export class DoctorsRatingDto {
   id: number;
+
   rating: number;
 
   review: string | null;

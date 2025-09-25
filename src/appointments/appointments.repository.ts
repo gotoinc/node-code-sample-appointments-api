@@ -192,6 +192,7 @@ export class AppointmentsRepository
 
     return { count: totalAppointments };
   }
+
   async countPatientsByDoctorId(
     doctorId: number,
     tx?: unknown,

@@ -60,6 +60,7 @@ export class AppointmentsResultRepository
       },
     });
   }
+
   update(
     appointmentResult: Partial<AppointmentResultEntity>,
     tx?: unknown,
