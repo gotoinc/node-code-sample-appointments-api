@@ -12,6 +12,7 @@ import { IPatientsService } from 'src/patients/patients.service.interface';
 import { ResponseStatus } from 'src/common/service-response';
 import { DoctorReturnType } from 'src/doctors/doctors.repository.interface';
 import { PatientReturnType } from 'src/patients/patients.repository.interface';
+import { IAppointmentsResultService } from './appointments_result/appointments_result.service.interface';
 
 function createMockAppointment(overrides = {}): AppointmentReturnType {
   return {
@@ -153,6 +154,10 @@ const mockDoctorsService: jest.Mocked<IDoctorsService> = {
 const mockTransactionManager: jest.Mocked<ITransactionManager> = {
   transaction: jest.fn(),
 };
+const mockAppointmentsResultService: jest.Mocked<IAppointmentsResultService> = {
+  create: jest.fn(),
+  update: jest.fn(),
+};
 
 describe('AppointmentsService', () => {
   let service: IAppointmentsService;
@@ -165,6 +170,7 @@ describe('AppointmentsService', () => {
       mockTimeslotsRepository,
       mockDoctorsService,
       mockTransactionManager,
+      mockAppointmentsResultService,
     );
   });
 

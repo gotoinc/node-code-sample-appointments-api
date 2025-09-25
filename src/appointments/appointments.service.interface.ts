@@ -1,6 +1,8 @@
 import { IServiceResponse } from 'src/common/service-response';
 import { CreateAppointmentDto } from './dto/create-appointment.dto';
 import { AppointmentDto } from './dto/appointment.dto';
+import { AppointmentResultDto } from './dto/appointment-result.dto';
+import { UpdateAppointmentResultDto } from './dto/update-appointment-result.dto';
 
 export const AppointmentsServiceSymbol = Symbol('APPOINTMENTS_SERVICE');
 
@@ -27,4 +29,8 @@ export interface IAppointmentsService {
     appointmentId: number,
     userId: number,
   ): Promise<IServiceResponse<AppointmentDto>>;
+  updateResults(
+    body: UpdateAppointmentResultDto,
+    userId: number,
+  ): Promise<IServiceResponse<AppointmentResultDto>>;
 }

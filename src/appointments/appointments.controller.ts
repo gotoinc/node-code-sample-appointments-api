@@ -196,25 +196,10 @@ export class AppointmentsController {
     @Req() req: Request,
   ): Promise<AppointmentResultDto> {
     const user = req.user!;
-    const { error: appointmentError } = await this.appointmentsService.findById(
-      body.appointmentId,
+    const { error, data } = await this.appointmentsService.updateResults(
+      body,
+      user.userId,
     );
-    if (appointmentError) {
-      throw new ServiceUnavailableException('Error finding appointment');
-    }
-
-    const { data: isUserInAppointment } =
-      await this.appointmentsService.isUserInAppointment(
-        body.appointmentId,
-        user.userId,
-      );
-
-    if (!isUserInAppointment?.included) {
-      throw new ForbiddenException('User is not in appointment');
-    }
-
-    const { error, data } = await this.appointmentsResultService.update(body);
-
     const exception = handleServiceError(error);
     if (exception) throw exception;
     if (!data)

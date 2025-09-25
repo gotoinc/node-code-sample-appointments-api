@@ -12,6 +12,10 @@ import { ITransactionManager } from 'src/common/interfaces/transaction-manager.i
 import { ITimeslotsRepository } from 'src/timeslots/timeslots.repository.interface';
 import { ILogger } from 'src/common/interfaces/logger.interface';
 import { AppointmentDto } from './dto/appointment.dto';
+import { IAppointmentsResultService } from './appointments_result/appointments_result.service.interface';
+import { handleServiceError } from 'src/common/handle-service-error';
+import { UpdateAppointmentResultDto } from './dto/update-appointment-result.dto';
+import { AppointmentResultDto } from './dto/appointment-result.dto';
 
 type AppointmentDeclinedFields = {
   doctor: 'declined_by_doctor';
@@ -25,6 +29,7 @@ export class AppointmentsService implements IAppointmentsService {
     private readonly timeslotsRepository: ITimeslotsRepository,
     private readonly doctorsService: IDoctorsService,
     private readonly transactionManager: ITransactionManager,
+    private readonly appointmentsResultService: IAppointmentsResultService,
   ) {}
 
   private declinedFieldByRole: AppointmentDeclinedFields = {
@@ -208,5 +213,44 @@ export class AppointmentsService implements IAppointmentsService {
       },
       error: null,
     };
+  }
+
+  async updateResults(
+    body: UpdateAppointmentResultDto,
+    userId: number,
+  ): Promise<IServiceResponse<AppointmentResultDto>> {
+    try {
+      const { error: appointmentError } = await this.findById(
+        body.appointmentId,
+      );
+      if (appointmentError) {
+        return ServiceResponse.notFound('Error finding appointment');
+      }
+
+      const { data: isUserInAppointment } = await this.isUserInAppointment(
+        body.appointmentId,
+        userId,
+      );
+
+      if (!isUserInAppointment?.included) {
+        return ServiceResponse.forbidden('User is not in appointment');
+      }
+
+      const { error, data } = await this.appointmentsResultService.update(body);
+
+      if (error) {
+        return { error, data: null };
+      }
+      if (!data) {
+        return ServiceResponse.conflict('Error updating appointment result');
+      }
+
+      return ServiceResponse.success<AppointmentResultDto>(data);
+    } catch (error) {
+      const exception = handleServiceError(error);
+      if (exception) throw exception;
+      this.logger.error(error);
+      return ServiceResponse.invalidData('Error updating appointment result');
+    }
   }
 }
