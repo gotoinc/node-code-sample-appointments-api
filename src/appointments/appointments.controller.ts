@@ -5,8 +5,8 @@ import {
   Get,
   Inject,
   Param,
+  Patch,
   Post,
-  Put,
   Req,
   ServiceUnavailableException,
 } from '@nestjs/common';
@@ -190,7 +190,7 @@ export class AppointmentsController {
   @ApiResponse({ type: AppointmentResultDto })
   @ApiForbiddenResponse({ description: 'User is not in appointment ' })
   @Roles('doctor')
-  @Put('result')
+  @Patch('result')
   async updateResult(
     @Body() body: UpdateAppointmentResultDto,
     @Req() req: Request,

@@ -4,8 +4,8 @@ import {
   Delete,
   Get,
   Inject,
+  Patch,
   Post,
-  Put,
   Req,
   UploadedFile,
   UseInterceptors,
@@ -35,7 +35,7 @@ export class UsersController {
     return data;
   }
 
-  @Put('me')
+  @Patch('me')
   async update(@Req() req: Request, @Body() body: UpdateUserDto) {
     const user = req.user!;
     const { error, data } = await this.usersService.update(user.userId, body);

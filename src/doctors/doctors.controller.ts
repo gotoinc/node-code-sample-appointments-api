@@ -6,8 +6,8 @@ import {
   Inject,
   NotFoundException,
   Param,
+  Patch,
   Post,
-  Put,
   Query,
   Req,
   ServiceUnavailableException,
@@ -116,7 +116,7 @@ export class DoctorsController {
   })
   @ApiBadRequestResponse({ description: 'Specialization not found' })
   @Roles('doctor')
-  @Put('me')
+  @Patch('me')
   async update(
     @Body() body: UpdateDoctorDto,
     @Req() req: Request,

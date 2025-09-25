@@ -180,7 +180,7 @@
           "Users"
         ]
       },
-      "put": {
+      "patch": {
         "operationId": "UsersController_update",
         "parameters": [],
         "requestBody": {
@@ -448,7 +448,7 @@
           "Doctors"
         ]
       },
-      "put": {
+      "patch": {
         "operationId": "DoctorsController_update",
         "parameters": [],
         "requestBody": {
@@ -870,7 +870,7 @@
           "Appointments"
         ]
       },
-      "put": {
+      "patch": {
         "operationId": "AppointmentsController_updateResult",
         "parameters": [],
         "requestBody": {
@@ -1044,7 +1044,7 @@
           "Patients"
         ]
       },
-      "put": {
+      "patch": {
         "operationId": "PatientsController_update",
         "parameters": [],
         "requestBody": {
