@@ -1,8 +1,15 @@
-import { IsNotEmpty, IsNumber, IsString, Max, Min } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+  Max,
+  Min,
+} from 'class-validator';
 
 export class CreateDoctorsRatingDto {
-  @IsNotEmpty()
   @IsNumber()
+  @Min(1, { message: 'Doctor ID must be a positive number' })
   doctor_id: number;
 
   @IsNotEmpty()
@@ -11,6 +18,7 @@ export class CreateDoctorsRatingDto {
   @Max(5, { message: 'Rating must be between 1 and 5' })
   rating: number;
 
+  @IsOptional()
   @IsString()
   review: string;
 }

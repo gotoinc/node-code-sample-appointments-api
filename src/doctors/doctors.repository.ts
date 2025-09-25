@@ -6,8 +6,8 @@ import {
 } from './doctors.repository.interface';
 import { DoctorEntity } from './entities/doctor.entity';
 import { PrismaService } from 'src/database/prisma.service';
-import { GetDoctorQuery } from './dto/doctor.dto';
 import { Prisma } from '@prisma/client';
+import { GetDoctorQuery } from './dto/get-doctor-query.dto';
 
 @Injectable()
 export class DoctorsRepository

@@ -1506,7 +1506,8 @@
         "type": "object",
         "properties": {
           "doctor_id": {
-            "type": "number"
+            "type": "number",
+            "minimum": 1
           },
           "rating": {
             "type": "number",

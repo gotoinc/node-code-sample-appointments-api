@@ -8,7 +8,7 @@ import { IDoctorsService } from './doctors.service.interface';
 import { ISpecializationsService } from 'src/specializations/specializations.service.interface';
 import { ResponseStatus } from 'src/common/service-response';
 import { IAppointmentsRepository } from 'src/appointments/appointments.repository.interface';
-import { GetDoctorQuery } from './dto/doctor.dto';
+import { GetDoctorQuery } from './dto/get-doctor-query.dto';
 import { IPatientsService } from 'src/patients/patients.service.interface';
 import { IDoctorsRatingService } from './doctors_rating/doctors_rating.service.interface';
 

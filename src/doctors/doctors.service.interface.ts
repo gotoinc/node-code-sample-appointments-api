@@ -1,7 +1,8 @@
 import { IServiceResponse } from 'src/common/service-response';
 import { CreateDoctorDto } from './dto/create-doctor.dto';
 import { UpdateDoctorDto } from './dto/update-doctor.dto';
-import { DoctorDto, GetDoctorQuery } from './dto/doctor.dto';
+import { DoctorDto } from './dto/doctor.dto';
+import { GetDoctorQuery } from './dto/get-doctor-query.dto';
 import { CreateDoctorsRatingDto } from './dto/create-doctor-rating.dto';
 import { DoctorsRatingDto } from './dto/doctor-rating.dto';
 

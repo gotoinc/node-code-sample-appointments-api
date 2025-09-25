@@ -24,7 +24,8 @@ import { UpdateDoctorDto } from './dto/update-doctor.dto';
 import { IdParamDto } from 'src/common/dto/id-param.dto';
 import { Request } from 'express';
 import { handleServiceError } from 'src/common/handle-service-error';
-import { DoctorDto, GetDoctorQuery } from './dto/doctor.dto';
+import { DoctorDto } from './dto/doctor.dto';
+import { GetDoctorQuery } from './dto/get-doctor-query.dto';
 import {
   ApiBadRequestResponse,
   ApiBody,

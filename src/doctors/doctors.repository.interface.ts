@@ -1,6 +1,7 @@
 import { Doctor, Specialization, User } from '@prisma/client';
 import { DoctorEntity } from './entities/doctor.entity';
-import { GetDoctorQuery } from './dto/doctor.dto';
+
+import { GetDoctorQuery } from './dto/get-doctor-query.dto';
 
 export type DoctorReturnType = Doctor & {
   specialization: Specialization;
