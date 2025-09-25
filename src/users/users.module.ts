@@ -25,7 +25,11 @@ import { IEmailCredentialsRepository } from 'src/iam/authentication/email-creden
 import { EmailCredentialsRepository } from 'src/iam/authentication/email-credentials/email-credentials.repository';
 
 @Module({
-  imports: [RolesModule, forwardRef(() => EmailCredentialsModule), MinioModule],
+  imports: [
+    RolesModule,
+    forwardRef(() => EmailCredentialsModule),
+    MinioModule.register(process.env.MINIO_BUCKET || 'default-bucket'),
+  ],
   controllers: [UsersController],
   providers: [
     PrismaService,

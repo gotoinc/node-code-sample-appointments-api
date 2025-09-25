@@ -1,4 +1,4 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
+import { OnModuleInit } from '@nestjs/common';
 import {
   S3Client,
   PutObjectCommand,
@@ -10,11 +10,13 @@ import { ILogger } from 'src/common/interfaces/logger.interface';
 import { IServiceResponse, ServiceResponse } from 'src/common/service-response';
 import { IMinioService } from './minio.service.interface';
 
-@Injectable()
 export class MinioService implements OnModuleInit, IMinioService {
   private s3: S3Client;
 
-  constructor(private readonly logger: ILogger) {}
+  constructor(
+    private readonly logger: ILogger,
+    private readonly bucketName: string,
+  ) {}
 
   onModuleInit() {
     const accessKeyId = process.env.MINIO_ACCESS_KEY ?? '';
@@ -32,13 +34,12 @@ export class MinioService implements OnModuleInit, IMinioService {
   }
 
   async uploadFile(
-    bucket: string,
     key: string,
     body: Buffer,
     mimetype: string,
   ): Promise<IServiceResponse<PutObjectCommandOutput>> {
     const command = new PutObjectCommand({
-      Bucket: bucket,
+      Bucket: this.bucketName,
       Key: key,
       Body: body,
       ContentType: mimetype,
@@ -53,9 +54,9 @@ export class MinioService implements OnModuleInit, IMinioService {
     }
   }
 
-  async getFile(bucket: string, key: string) {
+  async getFile(key: string) {
     const command = new GetObjectCommand({
-      Bucket: bucket,
+      Bucket: this.bucketName,
       Key: key,
     });
     try {
@@ -67,12 +68,9 @@ export class MinioService implements OnModuleInit, IMinioService {
     }
   }
 
-  async deleteFile(
-    bucket: string,
-    key: string,
-  ): Promise<IServiceResponse<string>> {
+  async deleteFile(key: string): Promise<IServiceResponse<string>> {
     const command = new DeleteObjectCommand({
-      Bucket: bucket,
+      Bucket: this.bucketName,
       Key: key,
     });
     try {

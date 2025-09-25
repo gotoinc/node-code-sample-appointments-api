@@ -4,16 +4,21 @@ import { ILogger } from 'src/common/interfaces/logger.interface';
 import { MinioServiceSymbol } from './minio.service.interface';
 import { Logger } from 'nestjs-pino';
 
-@Module({
-  providers: [
-    {
-      provide: MinioServiceSymbol,
-      useFactory: (logger: ILogger) => {
-        return new MinioService(logger);
-      },
-      inject: [Logger],
-    },
-  ],
-  exports: [MinioServiceSymbol],
-})
-export class MinioModule {}
+@Module({})
+export class MinioModule {
+  static register(bucketName: string) {
+    return {
+      module: MinioModule,
+      providers: [
+        {
+          provide: MinioServiceSymbol,
+          useFactory: (logger: ILogger) => {
+            return new MinioService(logger, bucketName);
+          },
+          inject: [Logger],
+        },
+      ],
+      exports: [MinioServiceSymbol],
+    };
+  }
+}

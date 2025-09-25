@@ -157,7 +157,6 @@ export class UsersService implements IUsersService {
       const bucketName = process.env.MINIO_BUCKET!;
       const objectName = `avatar-${userId}-${Date.now()}`;
       const uploadResult = await this.minioService.uploadFile(
-        bucketName,
         objectName,
         file.buffer,
         file.mimetype,
@@ -174,7 +173,7 @@ export class UsersService implements IUsersService {
       });
 
       if (oldAvatar) {
-        await this.minioService.deleteFile(bucketName, oldAvatar);
+        await this.minioService.deleteFile(oldAvatar);
       }
 
       return ServiceResponse.success<string>(avatarUrl);
@@ -188,10 +187,9 @@ export class UsersService implements IUsersService {
     try {
       const user = await this.usersRepository.findById(userId);
       const oldAvatar = user?.avatar?.split('/').pop();
-      const bucketName = process.env.MINIO_BUCKET!;
 
       if (oldAvatar) {
-        await this.minioService.deleteFile(bucketName, oldAvatar);
+        await this.minioService.deleteFile(oldAvatar);
       }
 
       await this.usersRepository.update(userId, { avatar: null });
