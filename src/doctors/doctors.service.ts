@@ -83,7 +83,6 @@ export class DoctorsService implements IDoctorsService {
   async findOne(id: number): Promise<IServiceResponse<DoctorDto | null>> {
     try {
       const doctor = await this.doctorsRepository.findOne(id);
-      console.log(doctor);
       const appointmentsCount =
         await this.appointmentsRepository.countAppointmentsByDoctorId(id);
 
