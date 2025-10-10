@@ -12,6 +12,9 @@ function createMockAppointment(overrides = {}): AppointmentReturnType {
     declined_by_doctor: null,
     declined_by_patient: null,
     doctor: {
+      hospital_address: 'hospital adress test',
+      hospital_name: 'hospital name test',
+      professional_since: new Date('2016-10-30T00:00:00.000Z'),
       id: 1,
       phone_number: '1234567890',
       licence_number: 'XYZ123',
@@ -49,6 +52,17 @@ function createMockAppointment(overrides = {}): AppointmentReturnType {
   };
 }
 
+function createMockResults(overrides = {}) {
+  return {
+    id: 1,
+    appointment_id: 1,
+    diagnosis: 'Diagnosis',
+    recommendations: 'Recommendations',
+    appointment: createMockAppointment(),
+    ...overrides,
+  };
+}
+
 const mockLogger: jest.Mocked<ILogger> = {
   log: jest.fn(),
   error: jest.fn(),
@@ -61,12 +75,15 @@ const mockAppointmentsRepository: jest.Mocked<IAppointmentsRepository> = {
   findByPatientId: jest.fn(),
   create: jest.fn(),
   update: jest.fn(),
+  countAppointmentsByDoctorId: jest.fn(),
+  countPatientsByDoctorId: jest.fn(),
 };
 
 const mockAppointmentsResultRepository: jest.Mocked<IAppointmentsResultRepository> =
   {
     create: jest.fn(),
     findByAppointmentId: jest.fn(),
+    update: jest.fn(),
   };
 
 describe('AppointmentsResultService', () => {
@@ -112,6 +129,89 @@ describe('AppointmentsResultService', () => {
       expect(result.data).not.toBeNull();
       expect(result.data?.diagnosis).toBe('Diagnosis');
       expect(result.data?.recommendations).toBe('Recommendations');
+    });
+
+    it('should return conflict if result already exists', async () => {
+      const appointment = createMockAppointment();
+      const appointmentResult = {
+        appointmentId: appointment.id,
+        diagnosis: 'Diagnosis',
+        recommendations: 'Recommendations',
+      };
+
+      mockAppointmentsResultRepository.findByAppointmentId.mockResolvedValueOnce(
+        createMockResults({ id: 1 }),
+      );
+
+      const result = await service.create(appointmentResult);
+
+      expect(result.error).not.toBeNull();
+      expect(result.error?.message).toBe('Result already exist');
+      expect(result.data).toBeNull();
+    });
+
+    it('should handle errors and log them on create', async () => {
+      const appointment = createMockAppointment();
+      const appointmentResult = {
+        id: 1,
+        appointmentId: appointment.id,
+        diagnosis: 'Diagnosis',
+        recommendations: 'Recommendations',
+      };
+
+      mockAppointmentsResultRepository.findByAppointmentId.mockRejectedValueOnce(
+        new Error('DB error'),
+      );
+
+      const result = await service.create(appointmentResult);
+
+      expect(mockLogger.error).toHaveBeenCalled();
+      expect(result.error).not.toBeNull();
+      expect(result.error?.message).toBe('Error creating appointment result');
+      expect(result.data).toBeNull();
+    });
+  });
+
+  describe('update', () => {
+    it('should update result and return success', async () => {
+      const updatedResults = {
+        appointmentId: 1,
+        diagnosis: 'Updated Diagnosis',
+        recommendations: 'Updated Recommendations',
+      };
+
+      mockAppointmentsResultRepository.update.mockResolvedValueOnce(
+        createMockResults({
+          diagnosis: 'Updated Diagnosis',
+          recommendations: 'Updated Recommendations',
+        }),
+      );
+
+      const result = await service.update(updatedResults);
+
+      expect(result.error).toBeNull();
+      expect(result.data).not.toBeNull();
+      expect(result.data?.diagnosis).toBe('Updated Diagnosis');
+      expect(result.data?.recommendations).toBe('Updated Recommendations');
+    });
+
+    it('should handle errors and log them on update', async () => {
+      const updatedResults = {
+        appointmentId: 1,
+        diagnosis: 'Updated Diagnosis',
+        recommendations: 'Updated Recommendations',
+      };
+
+      mockAppointmentsResultRepository.update.mockRejectedValueOnce(
+        new Error('DB error'),
+      );
+
+      const result = await service.update(updatedResults);
+
+      expect(mockLogger.error).toHaveBeenCalled();
+      expect(result.error).not.toBeNull();
+      expect(result.error?.message).toBe('Error updating appointment result');
+      expect(result.data).toBeNull();
     });
   });
 });

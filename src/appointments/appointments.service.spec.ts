@@ -12,6 +12,7 @@ import { IPatientsService } from 'src/patients/patients.service.interface';
 import { ResponseStatus } from 'src/common/service-response';
 import { DoctorReturnType } from 'src/doctors/doctors.repository.interface';
 import { PatientReturnType } from 'src/patients/patients.repository.interface';
+import { IAppointmentsResultService } from './appointments_result/appointments_result.service.interface';
 
 function createMockAppointment(overrides = {}): AppointmentReturnType {
   return {
@@ -59,6 +60,9 @@ function createMockAppointment(overrides = {}): AppointmentReturnType {
 }
 function createMockDoctor(overrides = {}): DoctorReturnType {
   return {
+    hospital_address: 'hospital adress test',
+    hospital_name: 'hospital name test',
+    professional_since: new Date('2016-10-30T00:00:00.000Z'),
     id: 1,
     phone_number: '1234567890',
     licence_number: 'XYZ123',
@@ -73,6 +77,7 @@ function createMockDoctor(overrides = {}): DoctorReturnType {
       email: 'doctor@example.com',
       first_name: 'John',
       last_name: 'Doe',
+      avatar: null, // Added avatar field
       created_at: new Date(),
       updated_at: new Date(),
       user_role_id: 2,
@@ -88,6 +93,7 @@ function createMockPatient(overrides = {}): PatientReturnType {
     date_of_birth: new Date(),
     gender: 'male',
     user: {
+      avatar: null,
       user_role_id: 1,
       id: 1,
       first_name: 'John',
@@ -96,46 +102,6 @@ function createMockPatient(overrides = {}): PatientReturnType {
       created_at: new Date(),
       updated_at: new Date(),
     },
-    created_at: new Date(),
-    updated_at: new Date(),
-    ...overrides,
-  };
-}
-
-function createMockAppointment(overrides = {}): AppointmentReturnType {
-  return {
-    doctor: {
-      id: 1,
-      phone_number: '1234567890',
-      licence_number: 'XYZ123',
-      specialization_id: 1,
-      user_id: 1,
-    },
-    patient: {
-      id: 1,
-      user_id: 1,
-      address: 'address',
-      date_of_birth: new Date(),
-      gender: 'male',
-      created_at: new Date(),
-      updated_at: new Date(),
-    },
-    timeslot: {
-      doctor_id: 1,
-      end_time: new Date(),
-      start_time: new Date(),
-      id: 1,
-      is_available: false,
-    },
-    doctor_id: 1,
-    email: 'email@email.com',
-    full_name: 'John Doe',
-    id: 1,
-    patient_id: 1,
-    patient_insurance_number: '123123',
-    phone_number: '123123213',
-    reason: 'Reason',
-    timeslot_id: 1,
     created_at: new Date(),
     updated_at: new Date(),
     ...overrides,
@@ -173,6 +139,7 @@ const mockTimeslotsRepository: jest.Mocked<ITimeslotsRepository> = {
   findManyByDoctorId: jest.fn(),
   findCollisions: jest.fn(),
   createMany: jest.fn(),
+  delete: jest.fn(),
 };
 
 const mockDoctorsService: jest.Mocked<IDoctorsService> = {
@@ -181,10 +148,15 @@ const mockDoctorsService: jest.Mocked<IDoctorsService> = {
   findAll: jest.fn(),
   create: jest.fn(),
   update: jest.fn(),
+  addDoctorRating: jest.fn(),
 };
 
 const mockTransactionManager: jest.Mocked<ITransactionManager> = {
   transaction: jest.fn(),
+};
+const mockAppointmentsResultService: jest.Mocked<IAppointmentsResultService> = {
+  create: jest.fn(),
+  update: jest.fn(),
 };
 
 describe('AppointmentsService', () => {
@@ -198,6 +170,7 @@ describe('AppointmentsService', () => {
       mockTimeslotsRepository,
       mockDoctorsService,
       mockTransactionManager,
+      mockAppointmentsResultService,
     );
   });
 

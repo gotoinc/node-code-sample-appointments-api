@@ -8,7 +8,12 @@ import { DoctorEntity } from './entities/doctor.entity';
 import { ISpecializationsService } from 'src/specializations/specializations.service.interface';
 import { ILogger } from 'src/common/interfaces/logger.interface';
 import { DoctorDto } from './dto/doctor.dto';
+import { GetDoctorQuery } from './dto/get-doctor-query.dto';
 import { IAppointmentsRepository } from 'src/appointments/appointments.repository.interface';
+import { CreateDoctorsRatingDto } from './dto/create-doctor-rating.dto';
+import { DoctorsRatingDto } from './dto/doctor-rating.dto';
+import { IDoctorsRatingService } from './doctors_rating/doctors_rating.service.interface';
+import { IPatientsService } from 'src/patients/patients.service.interface';
 
 export class DoctorsService implements IDoctorsService {
   constructor(
@@ -16,6 +21,8 @@ export class DoctorsService implements IDoctorsService {
     private readonly doctorsRepository: IDoctorsRepository,
     private readonly specializationsService: ISpecializationsService,
     private readonly appointmentsRepository: IAppointmentsRepository,
+    private readonly doctorsRatingService: IDoctorsRatingService,
+    private readonly patientsService: IPatientsService,
   ) {}
 
   async create(
@@ -60,11 +67,13 @@ export class DoctorsService implements IDoctorsService {
     }
   }
 
-  async findAll(): Promise<IServiceResponse<DoctorDto[]>> {
+  async findAll(
+    query: GetDoctorQuery,
+  ): Promise<IServiceResponse<{ data: DoctorDto[]; total: number }>> {
     try {
-      const doctors = await this.doctorsRepository.findAll();
+      const doctors = await this.doctorsRepository.findAll(query);
 
-      return ServiceResponse.success<Doctor[]>(doctors);
+      return ServiceResponse.success(doctors);
     } catch (error) {
       this.logger.error(error);
       return { error: { message: 'Error finding all doctors' }, data: null };
@@ -74,7 +83,6 @@ export class DoctorsService implements IDoctorsService {
   async findOne(id: number): Promise<IServiceResponse<DoctorDto | null>> {
     try {
       const doctor = await this.doctorsRepository.findOne(id);
-      console.log(doctor);
       const appointmentsCount =
         await this.appointmentsRepository.countAppointmentsByDoctorId(id);
 
@@ -116,34 +124,48 @@ export class DoctorsService implements IDoctorsService {
     userId: number,
   ): Promise<IServiceResponse<DoctorDto>> {
     try {
-      const exisingDoctor = await this.doctorsRepository.findByUserId(userId);
+      const existingDoctor = await this.doctorsRepository.findByUserId(userId);
 
-      if (!exisingDoctor)
+      if (!existingDoctor)
         return ServiceResponse.notFound('Doctor profile not found');
 
-      if (userId !== exisingDoctor.user_id) return ServiceResponse.forbidden();
+      if (userId !== existingDoctor.user_id) return ServiceResponse.forbidden();
 
-      const { error: errorSpecialization, data: specialization } =
-        await this.specializationsService.findOne(
-          doctorToUpdate.specializationId,
-        );
+      if (doctorToUpdate.specializationId) {
+        const { error: errorSpecialization, data: specialization } =
+          await this.specializationsService.findOne(
+            doctorToUpdate.specializationId,
+          );
 
-      if (errorSpecialization)
-        return { error: errorSpecialization, data: null };
-      if (!specialization)
-        return ServiceResponse.invalidData('Specialization not found');
+        if (errorSpecialization)
+          return { error: errorSpecialization, data: null };
+        if (!specialization)
+          return ServiceResponse.invalidData('Specialization not found');
+      }
 
-      const doctorEntity: DoctorEntity = {
-        phoneNumber: doctorToUpdate.phone_number,
-        licenceNumber: doctorToUpdate.licence_number,
-        specializationId: specialization.id,
-        hospital_address: doctorToUpdate.hospital_address,
-        hospital_name: doctorToUpdate.hospital_name,
-        professional_since: doctorToUpdate.professional_since,
+      const doctorEntity: Partial<DoctorEntity> = {
+        ...(doctorToUpdate.phone_number && {
+          phoneNumber: doctorToUpdate.phone_number,
+        }),
+        ...(doctorToUpdate.licence_number && {
+          licenceNumber: doctorToUpdate.licence_number,
+        }),
+        ...(doctorToUpdate.specializationId && {
+          specializationId: doctorToUpdate.specializationId,
+        }),
+        ...(doctorToUpdate.hospital_address && {
+          hospital_address: doctorToUpdate.hospital_address,
+        }),
+        ...(doctorToUpdate.hospital_name && {
+          hospital_name: doctorToUpdate.hospital_name,
+        }),
+        ...(doctorToUpdate.professional_since && {
+          professional_since: doctorToUpdate.professional_since,
+        }),
       };
 
       const updatedDoctor = await this.doctorsRepository.update(
-        exisingDoctor.id,
+        existingDoctor.id,
         doctorEntity,
       );
 
@@ -151,6 +173,39 @@ export class DoctorsService implements IDoctorsService {
     } catch (error) {
       this.logger.error(error);
       return { error: { message: 'Error updating doctor' }, data: null };
+    }
+  }
+
+  async addDoctorRating(
+    doctorsRating: CreateDoctorsRatingDto,
+    user_id: number,
+  ): Promise<IServiceResponse<DoctorsRatingDto | null>> {
+    try {
+      const { data: patient, error: patientError } =
+        await this.patientsService.findByUserId(user_id);
+      if (!patient || patientError) {
+        return ServiceResponse.notFound('Patient not found');
+      }
+
+      const existingDoctor = this.doctorsRepository.findOne(
+        doctorsRating.doctor_id,
+      );
+      if (!existingDoctor) {
+        return ServiceResponse.notFound('Doctor not found');
+      }
+      const { error, data } = await this.doctorsRatingService.create(
+        doctorsRating,
+        patient.id,
+      );
+
+      if (error) {
+        return { data: null, error };
+      }
+
+      return ServiceResponse.success(data);
+    } catch (error) {
+      this.logger.error(error);
+      return ServiceResponse.invalidData('Error adding doctor rating');
     }
   }
 }

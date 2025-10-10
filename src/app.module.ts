@@ -10,9 +10,15 @@ import { TimeslotsModule } from './timeslots/timeslots.module';
 import { AppointmentsModule } from './appointments/appointments.module';
 import { LoggerModule } from 'nestjs-pino';
 import { TemplateScheduleModule } from './template_schedules/template_schedules.module';
+import { MinioModule } from './minio-module/minio.module';
+import { MulterModule } from '@nestjs/platform-express';
+import * as multer from 'multer';
 
 @Module({
   imports: [
+    MulterModule.register({
+      storage: multer.memoryStorage(),
+    }),
     LoggerModule.forRoot({
       pinoHttp: {
         transport: {
@@ -30,6 +36,7 @@ import { TemplateScheduleModule } from './template_schedules/template_schedules.
     TimeslotsModule,
     AppointmentsModule,
     TemplateScheduleModule,
+    MinioModule,
   ],
   controllers: [],
   providers: [],

@@ -165,4 +165,36 @@ export class TimeslotsService implements ITimeslotsService {
       };
     }
   }
+
+  async delete(
+    id: number,
+    userId: number,
+  ): Promise<IServiceResponse<{ message: string }>> {
+    try {
+      const { data: doctor, error: errorDoctor } =
+        await this.doctorsService.findByUserId(userId);
+      if (errorDoctor) return { error: errorDoctor, data: null };
+      if (!doctor) return ServiceResponse.notFound('Doctor not found');
+
+      const timeslot = await this.timeslotsRepository.findById(id);
+      if (!timeslot) return ServiceResponse.notFound('Timeslot not found');
+
+      if (timeslot.doctor_id !== doctor.id) {
+        return ServiceResponse.forbidden(
+          'You do not have permission to delete this timeslot',
+        );
+      }
+
+      await this.timeslotsRepository.delete(id);
+      return ServiceResponse.success<{ message: string }>({
+        message: 'Timeslot deleted successfully',
+      });
+    } catch (error) {
+      this.logger.error(error);
+      return {
+        error: { message: 'Error deleting timeslot' },
+        data: null,
+      };
+    }
+  }
 }

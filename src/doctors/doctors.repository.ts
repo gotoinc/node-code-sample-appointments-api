@@ -6,6 +6,8 @@ import {
 } from './doctors.repository.interface';
 import { DoctorEntity } from './entities/doctor.entity';
 import { PrismaService } from 'src/database/prisma.service';
+import { Prisma } from '@prisma/client';
+import { GetDoctorQuery } from './dto/get-doctor-query.dto';
 
 @Injectable()
 export class DoctorsRepository
@@ -14,6 +16,37 @@ export class DoctorsRepository
 {
   constructor(private readonly prismaClient: PrismaService) {
     super(prismaClient);
+  }
+
+  private buildWhereClause(query: GetDoctorQuery): Prisma.DoctorWhereInput {
+    const where: Prisma.DoctorWhereInput = {};
+
+    if (query.specialization_id) {
+      where.specialization_id = query.specialization_id;
+    }
+
+    if (query.professional_since_from && query.professional_since_to) {
+      where.professional_since = {
+        gte: query.professional_since_from,
+        lte: query.professional_since_to,
+      };
+    }
+
+    if (query.search) {
+      where.OR = [
+        { hospital_name: { contains: query.search, mode: 'insensitive' } },
+        { licence_number: { contains: query.search, mode: 'insensitive' } },
+        {
+          user: { first_name: { contains: query.search, mode: 'insensitive' } },
+        },
+        {
+          user: { last_name: { contains: query.search, mode: 'insensitive' } },
+        },
+        { user: { email: { contains: query.search, mode: 'insensitive' } } },
+      ];
+    }
+
+    return where;
   }
 
   create(
@@ -37,12 +70,27 @@ export class DoctorsRepository
     });
   }
 
-  async findAll(tx?: unknown): Promise<DoctorReturnType[]> {
+  async findAll(
+    query: GetDoctorQuery,
+    tx?: unknown,
+  ): Promise<{ data: DoctorReturnType[]; total: number }> {
     const prisma = this.getClient(tx);
 
-    return await prisma.doctor.findMany({
-      include: { user: true, specialization: true },
-    });
+    const where = this.buildWhereClause(query);
+
+    const [data, total] = await Promise.all([
+      prisma.doctor.findMany({
+        where,
+        include: { user: true, specialization: true, doctorsRating: true },
+        skip: query.offset ? Number(query.offset) : undefined,
+        take: query.limit ? Number(query.limit) : undefined,
+      }),
+      prisma.doctor.count({
+        where,
+      }),
+    ]);
+
+    return { data, total };
   }
 
   async findOne(id: number, tx?: unknown): Promise<DoctorReturnType | null> {
@@ -50,7 +98,11 @@ export class DoctorsRepository
 
     return await prisma.doctor.findUnique({
       where: { id },
-      include: { user: true, specialization: true },
+      include: {
+        user: true,
+        specialization: true,
+        doctorsRating: { include: { patient: { include: { user: true } } } },
+      },
     });
   }
 
@@ -70,7 +122,7 @@ export class DoctorsRepository
 
   async update(
     id: number,
-    doctor: DoctorEntity,
+    doctor: Partial<DoctorEntity>,
     tx?: unknown,
   ): Promise<DoctorReturnType> {
     const prisma = this.getClient(tx);
@@ -80,12 +132,18 @@ export class DoctorsRepository
         id,
       },
       data: {
-        phone_number: doctor.phoneNumber,
-        licence_number: doctor.licenceNumber,
-        specialization_id: doctor.specializationId,
-        hospital_address: doctor.hospital_address,
-        hospital_name: doctor.hospital_name,
-        professional_since: doctor.professional_since,
+        ...(doctor.phoneNumber && { phone_number: doctor.phoneNumber }),
+        ...(doctor.licenceNumber && { licence_number: doctor.licenceNumber }),
+        ...(doctor.specializationId && {
+          specialization_id: doctor.specializationId,
+        }),
+        ...(doctor.hospital_address && {
+          hospital_address: doctor.hospital_address,
+        }),
+        ...(doctor.hospital_name && { hospital_name: doctor.hospital_name }),
+        ...(doctor.professional_since && {
+          professional_since: doctor.professional_since,
+        }),
       },
       include: { user: true, specialization: true },
     });

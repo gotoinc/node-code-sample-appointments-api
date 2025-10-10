@@ -8,6 +8,9 @@ import { IDoctorsService } from './doctors.service.interface';
 import { ISpecializationsService } from 'src/specializations/specializations.service.interface';
 import { ResponseStatus } from 'src/common/service-response';
 import { IAppointmentsRepository } from 'src/appointments/appointments.repository.interface';
+import { GetDoctorQuery } from './dto/get-doctor-query.dto';
+import { IPatientsService } from 'src/patients/patients.service.interface';
+import { IDoctorsRatingService } from './doctors_rating/doctors_rating.service.interface';
 
 function createMockDoctor(overrides = {}): DoctorReturnType {
   return {
@@ -24,30 +27,7 @@ function createMockDoctor(overrides = {}): DoctorReturnType {
       name: 'Doctor',
     },
     user: {
-      id: 1,
-      email: 'doctor@example.com',
-      first_name: 'John',
-      last_name: 'Doe',
-      created_at: new Date(),
-      updated_at: new Date(),
-      user_role_id: 2,
-    },
-    ...overrides,
-  };
-}
-
-function createMockDoctor(overrides = {}): DoctorReturnType {
-  return {
-    id: 1,
-    phone_number: '1234567890',
-    licence_number: 'XYZ123',
-    specialization_id: 1,
-    user_id: 1,
-    specialization: {
-      id: 1,
-      name: 'Doctor',
-    },
-    user: {
+      avatar: null,
       id: 1,
       email: 'doctor@example.com',
       first_name: 'John',
@@ -88,6 +68,18 @@ const mockAppointmentsRepository: jest.Mocked<IAppointmentsRepository> = {
   findByDoctorId: jest.fn(),
   findById: jest.fn(),
   findByPatientId: jest.fn(),
+  update: jest.fn(),
+};
+
+const mockPatientsService: jest.Mocked<IPatientsService> = {
+  findAll: jest.fn(),
+  findByUserId: jest.fn(),
+  create: jest.fn(),
+  findById: jest.fn(),
+  update: jest.fn(),
+};
+const mockDoctorsRatingService: jest.Mocked<IDoctorsRatingService> = {
+  create: jest.fn(),
 };
 
 describe('DoctorsService', () => {
@@ -99,6 +91,8 @@ describe('DoctorsService', () => {
       mockDoctorsRepository,
       mockSpecializationsService,
       mockAppointmentsRepository,
+      mockDoctorsRatingService,
+      mockPatientsService,
     );
   });
 
@@ -242,15 +236,16 @@ describe('DoctorsService', () => {
 
   describe('findAll', () => {
     it('should return all doctors', async () => {
-      mockDoctorsRepository.findAll.mockResolvedValueOnce([
-        createMockDoctor({ id: 1 }),
-        createMockDoctor({ id: 2 }),
-      ]);
+      mockDoctorsRepository.findAll.mockResolvedValueOnce({
+        data: [createMockDoctor({ id: 1 }), createMockDoctor({ id: 2 })],
+        total: 2,
+      });
 
-      const doctors = await service.findAll();
+      const query: GetDoctorQuery = {};
+      const doctors = await service.findAll(query);
 
       expect(doctors.error).toBeNull();
-      expect(doctors.data?.length).toBe(2);
+      expect(doctors.data?.data.length).toBe(2);
     });
 
     it('should return error if repository throws error', async () => {
@@ -258,7 +253,8 @@ describe('DoctorsService', () => {
         'Error finding doctors',
       );
 
-      const doctors = await service.findAll();
+      const query: GetDoctorQuery = {};
+      const doctors = await service.findAll(query);
 
       expect(doctors.data).toBeNull();
       expect(doctors.error).not.toBeNull();

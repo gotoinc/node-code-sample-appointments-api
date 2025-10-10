@@ -13,4 +13,8 @@ export interface IAppointmentsResultRepository {
   ): Promise<
     (AppointmentResult & { appointment: AppointmentReturnType }) | null
   >;
+  update(
+    appointmentResult: Partial<AppointmentResultEntity>,
+    tx?: unknown,
+  ): Promise<AppointmentResult & { appointment: AppointmentReturnType }>;
 }

@@ -67,20 +67,23 @@ export class PatientsRepository
 
   async update(
     id: number,
-    patient: PatientEntity,
+    patient: Partial<PatientEntity>,
     tx?: unknown,
   ): Promise<PatientReturnType> {
     const prisma = this.getClient(tx);
+
+    const data = Object.assign(
+      {},
+      patient.dateOfBirth && { date_of_birth: patient.dateOfBirth },
+      patient.gender && { gender: patient.gender },
+      patient.address && { address: patient.address },
+    );
 
     return await prisma.patient.update({
       where: {
         id,
       },
-      data: {
-        date_of_birth: patient.dateOfBirth,
-        gender: patient.gender,
-        address: patient.address,
-      },
+      data,
       include: { user: true },
     });
   }

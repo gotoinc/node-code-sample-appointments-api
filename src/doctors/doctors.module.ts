@@ -16,12 +16,24 @@ import { TemplateScheduleModule } from 'src/template_schedules/template_schedule
 import { AppointmentsModule } from 'src/appointments/appointments.module';
 import { AppointmentsRepository } from 'src/appointments/appointments.repository';
 import { IAppointmentsRepository } from 'src/appointments/appointments.repository.interface';
+import { DoctorsRatingModule } from './doctors_rating/doctors_rating.module';
+import {
+  DoctorsRatingServiceSymbol,
+  IDoctorsRatingService,
+} from './doctors_rating/doctors_rating.service.interface';
+import { PatientsModule } from 'src/patients/patients.module';
+import {
+  IPatientsService,
+  PatientsServiceSymbol,
+} from 'src/patients/patients.service.interface';
 
 @Module({
   imports: [
     SpecializationsModule,
     forwardRef(() => TemplateScheduleModule),
     forwardRef(() => AppointmentsModule),
+    DoctorsRatingModule,
+    PatientsModule,
   ],
   controllers: [DoctorsController],
   providers: [
@@ -34,12 +46,16 @@ import { IAppointmentsRepository } from 'src/appointments/appointments.repositor
         doctorsRepository: IDoctorsRepository,
         specializationService: ISpecializationsService,
         appointmentsRepository: IAppointmentsRepository,
+        doctorsRatingService: IDoctorsRatingService,
+        patientsService: IPatientsService,
       ) => {
         return new DoctorsService(
           logger,
           doctorsRepository,
           specializationService,
           appointmentsRepository,
+          doctorsRatingService,
+          patientsService,
         );
       },
       inject: [
@@ -47,6 +63,8 @@ import { IAppointmentsRepository } from 'src/appointments/appointments.repositor
         DoctorsRepository,
         SpecializationsServiceSymbol,
         AppointmentsRepository,
+        DoctorsRatingServiceSymbol,
+        PatientsServiceSymbol,
       ],
     },
   ],

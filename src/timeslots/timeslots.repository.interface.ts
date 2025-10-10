@@ -20,4 +20,5 @@ export interface ITimeslotsRepository {
     timeslots: TimeslotEntity[],
     tx?: unknown,
   ): Promise<{ count: number }>;
+  delete: (id: number, tx?: unknown) => Promise<Timeslot>;
 }

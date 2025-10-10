@@ -130,23 +130,18 @@ export class AuthenticationService {
   > {
     const { error, data: userCredentials } =
       await this.emailCredentialsService.findOne(email);
-    console.log(userCredentials, error);
 
     if (!userCredentials || error) return null;
-
-    console.log('p', pass, userCredentials.password_hash);
 
     const isValidCredentials = this.hashingService.verify(
       pass,
       userCredentials.password_hash,
     );
-    console.log(isValidCredentials, 2);
     if (!isValidCredentials) return null;
 
     const { error: errorFindUser, data: user } =
       await this.usersService.findOne(email);
 
-    console.log(errorFindUser, 'errorFindUser');
     if (errorFindUser || !user) return null;
 
     const result = {
@@ -170,7 +165,6 @@ export class AuthenticationService {
         email,
         updatePasswordDto.old_password,
       );
-      console.log(existingUser);
 
       if (!existingUser) {
         return { error: { message: 'Wrong old password' }, data: null };

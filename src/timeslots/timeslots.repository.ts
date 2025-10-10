@@ -90,6 +90,7 @@ export class TimeslotsRepository
       },
     });
   }
+
   async createMany(
     timeslots: TimeslotEntity[],
     tx?: unknown,
@@ -103,6 +104,16 @@ export class TimeslotsRepository
         doctor_id: ts.doctorId,
       })),
       skipDuplicates: true,
+    });
+  }
+
+  async delete(id: number, tx?: unknown): Promise<Timeslot> {
+    const prisma = this.getClient(tx);
+
+    return await prisma.timeslot.delete({
+      where: {
+        id,
+      },
     });
   }
 }

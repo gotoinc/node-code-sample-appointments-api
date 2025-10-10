@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { PrismaService } from 'src/database/prisma.service';
 import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
@@ -13,23 +13,55 @@ import {
 } from 'src/roles/roles.service.interface';
 import { Logger } from 'nestjs-pino';
 import { ILogger } from 'src/common/interfaces/logger.interface';
+import { MinioModule } from 'src/minio-module/minio.module';
+import {
+  IMinioService,
+  MinioServiceSymbol,
+} from 'src/minio-module/minio.service.interface';
+import { EmailCredentialsModule } from 'src/iam/authentication/email-credentials/email-credentials.module';
+import { ITransactionManager } from 'src/common/interfaces/transaction-manager.interface';
+import { PrismaTransactionManager } from 'src/database/prisma-transaction.service';
+import { IEmailCredentialsRepository } from 'src/iam/authentication/email-credentials/email-credentials.repository.interface';
+import { EmailCredentialsRepository } from 'src/iam/authentication/email-credentials/email-credentials.repository';
 
 @Module({
-  imports: [RolesModule],
+  imports: [
+    RolesModule,
+    forwardRef(() => EmailCredentialsModule),
+    MinioModule.register(process.env.MINIO_BUCKET || 'default-bucket'),
+  ],
   controllers: [UsersController],
   providers: [
     PrismaService,
     UsersRepository,
+    PrismaTransactionManager,
     {
       provide: UsersServiceSymbol,
       useFactory: (
         logger: ILogger,
         usersRepository: IUsersRepository,
         rolesService: IRolesService,
+        emailCredentialService: IEmailCredentialsRepository,
+        transactionManager: ITransactionManager,
+        minioService: IMinioService,
       ) => {
-        return new UsersService(logger, usersRepository, rolesService);
+        return new UsersService(
+          logger,
+          usersRepository,
+          rolesService,
+          emailCredentialService,
+          transactionManager,
+          minioService,
+        );
       },
-      inject: [Logger, UsersRepository, RolesServiceSymbol],
+      inject: [
+        Logger,
+        UsersRepository,
+        RolesServiceSymbol,
+        EmailCredentialsRepository,
+        PrismaTransactionManager,
+        MinioServiceSymbol,
+      ],
     },
     JwtAuthGuard,
   ],

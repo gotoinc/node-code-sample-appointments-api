@@ -6,8 +6,8 @@ import {
   Inject,
   NotFoundException,
   Param,
+  Patch,
   Post,
-  Put,
   Req,
   ServiceUnavailableException,
 } from '@nestjs/common';
@@ -101,7 +101,7 @@ export class PatientsController {
   })
   @ApiBadRequestResponse({ description: 'Specialization not found' })
   @Roles('patient')
-  @Put('me')
+  @Patch('me')
   async update(
     @Body() body: UpdatePatientDto,
     @Req() req: Request,

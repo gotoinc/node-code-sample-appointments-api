@@ -81,6 +81,7 @@ describe('AuthenticationService', () => {
     last_name: 'Doe',
     created_at: new Date(),
     updated_at: new Date(),
+    avatar: null,
     user_role_id: 1,
     user_role: {
       id: 1,
@@ -224,6 +225,7 @@ describe('AuthenticationService', () => {
       mockEmailCredentialsService.createNewUser.mockResolvedValue({
         error: null,
         data: {
+          avatar: null,
           id: 1,
           email: 'test@example.com',
           first_name: 'John',

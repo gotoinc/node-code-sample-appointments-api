@@ -38,6 +38,7 @@ export class EmailCredentialsRepository
       },
     });
   }
+
   async updatePassword(
     email: string,
     hashedPassword: string,
@@ -52,6 +53,16 @@ export class EmailCredentialsRepository
       data: {
         password_hash: hashedPassword,
       },
+    });
+  }
+
+  async updateEmail(
+    email: string,
+    newEmail: string,
+  ): Promise<EmailCredentials | null> {
+    return await this.prismaClient.emailCredentials.update({
+      where: { email },
+      data: { email: newEmail },
     });
   }
 }

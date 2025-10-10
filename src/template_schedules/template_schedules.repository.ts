@@ -52,6 +52,7 @@ export class TemplateScheduleRepository
       },
     });
   }
+
   async findByName(
     name: string,
     doctorId: number,

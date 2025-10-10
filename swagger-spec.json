@@ -179,6 +179,66 @@
         "tags": [
           "Users"
         ]
+      },
+      "patch": {
+        "operationId": "UsersController_update",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Users"
+        ]
+      },
+      "delete": {
+        "operationId": "UsersController_remove",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Users"
+        ]
+      }
+    },
+    "/users/me/avatar": {
+      "post": {
+        "operationId": "UsersController_uploadAvatar",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Users"
+        ]
+      },
+      "delete": {
+        "operationId": "UsersController_removeAvatar",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Users"
+        ]
       }
     },
     "/roles": {
@@ -299,20 +359,59 @@
       },
       "get": {
         "operationId": "DoctorsController_findAll",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "offset",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "specialization_id",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "professional_since_from",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "professional_since_to",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/DoctorDto"
-                  }
-                }
-              }
-            }
+            "description": ""
           },
           "503": {
             "description": "Error finding all doctors"
@@ -349,7 +448,7 @@
           "Doctors"
         ]
       },
-      "put": {
+      "patch": {
         "operationId": "DoctorsController_update",
         "parameters": [],
         "requestBody": {
@@ -478,6 +577,43 @@
           },
           "503": {
             "description": "Error creating template"
+          }
+        },
+        "tags": [
+          "Doctors"
+        ]
+      }
+    },
+    "/doctors/ratings": {
+      "post": {
+        "operationId": "DoctorsController_createDoctorRating",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateDoctorsRatingDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Rating created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DoctorsRatingDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Doctor not found"
+          },
+          "503": {
+            "description": "Error creating doctors rating"
           }
         },
         "tags": [
@@ -718,6 +854,64 @@
           },
           "503": {
             "description": "Error creating appointment result"
+          },
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AppointmentResultDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Appointments"
+        ]
+      },
+      "patch": {
+        "operationId": "AppointmentsController_updateResult",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateAppointmentResultDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AppointmentResultDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "User is not in appointment "
+          },
+          "404": {
+            "description": "Appointment not found"
+          },
+          "503": {
+            "description": "Error updating appointment result"
+          },
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AppointmentResultDto"
+                }
+              }
+            }
           }
         },
         "tags": [
@@ -850,7 +1044,7 @@
           "Patients"
         ]
       },
-      "put": {
+      "patch": {
         "operationId": "PatientsController_update",
         "parameters": [],
         "requestBody": {
@@ -1022,6 +1216,48 @@
         ]
       }
     },
+    "/timeslots/{id}": {
+      "delete": {
+        "operationId": "TimeslotsController_deleteDoctorTimeslot",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeleteTimeslotDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "404": {
+            "description": "Doctor not found"
+          },
+          "409": {
+            "description": "Timeslots collision"
+          },
+          "503": {
+            "description": "Error creating schedule"
+          }
+        },
+        "tags": [
+          "Timeslots"
+        ]
+      }
+    },
     "/timeslots/schedule": {
       "post": {
         "operationId": "TimeslotsController_createSchedule",
@@ -1052,157 +1288,6 @@
         },
         "tags": [
           "Timeslots"
-        ]
-      }
-    },
-    "/appointments/{id}": {
-      "get": {
-        "operationId": "AppointmentsController_findById",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "minimum": 1,
-              "type": "number"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AppointmentDto"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Appointment not found"
-          },
-          "503": {
-            "description": "Error finding appointment"
-          }
-        },
-        "tags": [
-          "Appointments"
-        ]
-      }
-    },
-    "/appointments/doctors/{doctorId}": {
-      "get": {
-        "operationId": "AppointmentsController_findByDoctorId",
-        "parameters": [
-          {
-            "name": "doctorId",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "minimum": 1,
-              "type": "number"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/AppointmentDto"
-                  }
-                }
-              }
-            }
-          },
-          "503": {
-            "description": "Error finding appointments"
-          }
-        },
-        "tags": [
-          "Appointments"
-        ]
-      }
-    },
-    "/appointments/patients/{patientId}": {
-      "get": {
-        "operationId": "AppointmentsController_findByPatientId",
-        "parameters": [
-          {
-            "name": "patientId",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "minimum": 1,
-              "type": "number"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/AppointmentDto"
-                  }
-                }
-              }
-            }
-          },
-          "503": {
-            "description": "Error finding appointments"
-          }
-        },
-        "tags": [
-          "Appointments"
-        ]
-      }
-    },
-    "/appointments": {
-      "post": {
-        "operationId": "AppointmentsController_create",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateAppointmentDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AppointmentDto"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Timeslot is already taken or Doctor does not match"
-          },
-          "404": {
-            "description": "Doctor, Patient or Timeslot not found"
-          },
-          "503": {
-            "description": "Error creating appointment"
-          }
-        },
-        "tags": [
-          "Appointments"
         ]
       }
     }
@@ -1326,6 +1411,15 @@
           "message"
         ]
       },
+      "UpdateUserDto": {
+        "type": "object",
+        "properties": {
+          "avatar": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
       "RoleDto": {
         "type": "object",
         "properties": {
@@ -1402,58 +1496,32 @@
       },
       "UpdateDoctorDto": {
         "type": "object",
-        "properties": {
-          "phone_number": {
-            "type": "string"
-          },
-          "licence_number": {
-            "type": "string"
-          },
-          "specializationId": {
-            "type": "number",
-            "minimum": 1
-          },
-          "hospital_address": {
-            "type": "object"
-          },
-          "hospital_name": {
-            "type": "object"
-          },
-          "professional_since": {
-            "type": "object"
-          }
-        },
-        "required": [
-          "phone_number",
-          "licence_number",
-          "specializationId"
-        ]
+        "properties": {}
       },
       "CreateTemplateScheduleDto": {
         "type": "object",
         "properties": {}
       },
-      "CreatePatientDto": {
+      "CreateDoctorsRatingDto": {
         "type": "object",
         "properties": {
-          "date_of_birth": {
-            "type": "string"
+          "doctor_id": {
+            "type": "number",
+            "minimum": 1
           },
-          "gender": {
-            "type": "string"
+          "rating": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 5
           },
-          "address": {
+          "review": {
             "type": "string"
           }
         },
         "required": [
-          "date_of_birth",
-          "gender",
-          "address",
-          "specializationId",
-          "hospital_address",
-          "hospital_name",
-          "professional_since"
+          "doctor_id",
+          "rating",
+          "review"
         ]
       },
       "PatientDto": {
@@ -1495,6 +1563,34 @@
           "updated_at"
         ]
       },
+      "DoctorsRatingDto": {
+        "type": "object",
+        "properties": {
+          "doctor": {
+            "$ref": "#/components/schemas/DoctorDto"
+          },
+          "patient": {
+            "$ref": "#/components/schemas/PatientDto"
+          },
+          "id": {
+            "type": "number"
+          },
+          "rating": {
+            "type": "number"
+          },
+          "review": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": [
+          "doctor",
+          "patient",
+          "id",
+          "rating",
+          "review"
+        ]
+      },
       "TimeslotDto": {
         "type": "object",
         "properties": {
@@ -1522,35 +1618,6 @@
           "end_time",
           "is_available",
           "doctor_id"
-        ]
-      },
-      "CreateTimeslotDto": {
-        "type": "object",
-        "properties": {
-          "start_time": {
-            "type": "string"
-          },
-          "end_time": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "start_time",
-          "end_time"
-        ]
-      },
-      "CreateScheduleDto": {
-        "type": "object",
-        "properties": {
-          "timeslots": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/CreateTimeslotDto"
-            }
-          }
-        },
-        "required": [
-          "timeslots"
         ]
       },
       "AppointmentDto": {
@@ -1686,6 +1753,23 @@
           "appointment"
         ]
       },
+      "UpdateAppointmentResultDto": {
+        "type": "object",
+        "properties": {
+          "appointmentId": {
+            "type": "number"
+          },
+          "diagnosis": {
+            "type": "string"
+          },
+          "recommendations": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "appointmentId"
+        ]
+      },
       "DeclineAppointmentDto": {
         "type": "object",
         "properties": {
@@ -1729,12 +1813,7 @@
           "address": {
             "type": "string"
           }
-        },
-        "required": [
-          "date_of_birth",
-          "gender",
-          "address"
-        ]
+        }
       },
       "CreateTimeslotDto": {
         "type": "object",
@@ -1749,6 +1828,31 @@
         "required": [
           "start_time",
           "end_time"
+        ]
+      },
+      "DeleteTimeslotDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "CreateScheduleDto": {
+        "type": "object",
+        "properties": {
+          "timeslots": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CreateTimeslotDto"
+            }
+          }
+        },
+        "required": [
+          "timeslots"
         ]
       },
       "ValidationError": {

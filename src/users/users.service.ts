@@ -6,12 +6,20 @@ import { IUsersRepository } from './users.repository.interface';
 import { IRolesService } from 'src/roles/roles.service.interface';
 import { CreateUserDto } from './dto/create-user.dto';
 import { ILogger } from 'src/common/interfaces/logger.interface';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { ITransactionManager } from 'src/common/interfaces/transaction-manager.interface';
+import { IEmailCredentialsRepository } from 'src/iam/authentication/email-credentials/email-credentials.repository.interface';
+import Multer from 'multer';
+import { IMinioService } from 'src/minio-module/minio.service.interface';
 
 export class UsersService implements IUsersService {
   constructor(
     private readonly logger: ILogger,
     private readonly usersRepository: IUsersRepository,
     private readonly rolesService: IRolesService,
+    private readonly emailCredentialRepository: IEmailCredentialsRepository,
+    private readonly transactionManager: ITransactionManager,
+    private readonly minioService: IMinioService,
   ) {}
 
   async create(user: CreateUserDto): Promise<IServiceResponse<User>> {
@@ -58,6 +66,134 @@ export class UsersService implements IUsersService {
       const users: User[] = await this.usersRepository.findAll();
 
       return ServiceResponse.success<User[]>(users);
+    } catch (error) {
+      this.logger.error(error);
+      return { error: { message: error.message }, data: null };
+    }
+  }
+
+  async update(
+    id: number,
+    updateUserDto: UpdateUserDto,
+  ): Promise<IServiceResponse<User>> {
+    try {
+      if (updateUserDto.email) {
+        const currentUser = await this.usersRepository.findById(id);
+        const curentUserCredentials =
+          await this.emailCredentialRepository.findOne(
+            currentUser?.email || '',
+          );
+
+        if (!currentUser || !curentUserCredentials) {
+          return ServiceResponse.notFound('User not found');
+        }
+
+        const existingUser = await this.usersRepository.findOne(
+          updateUserDto.email,
+        );
+
+        const existedUserCredentials =
+          await this.emailCredentialRepository.findOne(updateUserDto.email);
+
+        if (
+          (existingUser && existingUser.id !== id) ||
+          (existedUserCredentials && existedUserCredentials.user_id !== id)
+        ) {
+          return ServiceResponse.conflict('Email already in use');
+        }
+
+        const updatedEmail = await this.transactionManager.transaction(
+          async (tx) => {
+            await this.emailCredentialRepository.updateEmail(
+              currentUser.email,
+              updateUserDto.email!,
+            );
+
+            const upd = await this.usersRepository.update(
+              id,
+              updateUserDto,
+              tx,
+            );
+
+            return upd;
+          },
+        );
+
+        return ServiceResponse.success<User>(updatedEmail);
+      } else {
+        const updatedUser = await this.usersRepository.update(
+          id,
+          updateUserDto,
+        );
+        return ServiceResponse.success<User>(updatedUser);
+      }
+    } catch (error) {
+      this.logger.error(error);
+      return { error: { message: error.message }, data: null };
+    }
+  }
+
+  async remove(id: number, email: string): Promise<IServiceResponse<User>> {
+    try {
+      const user = await this.usersRepository.findOne(email);
+      if (!user) return ServiceResponse.notFound('User not found');
+
+      await this.usersRepository.remove(id);
+      return ServiceResponse.success<User>(user);
+    } catch (error) {
+      this.logger.error(error);
+      return { error: { message: error.message }, data: null };
+    }
+  }
+
+  async uploadAvatar(
+    userId: number,
+    file: Multer.File,
+  ): Promise<IServiceResponse<string>> {
+    try {
+      const user = await this.usersRepository.findById(userId);
+      const oldAvatar = user?.avatar?.split('/').pop();
+
+      const bucketName = process.env.MINIO_BUCKET!;
+      const objectName = `avatar-${userId}-${Date.now()}`;
+      const uploadResult = await this.minioService.uploadFile(
+        objectName,
+        file.buffer,
+        file.mimetype,
+      );
+
+      if (uploadResult.error) {
+        return { error: uploadResult.error, data: null };
+      }
+
+      const avatarUrl = `/${bucketName}/${objectName}`;
+
+      await this.usersRepository.update(userId, {
+        avatar: avatarUrl,
+      });
+
+      if (oldAvatar) {
+        await this.minioService.deleteFile(oldAvatar);
+      }
+
+      return ServiceResponse.success<string>(avatarUrl);
+    } catch (error) {
+      this.logger.error(error);
+      return { error: { message: error.message }, data: null };
+    }
+  }
+
+  async removeAvatar(userId: number): Promise<IServiceResponse<boolean>> {
+    try {
+      const user = await this.usersRepository.findById(userId);
+      const oldAvatar = user?.avatar?.split('/').pop();
+
+      if (oldAvatar) {
+        await this.minioService.deleteFile(oldAvatar);
+      }
+
+      await this.usersRepository.update(userId, { avatar: null });
+      return ServiceResponse.success<boolean>(true);
     } catch (error) {
       this.logger.error(error);
       return { error: { message: error.message }, data: null };

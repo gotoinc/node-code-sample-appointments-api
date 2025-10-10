@@ -6,8 +6,9 @@ import {
   Inject,
   NotFoundException,
   Param,
+  Patch,
   Post,
-  Put,
+  Query,
   Req,
   ServiceUnavailableException,
   UsePipes,
@@ -24,10 +25,13 @@ import { IdParamDto } from 'src/common/dto/id-param.dto';
 import { Request } from 'express';
 import { handleServiceError } from 'src/common/handle-service-error';
 import { DoctorDto } from './dto/doctor.dto';
+import { GetDoctorQuery } from './dto/get-doctor-query.dto';
 import {
   ApiBadRequestResponse,
+  ApiBody,
   ApiForbiddenResponse,
   ApiNotFoundResponse,
+  ApiResponse,
   ApiServiceUnavailableResponse,
 } from '@nestjs/swagger';
 import {
@@ -38,6 +42,8 @@ import { DoctorIdParamDto } from 'src/timeslots/dto/doctor-id-param.dto';
 import { TemplateSchedule } from '@prisma/client';
 import { ZodValidationPipe } from 'nestjs-zod';
 import { CreateTemplateScheduleDto } from 'src/template_schedules/dto/createTemplateSchedule.dto';
+import { CreateDoctorsRatingDto } from './dto/create-doctor-rating.dto';
+import { DoctorsRatingDto } from './dto/doctor-rating.dto';
 
 @Auth('Jwt')
 @Controller('doctors')
@@ -67,8 +73,11 @@ export class DoctorsController {
 
   @ApiServiceUnavailableResponse({ description: 'Error finding all doctors' })
   @Get()
-  async findAll(): Promise<DoctorDto[]> {
-    const { error, data } = await this.doctorsService.findAll();
+  async findAll(
+    @Query() query: GetDoctorQuery,
+  ): Promise<{ data: DoctorDto[]; total: number }> {
+    const { error, data } = await this.doctorsService.findAll(query);
+
     if (error) throw new ServiceUnavailableException(error.message);
     if (!data)
       throw new ServiceUnavailableException('Error finding all doctors');
@@ -107,7 +116,7 @@ export class DoctorsController {
   })
   @ApiBadRequestResponse({ description: 'Specialization not found' })
   @Roles('doctor')
-  @Put('me')
+  @Patch('me')
   async update(
     @Body() body: UpdateDoctorDto,
     @Req() req: Request,
@@ -159,6 +168,33 @@ export class DoctorsController {
     if (exception) throw exception;
     if (!data) throw new ServiceUnavailableException('Error creating template');
 
+    return data;
+  }
+
+  @ApiServiceUnavailableResponse({
+    description: 'Error creating doctors rating',
+  })
+  @ApiNotFoundResponse({ description: 'Doctor not found' })
+  @Roles('patient')
+  @Post('ratings')
+  @ApiBody({ type: CreateDoctorsRatingDto })
+  @ApiResponse({
+    status: 201,
+    description: 'Rating created',
+    type: DoctorsRatingDto,
+  })
+  async createDoctorRating(
+    @Body() body: CreateDoctorsRatingDto,
+    @Req() req: Request,
+  ): Promise<DoctorsRatingDto> {
+    const user = req.user!;
+    const { error, data } = await this.doctorsService.addDoctorRating(
+      body,
+      user.userId,
+    );
+    const exception = handleServiceError(error);
+    if (exception) throw exception;
+    if (!data) throw new ServiceUnavailableException('Error creating rating');
     return data;
   }
 }

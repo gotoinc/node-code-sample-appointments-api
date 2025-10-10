@@ -5,6 +5,7 @@ import {
   Get,
   Inject,
   Param,
+  Patch,
   Post,
   Req,
   ServiceUnavailableException,
@@ -22,8 +23,10 @@ import { Request } from 'express';
 import { Roles } from 'src/iam/authorization/decorators/roles.decorator';
 import { AppointmentDto } from './dto/appointment.dto';
 import {
+  ApiBody,
   ApiForbiddenResponse,
   ApiNotFoundResponse,
+  ApiResponse,
   ApiServiceUnavailableResponse,
 } from '@nestjs/swagger';
 import { AppointmentResultDto } from './dto/appointment-result.dto';
@@ -37,6 +40,7 @@ import {
   IPatientsService,
   PatientsServiceSymbol,
 } from 'src/patients/patients.service.interface';
+import { UpdateAppointmentResultDto } from './dto/update-appointment-result.dto';
 
 @Controller('appointments')
 export class AppointmentsController {
@@ -141,6 +145,8 @@ export class AppointmentsController {
   })
   @ApiNotFoundResponse({ description: 'Appointment not found' })
   @Roles('doctor')
+  @ApiBody({ type: AddAppointmentResultDto })
+  @ApiResponse({ type: AppointmentResultDto })
   @Post('result')
   async createResult(
     @Body() body: AddAppointmentResultDto,
@@ -175,6 +181,35 @@ export class AppointmentsController {
 
     return data;
   }
+
+  @ApiServiceUnavailableResponse({
+    description: 'Error updating appointment result',
+  })
+  @ApiNotFoundResponse({ description: 'Appointment not found' })
+  @ApiBody({ type: UpdateAppointmentResultDto })
+  @ApiResponse({ type: AppointmentResultDto })
+  @ApiForbiddenResponse({ description: 'User is not in appointment ' })
+  @Roles('doctor')
+  @Patch('result')
+  async updateResult(
+    @Body() body: UpdateAppointmentResultDto,
+    @Req() req: Request,
+  ): Promise<AppointmentResultDto> {
+    const user = req.user!;
+    const { error, data } = await this.appointmentsService.updateResults(
+      body,
+      user.userId,
+    );
+    const exception = handleServiceError(error);
+    if (exception) throw exception;
+    if (!data)
+      throw new ServiceUnavailableException(
+        'Error updating appointment result',
+      );
+
+    return data;
+  }
+
   @ApiServiceUnavailableResponse({ description: 'Error declining appointment' })
   @ApiNotFoundResponse({ description: 'Appointment not found' })
   @Post('decline')

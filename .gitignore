@@ -3,3 +3,5 @@
 /coverage
 .env
 /dist
+/minio-data
+.env.docker

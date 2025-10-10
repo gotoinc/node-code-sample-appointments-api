@@ -4,6 +4,7 @@ import { PrismaService } from 'src/database/prisma.service';
 import { IUsersRepository } from './users.repository.interface';
 import { Injectable } from '@nestjs/common';
 import { UserEntity } from './entities/user.entity';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UsersRepository
@@ -53,5 +54,35 @@ export class UsersRepository
     const prisma = this.getClient(tx);
 
     return await prisma.user.findMany();
+  }
+
+  async update(id: number, user: UpdateUserDto, tx?: unknown): Promise<User> {
+    const prisma = this.getClient(tx);
+
+    return await prisma.user.update({
+      where: { id },
+      data: {
+        ...(user.first_name && { first_name: user.first_name }),
+        ...(user.last_name && { last_name: user.last_name }),
+        ...(user.email && { email: user.email }),
+        ...(user.avatar !== undefined && { avatar: user.avatar }),
+      },
+    });
+  }
+
+  async findById(id: number, tx?: unknown): Promise<User | null> {
+    const prisma = this.getClient(tx);
+
+    return await prisma.user.findUnique({
+      where: { id },
+    });
+  }
+
+  async remove(id: number, tx?: unknown): Promise<User> {
+    const prisma = this.getClient(tx);
+
+    return await prisma.user.delete({
+      where: { id },
+    });
   }
 }

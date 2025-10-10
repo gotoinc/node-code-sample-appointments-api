@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Inject,
   Param,
@@ -21,11 +22,13 @@ import { Request } from 'express';
 import { FromToQueryDto } from './dto/from-to-query.dto';
 import { TimeslotDto } from './dto/timeslot.dto';
 import {
+  ApiBody,
   ApiConflictResponse,
   ApiNotFoundResponse,
   ApiServiceUnavailableResponse,
 } from '@nestjs/swagger';
 import { CreateScheduleDto } from './dto/create-schedule.dto';
+import { DeleteTimeslotDto } from './dto/delete-timeslot.dto';
 
 @Controller('timeslots')
 export class TimeslotsController {
@@ -71,6 +74,26 @@ export class TimeslotsController {
     const exception = handleServiceError(error);
     if (exception) throw exception;
     if (!data) throw new ServiceUnavailableException('Error creating timeslot');
+
+    return data;
+  }
+
+  @ApiServiceUnavailableResponse({ description: 'Error creating schedule' })
+  @ApiNotFoundResponse({ description: 'Doctor not found' })
+  @ApiConflictResponse({ description: 'Timeslots collision' })
+  @ApiBody({ type: DeleteTimeslotDto })
+  @Roles('doctor')
+  @Delete('/:id')
+  async deleteDoctorTimeslot(
+    @Param() { id }: DeleteTimeslotDto,
+    @Req() req: Request,
+  ): Promise<{ message: string }> {
+    const user = req.user!;
+    const { error, data } = await this.timeslotsService.delete(id, user.userId);
+
+    const exception = handleServiceError(error);
+    if (exception) throw exception;
+    if (!data) throw new ServiceUnavailableException('Error deleting timeslot');
 
     return data;
   }
